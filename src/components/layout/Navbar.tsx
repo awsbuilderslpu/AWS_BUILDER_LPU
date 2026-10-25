@@ -8,6 +8,7 @@ import { Menu } from "lucide-react";
 import { siteConfig, navLinks } from "@/data/site";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/layout/Logo";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -65,8 +66,9 @@ export function Navbar() {
           })}
         </nav>
 
-        {/* Right: Sign in CTA (Desktop) */}
-        <div className="hidden items-center lg:flex">
+        {/* Right: Actions (Desktop) */}
+        <div className="hidden items-center gap-3 lg:flex">
+          <NotificationBell />
           <Button
             asChild
             variant="outlineOrange"
@@ -78,8 +80,9 @@ export function Navbar() {
           </Button>
         </div>
 
-        {/* Mobile: Hamburger Button and Sheet */}
-        <div className="flex items-center lg:hidden">
+        {/* Mobile: Notification and Hamburger */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <NotificationBell />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button

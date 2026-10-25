@@ -5,6 +5,10 @@ import {
   Crown,
   User,
   Calendar,
+  Layers,
+  Cpu,
+  Code2,
+  GitPullRequest,
 } from "lucide-react";
 import type { StatItem } from "@/components/ui/StatsRow";
 
@@ -27,4 +31,11 @@ export const memberStats: StatItem[] = [
   { value: "15+", label: "Core Team", icon: Crown },
   { value: "10+", label: "Mentors & Experts", icon: User },
   { value: "20+", label: "Events Together", icon: Calendar },
+];
+
+export const projectStats: StatItem[] = [
+  { value: "24+", label: "Projects Shipped", icon: Layers },
+  { value: "12+", label: "AWS Services", icon: Cpu },
+  { value: "50+", label: "Student Builders", icon: Code2 },
+  { value: "100%", label: "Open Source", icon: GitPullRequest },
 ];
