@@ -15,6 +15,7 @@ export interface Project {
   title: string;
   description: string;
   category: "Serverless" | "AI & ML" | "Cloud Infrastructure" | "DevOps & CI/CD";
+  image?: string;
   awsServices: string[];
   techStack: string[];
   status: ProjectStatus;
@@ -48,6 +49,7 @@ export const projects: Project[] = [
     description:
       "Serverless event check-in system engineered for campus tech symposiums. Handles concurrent QR ticket validation with sub-100ms DynamoDB single-digit latency and live CloudWatch telemetry.",
     category: "Serverless",
+    image: "/images/projects/cloudpulse-attendance.jpg",
     awsServices: ["AWS Lambda", "Amazon DynamoDB", "Amazon API Gateway", "Amazon S3"],
     techStack: ["Next.js", "TypeScript", "Tailwind CSS", "AWS CDK"],
     status: "Live",
@@ -64,6 +66,7 @@ export const projects: Project[] = [
     description:
       "Enterprise Retrieval-Augmented Generation (RAG) assistant running on Amazon Bedrock (Claude 3.5 Sonnet) and OpenSearch Serverless. Answers student queries across syllabi, labs, and cloud club guides.",
     category: "AI & ML",
+    image: "/images/projects/nimbusbot-bedrock.jpg",
     awsServices: ["Amazon Bedrock", "OpenSearch Serverless", "AWS Lambda", "Amazon S3"],
     techStack: ["Python", "LangChain", "FastAPI", "React"],
     status: "Live",
@@ -79,6 +82,7 @@ export const projects: Project[] = [
     description:
       "Autonomous infrastructure controller monitoring spot termination notices to gracefully drain workloads, checkpoint state, and spin up replacement capacity, trimming dev compute bills by 68%.",
     category: "DevOps & CI/CD",
+    image: "/images/projects/autoscaler-x.jpg",
     awsServices: ["Amazon EC2 Spot", "AWS Auto Scaling", "Amazon CloudWatch", "Amazon SNS"],
     techStack: ["Go", "Docker", "Terraform", "Prometheus"],
     status: "Open Source",
@@ -94,6 +98,7 @@ export const projects: Project[] = [
     description:
       "Declarative Kubernetes cluster scaffolding with ArgoCD, AWS Load Balancer Controller, and external-secrets integration for automated student team microservice deployments.",
     category: "Cloud Infrastructure",
+    image: "/images/projects/kubeforge-eks.jpg",
     awsServices: ["Amazon EKS", "AWS IAM Roles for Service Accounts (IRSA)", "Amazon ECR", "AWS Secrets Manager"],
     techStack: ["Kubernetes", "Helm", "ArgoCD", "Terraform"],
     status: "Live",
@@ -108,6 +113,7 @@ export const projects: Project[] = [
     description:
       "Developer-friendly CLI tool that provisions dedicated S3 static hosting, CloudFront CDN edge distribution, and automated Route 53 DNS with free ACM SSL certificates in under two minutes.",
     category: "Serverless",
+    image: "/images/projects/serverless-forge.jpg",
     awsServices: ["Amazon S3", "Amazon CloudFront", "Amazon Route 53", "AWS Certificate Manager"],
     techStack: ["Node.js", "TypeScript", "AWS SDK v3"],
     status: "Open Source",
@@ -122,6 +128,7 @@ export const projects: Project[] = [
     description:
       "High-throughput time-series telemetry pipeline ingesting air quality, temperature, and noise sensors across campus labs with real-time alerting via Amazon EventBridge and SNS.",
     category: "Cloud Infrastructure",
+    image: "/images/projects/ecostream-iot.jpg",
     awsServices: ["AWS IoT Core", "Amazon Kinesis", "Amazon Timestream", "Amazon SNS"],
     techStack: ["Python", "MQTT", "Grafana", "ESP32"],
     status: "In Development",
@@ -136,6 +143,7 @@ export const projects: Project[] = [
     description:
       "Serverless intelligent document processing pipeline utilizing Amazon Textract and AWS Step Functions to validate student event certificates and transcript submissions.",
     category: "AI & ML",
+    image: "/images/projects/docuextract-ocr.jpg",
     awsServices: ["Amazon Textract", "AWS Step Functions", "Amazon S3", "AWS Lambda"],
     techStack: ["Python", "Boto3", "Next.js"],
     status: "Live",
@@ -151,6 +159,7 @@ export const projects: Project[] = [
     description:
       "Lightweight compliance audit bot scanning AWS student accounts for wildcard administrative permissions, inactive API keys, and unencrypted S3 buckets, alerting via Discord webhooks.",
     category: "DevOps & CI/CD",
+    image: "/images/projects/secureguard-iam.jpg",
     awsServices: ["AWS IAM", "AWS Config", "AWS CloudTrail", "AWS Lambda"],
     techStack: ["Python", "Discord API", "Boto3"],
     status: "Open Source",
