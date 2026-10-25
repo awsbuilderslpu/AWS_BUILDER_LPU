@@ -41,10 +41,10 @@ export function Footer() {
   return (
     <footer className="relative z-10 w-full border-t border-border bg-transparent text-foreground">
       <div className="mx-auto w-full max-w-[1400px] px-4 pt-16 pb-8 sm:px-6 lg:px-8">
-        {/* 5-Column Grid with thin vertical dividers on lg */}
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5 lg:gap-0">
+        {/* Grid: 2-column on mobile, 5-column on lg */}
+        <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:gap-x-12 lg:grid-cols-5 lg:gap-0">
           {/* Column 1: Logo, Description, Tagline, Socials */}
-          <div className="flex flex-col items-start lg:pr-8">
+          <div className="col-span-2 flex flex-col items-start lg:col-span-1 lg:pr-8">
             <Logo />
             <p className="mt-4 text-xs leading-relaxed text-muted-foreground sm:text-sm">
               {siteConfig.description}
@@ -83,7 +83,7 @@ export function Footer() {
           {footerLinks.map((group) => (
             <div
               key={group.title}
-              className="flex flex-col lg:border-l lg:border-border lg:pl-8"
+              className="col-span-1 flex flex-col lg:border-l lg:border-border lg:pl-8"
             >
               <div className="mb-4 flex items-center gap-2">
                 <h3 className="text-sm font-semibold tracking-wide text-foreground">
@@ -110,7 +110,7 @@ export function Footer() {
           ))}
 
           {/* Column 5: Contact Us */}
-          <div className="flex flex-col lg:border-l lg:border-border lg:pl-8">
+          <div className="col-span-1 flex flex-col lg:border-l lg:border-border lg:pl-8">
             <div className="mb-4 flex items-center gap-2">
               <h3 className="text-sm font-semibold tracking-wide text-foreground">
                 Contact Us
