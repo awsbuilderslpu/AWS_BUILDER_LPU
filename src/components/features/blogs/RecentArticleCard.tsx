@@ -39,7 +39,7 @@ export function RecentArticleCard({
 
       {/* Body: flex flex-1 flex-col px-3.5 pb-3.5 pt-3 */}
       <div className="flex flex-1 flex-col px-3.5 pb-3.5 pt-3">
-        <h3 className="text-[15px] font-semibold leading-[1.25] text-foreground line-clamp-2 min-h-[2.5em]">
+        <h3 className="text-[15px] font-semibold leading-[1.25] text-foreground transition-colors group-hover:text-primary line-clamp-2 min-h-[2.5em]">
           <Link
             href={post.href}
             className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded after:absolute after:inset-0"

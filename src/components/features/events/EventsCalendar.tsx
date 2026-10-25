@@ -109,9 +109,9 @@ export function EventsCalendar({ events, className }: EventsCalendarProps) {
             month: "w-full flex flex-col items-center",
             nav: "absolute top-0 inset-x-0 mx-auto w-[190px] h-8 flex items-center justify-between pointer-events-none z-10",
             button_previous:
-              "pointer-events-auto flex items-center justify-center size-7 text-muted-foreground hover:text-foreground transition-colors cursor-pointer",
+              "pointer-events-auto flex items-center justify-center size-7 text-muted-foreground hover:text-primary transition-colors cursor-pointer",
             button_next:
-              "pointer-events-auto flex items-center justify-center size-7 text-muted-foreground hover:text-foreground transition-colors cursor-pointer",
+              "pointer-events-auto flex items-center justify-center size-7 text-muted-foreground hover:text-primary transition-colors cursor-pointer",
             month_caption: "flex items-center justify-center h-8 w-full",
             caption_label:
               "text-sm font-medium uppercase text-foreground select-none",

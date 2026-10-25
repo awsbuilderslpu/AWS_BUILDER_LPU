@@ -99,7 +99,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-xs text-muted-foreground transition-colors duration-200 hover:text-foreground sm:text-sm"
+                      className="text-xs text-muted-foreground transition-colors duration-200 hover:text-primary sm:text-sm"
                     >
                       {link.label}
                     </Link>
@@ -136,7 +136,7 @@ export function Footer() {
                 <Mail className="size-4 shrink-0 text-primary" />
                 <a
                   href={`mailto:${siteConfig.email}`}
-                  className="transition-colors duration-200 hover:text-foreground"
+                  className="transition-colors duration-200 hover:text-primary"
                 >
                   {siteConfig.email}
                 </a>
@@ -149,7 +149,7 @@ export function Footer() {
                   href={`https://${siteConfig.website}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition-colors duration-200 hover:text-foreground"
+                  className="transition-colors duration-200 hover:text-primary"
                 >
                   {siteConfig.website}
                 </a>
@@ -182,7 +182,7 @@ export function Footer() {
               <React.Fragment key={link.label}>
                 <Link
                   href={link.href}
-                  className="transition-colors duration-200 hover:text-foreground"
+                  className="transition-colors duration-200 hover:text-primary"
                 >
                   {link.label}
                 </Link>

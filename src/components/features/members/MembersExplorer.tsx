@@ -131,7 +131,7 @@ export function MembersExplorer() {
                     "h-8 rounded-md border px-3 text-[13px] transition-colors cursor-pointer select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background",
                     isPressed
                       ? "border-primary bg-primary/10 text-primary font-medium"
-                      : "border-border bg-card/40 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                      : "border-border bg-card/40 text-muted-foreground hover:border-primary/50 hover:text-primary"
                   )}
                 >
                   {skill}

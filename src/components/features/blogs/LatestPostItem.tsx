@@ -40,7 +40,7 @@ export function LatestPostItem({
           {post.category}
         </CategoryBadge>
 
-        <h3 className="text-[15px] font-semibold leading-[1.2] text-foreground line-clamp-2">
+        <h3 className="text-[15px] font-semibold leading-[1.2] text-foreground transition-colors group-hover:text-primary line-clamp-2">
           <Link
             href={post.href}
             className="focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded after:absolute after:inset-0"

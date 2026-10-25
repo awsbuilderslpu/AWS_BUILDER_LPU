@@ -73,7 +73,7 @@ export function EventCard({ event, className, ...props }: EventCardProps) {
 
       {/* Body: flex flex-1 flex-col px-4 pb-5 pt-5 */}
       <div className="flex flex-1 flex-col px-4 pb-5 pt-5">
-        <h2 className="text-xl font-semibold leading-[1.25] text-foreground">
+        <h2 className="text-xl font-semibold leading-[1.25] text-foreground transition-colors group-hover:text-primary">
           <Link
             href={event.href}
             className="focus:outline-none after:absolute after:inset-0"

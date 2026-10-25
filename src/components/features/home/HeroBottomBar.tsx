@@ -21,13 +21,13 @@ export function HeroBottomBar({ className, ...props }: HeroBottomBarProps) {
       <div className="hidden sm:flex sm:items-center sm:gap-4">
         <a
           href="#cta"
-          className="group flex items-center gap-3.5 text-muted-foreground transition-colors hover:text-foreground"
+          className="group flex items-center gap-3.5 text-muted-foreground transition-colors hover:text-primary"
         >
           <Mouse
             aria-hidden="true"
-            className="size-7 stroke-[1.25] text-muted-foreground transition-colors group-hover:text-foreground"
+            className="size-7 stroke-[1.25] text-muted-foreground transition-colors group-hover:text-primary"
           />
-          <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-muted-foreground transition-colors group-hover:text-foreground">
+          <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-muted-foreground transition-colors group-hover:text-primary">
             SCROLL TO EXPLORE
           </span>
         </a>

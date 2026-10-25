@@ -42,7 +42,7 @@ export function FilterChips({
                 ? variant === "outline"
                   ? "border-primary text-primary bg-primary/10 font-medium shadow-[0_0_12px_color-mix(in_srgb,var(--primary)_20%,transparent)]"
                   : "bg-primary text-background font-semibold border-primary hover:bg-primary-hover"
-                : "border-border bg-card/40 text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                : "border-border bg-card/40 text-muted-foreground hover:border-primary/50 hover:text-primary"
             )}
           >
             {option}

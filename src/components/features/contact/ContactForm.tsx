@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { ChevronDown, Loader2, Check } from "lucide-react";
+import { ChevronDown, Loader2, Check, UploadCloud, FileText, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { FormField } from "@/components/ui/FormField";
 import { fieldClass } from "@/components/ui/formStyles";
 import { Button } from "@/components/ui/button";
 import { contactCopy, formSubjects, messageLimits } from "@/data/contact";
+import { siteConfig } from "@/data/site";
 import {
   type ContactField,
   type ContactValues,
@@ -15,11 +16,15 @@ import {
   validateField,
   validateContact,
   submitContact,
+  validateResumeFile,
 } from "@/lib/contact";
 
 const initialValues: ContactValues = {
   name: "",
   email: "",
+  phone: "",
+  registrationNumber: "",
+  university: siteConfig.university,
   subject: "",
   message: "",
 };
@@ -27,6 +32,12 @@ const initialValues: ContactValues = {
 export function ContactForm() {
   const [values, setValues] = React.useState<ContactValues>(initialValues);
   const [errors, setErrors] = React.useState<ContactErrors>({});
+  const [resumeFile, setResumeFile] = React.useState<File | null>(null);
+  const [resumeError, setResumeError] = React.useState<string | undefined>(
+    undefined
+  );
+  const [isDragging, setIsDragging] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [status, setStatus] = React.useState<
     "idle" | "submitting" | "success" | "failed"
   >("idle");
@@ -61,6 +72,41 @@ export function ContactForm() {
     }
   };
 
+  const handleFileChange = (file: File | null) => {
+    if (!file) {
+      setResumeFile(null);
+      setResumeError(undefined);
+      return;
+    }
+
+    const error = validateResumeFile(file);
+    if (error) {
+      setResumeError(error);
+      setResumeFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } else {
+      setResumeError(undefined);
+      setResumeFile(file);
+    }
+  };
+
+  const handleRemoveFile = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setResumeFile(null);
+    setResumeError(undefined);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (status === "submitting") return;
@@ -69,7 +115,15 @@ export function ContactForm() {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
 
-      const fieldOrder: ContactField[] = ["name", "email", "subject", "message"];
+      const fieldOrder: ContactField[] = [
+        "name",
+        "email",
+        "phone",
+        "registrationNumber",
+        "university",
+        "subject",
+        "message",
+      ];
       const firstInvalid = fieldOrder.find((f) => validationErrors[f]);
       if (firstInvalid) {
         document.getElementById(`contact-${firstInvalid}`)?.focus();
@@ -77,8 +131,13 @@ export function ContactForm() {
       return;
     }
 
+    if (resumeError) {
+      document.getElementById("contact-resume-dropzone")?.focus();
+      return;
+    }
+
     setStatus("submitting");
-    const result = await submitContact(values);
+    const result = await submitContact(values, resumeFile);
     if (result.ok) {
       setStatus("success");
     } else {
@@ -89,6 +148,11 @@ export function ContactForm() {
   const handleReset = () => {
     setValues(initialValues);
     setErrors({});
+    setResumeFile(null);
+    setResumeError(undefined);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     setStatus("idle");
     setTimeout(() => {
       document.getElementById("contact-name")?.focus();
@@ -194,47 +258,211 @@ export function ContactForm() {
             </FormField>
           </div>
 
-          {/* Topic */}
-          <FormField
-            id="contact-subject"
-            label={contactCopy.fields.subject.label}
-            required
-            error={errors.subject}
-          >
-            <div className="relative">
-              <select
-                id="contact-subject"
-                name="subject"
-                value={values.subject}
-                onChange={(e) => handleChange("subject", e.target.value)}
-                aria-invalid={Boolean(errors.subject)}
-                aria-describedby={
-                  errors.subject ? "contact-subject-error" : undefined
+          {/* Row 2: Phone Number and Registration Number */}
+          <div className="grid gap-5 sm:grid-cols-2">
+            <FormField
+              id="contact-phone"
+              label={contactCopy.fields.phone.label}
+              required
+              error={errors.phone}
+            >
+              <input
+                id="contact-phone"
+                name="phone"
+                type="tel"
+                autoComplete="tel"
+                inputMode="tel"
+                value={values.phone}
+                onChange={(e) => handleChange("phone", e.target.value)}
+                placeholder={contactCopy.fields.phone.placeholder}
+                aria-invalid={Boolean(errors.phone)}
+                aria-describedby={errors.phone ? "contact-phone-error" : undefined}
+                className={cn(fieldClass, "h-11")}
+              />
+            </FormField>
+
+            <FormField
+              id="contact-registrationNumber"
+              label={contactCopy.fields.registrationNumber.label}
+              required
+              error={errors.registrationNumber}
+            >
+              <input
+                id="contact-registrationNumber"
+                name="registrationNumber"
+                type="text"
+                autoComplete="off"
+                value={values.registrationNumber}
+                onChange={(e) =>
+                  handleChange("registrationNumber", e.target.value)
                 }
+                placeholder={contactCopy.fields.registrationNumber.placeholder}
+                aria-invalid={Boolean(errors.registrationNumber)}
+                aria-describedby={
+                  errors.registrationNumber
+                    ? "contact-registrationNumber-error"
+                    : undefined
+                }
+                className={cn(fieldClass, "h-11")}
+              />
+            </FormField>
+          </div>
+
+          {/* Row 3: University and Topic */}
+          <div className="grid gap-5 sm:grid-cols-2">
+            <FormField
+              id="contact-university"
+              label={contactCopy.fields.university.label}
+              required
+              error={errors.university}
+            >
+              <input
+                id="contact-university"
+                name="university"
+                type="text"
+                autoComplete="organization"
+                value={values.university}
+                onChange={(e) => handleChange("university", e.target.value)}
+                placeholder={contactCopy.fields.university.placeholder}
+                aria-invalid={Boolean(errors.university)}
+                aria-describedby={
+                  errors.university ? "contact-university-error" : undefined
+                }
+                className={cn(fieldClass, "h-11")}
+              />
+            </FormField>
+
+            <FormField
+              id="contact-subject"
+              label={contactCopy.fields.subject.label}
+              required
+              error={errors.subject}
+            >
+              <div className="relative">
+                <select
+                  id="contact-subject"
+                  name="subject"
+                  value={values.subject}
+                  onChange={(e) => handleChange("subject", e.target.value)}
+                  aria-invalid={Boolean(errors.subject)}
+                  aria-describedby={
+                    errors.subject ? "contact-subject-error" : undefined
+                  }
+                  className={cn(
+                    fieldClass,
+                    "h-11 appearance-none pr-10 [color-scheme:dark] cursor-pointer",
+                    values.subject === ""
+                      ? "text-muted-foreground"
+                      : "text-foreground"
+                  )}
+                >
+                  <option value="" disabled>
+                    {contactCopy.fields.subject.placeholder}
+                  </option>
+                  {formSubjects.map((sub) => (
+                    <option
+                      key={sub}
+                      value={sub}
+                      className="bg-card text-foreground"
+                    >
+                      {sub}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                  aria-hidden="true"
+                />
+              </div>
+            </FormField>
+          </div>
+
+          {/* Row 4: Resume / CV Upload */}
+          <FormField
+            id="contact-resume"
+            label={contactCopy.fields.resume.label}
+            error={resumeError}
+          >
+            <input
+              ref={fileInputRef}
+              id="contact-resume"
+              type="file"
+              accept=".pdf,.doc,.docx"
+              className="sr-only"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                handleFileChange(file);
+              }}
+            />
+
+            {resumeFile ? (
+              <div className="flex items-center justify-between rounded-lg border border-primary/40 bg-card/80 p-3.5 transition-all">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-primary/30 bg-primary/10 text-primary">
+                    <FileText className="size-5" />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="truncate text-sm font-medium text-foreground">
+                      {resumeFile.name}
+                    </span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {formatFileSize(resumeFile.size)}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleRemoveFile}
+                  aria-label="Remove resume"
+                  className="ml-3 flex size-8 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground cursor-pointer"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+            ) : (
+              <div
+                id="contact-resume-dropzone"
+                tabIndex={0}
+                role="button"
+                aria-label="Upload resume"
+                onClick={() => fileInputRef.current?.click()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    fileInputRef.current?.click();
+                  }
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsDragging(false);
+                  const file = e.dataTransfer.files?.[0] || null;
+                  handleFileChange(file);
+                }}
                 className={cn(
-                  fieldClass,
-                  "h-11 appearance-none pr-10 [color-scheme:dark] cursor-pointer",
-                  values.subject === "" ? "text-muted-foreground" : "text-foreground"
+                  "group flex flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center transition-all cursor-pointer select-none",
+                  isDragging
+                    ? "border-primary bg-primary/10 shadow-[0_0_15px_rgba(255,153,0,0.15)]"
+                    : "border-border bg-card/40 hover:border-primary/50 hover:bg-card/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 )}
               >
-                <option value="" disabled>
-                  {contactCopy.fields.subject.placeholder}
-                </option>
-                {formSubjects.map((sub) => (
-                  <option
-                    key={sub}
-                    value={sub}
-                    className="bg-card text-foreground"
-                  >
-                    {sub}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                aria-hidden="true"
-              />
-            </div>
+                <div className="flex size-10 items-center justify-center rounded-full border border-border bg-muted/60 text-muted-foreground transition-colors group-hover:border-primary/40 group-hover:text-primary">
+                  <UploadCloud className="size-5" />
+                </div>
+                <div className="mt-2.5 text-sm font-medium text-foreground">
+                  <span className="text-primary hover:underline">Click to upload</span>{" "}
+                  or drag and drop your resume
+                </div>
+                <p className="mt-1 font-mono text-xs text-muted-foreground">
+                  {contactCopy.fields.resume.hint}
+                </p>
+              </div>
+            )}
           </FormField>
 
           {/* Message */}

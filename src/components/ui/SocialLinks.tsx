@@ -42,7 +42,7 @@ export function SocialLinks({ className, ...props }: SocialLinksProps) {
             aria-label={social.name}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-muted-foreground transition-colors duration-200 hover:text-foreground"
+            className="text-muted-foreground transition-colors duration-200 hover:text-primary"
           >
             <IconComponent className="size-[18px]" />
           </a>

@@ -61,7 +61,7 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
               href="https://awslpu.in"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 transition-colors hover:text-primary"
             >
               <Link2 className="size-3.5 text-primary" />
               <span>https://awslpu.in</span>
@@ -70,7 +70,7 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
               href="https://www.instagram.com/awsbuilders.lpu/"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 transition-colors hover:text-primary"
             >
               <FaInstagram className="size-3.5 text-primary" />
               <span>awsbuilders.lpu</span>
@@ -79,7 +79,7 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
               href="https://www.linkedin.com/company/awsbuilderslpu"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 transition-colors hover:text-primary"
             >
               <FaLinkedinIn className="size-3.5 text-primary" />
               <span>company/awsbuilderslpu</span>
@@ -88,7 +88,7 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
               href="https://github.com/awsbuilderslpu"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 transition-colors hover:text-primary"
             >
               <FaGithub className="size-3.5 text-primary" />
               <span>awsbuilderslpu</span>
@@ -97,7 +97,7 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
               href="https://discord.com/channels/1093195608409510009/1204396903605993472"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 transition-colors hover:text-primary"
             >
               <FaDiscord className="size-3.5 text-primary" />
               <span>Discord</span>
@@ -106,14 +106,14 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
               href="https://www.youtube.com/@AWSCloudCommunityLPU"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 transition-colors hover:text-primary"
             >
               <FaYoutube className="size-3.5 text-primary" />
               <span>YouTube</span>
             </a>
             <a
               href={`mailto:${siteConfig.email}`}
-              className="flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 transition-colors hover:text-primary"
             >
               <Mail className="size-3.5 text-primary" />
               <span>{siteConfig.email}</span>

@@ -77,13 +77,32 @@ export const contactCopy = {
   fields: {
     name: { label: "Name", placeholder: "Your name" },
     email: { label: "Email", placeholder: "you@example.com" },
+    phone: { label: "Phone Number", placeholder: "+91 98765 43210" },
+    registrationNumber: {
+      label: "Registration Number",
+      placeholder: "e.g. 12201234",
+    },
+    university: {
+      label: "University",
+      placeholder: "Lovely Professional University",
+    },
     subject: { label: "Topic", placeholder: "Select a topic" },
+    resume: {
+      label: "Resume / CV",
+      placeholder: "Upload your resume",
+      hint: "PDF, DOC, or DOCX (Max 5MB)",
+    },
     message: { label: "Message", placeholder: "Tell us how we can help..." },
   },
   errors: {
     name: "Please enter your name.",
     email: "Please enter a valid email address.",
+    phone: "Please enter a valid phone number.",
+    registrationNumber: "Please enter your registration number.",
+    university: "Please enter your university name.",
     subject: "Please choose a topic.",
+    resumeSize: "Resume file size must be less than 5MB.",
+    resumeType: "Please upload a valid PDF, DOC, or DOCX file.",
     message: `Please write at least ${messageLimits.min} characters.`,
   },
   submit: "Send Message",

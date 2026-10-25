@@ -68,8 +68,8 @@ const defaultSocials: MemberSocials = {
 
 export const members: Member[] = [
   {
-    slug: "md-arfaa-taj",
-    name: "MD ARFAA TAJ",
+    slug: "shashank",
+    name: "Shashank",
     role: "Club Lead",
     focus: `${siteConfig.name} ${siteConfig.org}`,
     group: "core",
@@ -77,8 +77,8 @@ export const members: Member[] = [
     socials: defaultSocials,
   },
   {
-    slug: "sneha-sharma",
-    name: "Sneha Sharma",
+    slug: "md-arfaa",
+    name: "MD ARFAA",
     role: "Technical Lead",
     focus: "Cloud & DevOps",
     group: "core",
