@@ -11,6 +11,7 @@ export interface StatItem {
 export interface StatsRowProps extends React.HTMLAttributes<HTMLDivElement> {
   stats: StatItem[];
   variant?: "plain" | "boxed";
+  size?: "md" | "sm";
   action?: React.ReactNode;
   className?: string;
 }
@@ -18,15 +19,18 @@ export interface StatsRowProps extends React.HTMLAttributes<HTMLDivElement> {
 export function StatsRow({
   stats,
   variant = "plain",
+  size = "md",
   action,
   className,
   ...props
 }: StatsRowProps) {
   if (variant === "boxed") {
+    const isSm = size === "sm";
     return (
       <div
         className={cn(
-          "w-full rounded-xl border border-border bg-card/60 p-5 sm:p-6 backdrop-blur-sm",
+          "w-full rounded-xl border border-border bg-card/60 backdrop-blur-sm",
+          isSm ? "p-5" : "p-5 sm:p-6",
           "flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8",
           className
         )}
@@ -39,19 +43,46 @@ export function StatsRow({
               <React.Fragment key={`${stat.label}-${idx}`}>
                 <div className="flex items-center gap-3.5 sm:gap-4">
                   {Icon && (
-                    <div className="flex size-10 shrink-0 items-center justify-center text-primary">
-                      <Icon className="size-8 stroke-[1.5]" />
+                    <div
+                      className={cn(
+                        "flex shrink-0 items-center justify-center text-primary",
+                        isSm ? "size-[34px]" : "size-10"
+                      )}
+                    >
+                      <Icon
+                        className={cn(
+                          "stroke-[1.5]",
+                          isSm ? "size-[34px]" : "size-8"
+                        )}
+                      />
                     </div>
                   )}
                   <div className="flex flex-col">
-                    <span className="text-xl font-bold text-foreground leading-tight sm:text-2xl lg:text-[28px]">
+                    <span
+                      className={cn(
+                        "text-foreground leading-tight",
+                        isSm
+                          ? "text-[24px] font-semibold"
+                          : "text-xl font-bold sm:text-2xl lg:text-[28px]"
+                      )}
+                    >
                       {stat.value === "∞" ? (
-                        <InfinityIcon className="size-7 text-primary" />
+                        <InfinityIcon
+                          className={cn(
+                            "text-primary",
+                            isSm ? "size-6" : "size-7"
+                          )}
+                        />
                       ) : (
                         stat.value
                       )}
                     </span>
-                    <span className="text-xs text-muted-foreground sm:text-sm mt-0.5 whitespace-nowrap">
+                    <span
+                      className={cn(
+                        "text-muted-foreground mt-0.5 whitespace-nowrap",
+                        isSm ? "text-[13px]" : "text-xs sm:text-sm"
+                      )}
+                    >
                       {stat.label}
                     </span>
                   </div>
@@ -59,7 +90,10 @@ export function StatsRow({
                 {idx < stats.length - 1 && (
                   <div
                     aria-hidden="true"
-                    className="hidden h-12 w-px bg-border lg:block"
+                    className={cn(
+                      "hidden w-px bg-border lg:block",
+                      isSm ? "h-10" : "h-12"
+                    )}
                   />
                 )}
               </React.Fragment>

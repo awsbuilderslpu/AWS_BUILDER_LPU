@@ -1,0 +1,41 @@
+import * as React from "react";
+import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
+import { PageHeading } from "@/components/ui/PageHeading";
+import { StatsRow } from "@/components/ui/StatsRow";
+import { memberStats } from "@/data/stats";
+import { membersHeading, membersIntro } from "@/data/members";
+import { MembersDecor } from "@/components/features/members/MembersDecor";
+import { MembersExplorer } from "@/components/features/members/MembersExplorer";
+
+export function MembersSection() {
+  return (
+    <section className="relative overflow-hidden pb-12">
+      <MembersDecor />
+
+      {/* Header */}
+      <div className="relative z-10 w-full px-6 pt-7 xl:pl-[12.3%]">
+        <SectionEyebrow lines="both">Our Members</SectionEyebrow>
+        <PageHeading
+          as="h1"
+          size="md"
+          lines={membersHeading}
+          className="mt-3"
+        />
+        <p className="mt-2 text-base leading-6 text-muted-foreground max-w-[clamp(300px,26.6vw,445px)]">
+          {membersIntro}
+        </p>
+      </div>
+
+      {/* Main wrapper */}
+      <div className="relative z-10 mt-3 w-full px-6 xl:pl-[10.2%] xl:pr-[7.7%]">
+        <StatsRow
+          variant="boxed"
+          size="sm"
+          stats={memberStats}
+          className="px-8 py-5 xl:w-[clamp(620px,48.6vw,812px)]"
+        />
+        <MembersExplorer />
+      </div>
+    </section>
+  );
+}

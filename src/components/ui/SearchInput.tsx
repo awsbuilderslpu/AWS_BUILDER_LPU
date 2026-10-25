@@ -20,7 +20,7 @@ export function SearchInput({
   className,
 }: SearchInputProps) {
   return (
-    <div className={cn("relative w-full", className)}>
+    <div className={cn("relative h-10 w-full", className)}>
       <Search
         aria-hidden="true"
         className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
@@ -32,7 +32,7 @@ export function SearchInput({
         placeholder={placeholder}
         aria-label={ariaLabel}
         className={cn(
-          "h-10 w-full rounded-lg border border-border bg-card/40 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground",
+          "h-full w-full rounded-lg border border-border bg-card/40 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground",
           "transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         )}
       />

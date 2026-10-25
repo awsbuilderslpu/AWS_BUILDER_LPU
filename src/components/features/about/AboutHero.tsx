@@ -20,6 +20,7 @@ import {
   aboutPillars,
   aboutQuote,
 } from "@/data/about";
+import { siteConfig } from "@/data/site";
 
 export interface AboutHeroProps extends React.HTMLAttributes<HTMLElement> {
   className?: string;
@@ -111,11 +112,11 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
               <span>YouTube</span>
             </a>
             <a
-              href="mailto:awsbuilders.lpu@gmail.com"
+              href={`mailto:${siteConfig.email}`}
               className="flex items-center gap-1.5 transition-colors hover:text-foreground"
             >
               <Mail className="size-3.5 text-primary" />
-              <span>awsbuilders.lpu@gmail.com</span>
+              <span>{siteConfig.email}</span>
             </a>
           </div>
 

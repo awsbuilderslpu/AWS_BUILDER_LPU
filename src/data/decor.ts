@@ -6,6 +6,7 @@ export interface SharedLabels {
   ideasDeploy: string[];
   communityTech: string[];
   realSkills: string[];
+  studentsCollab: string[];
 }
 
 export const sharedLabels: SharedLabels = {
@@ -22,4 +23,5 @@ export const sharedLabels: SharedLabels = {
     "Tomorrow",
   ],
   realSkills: ["Real skills", "Real people", "Real impact", "At LPU"],
+  studentsCollab: ["Students", "Ideas", "Collaboration", "Impact"],
 };
