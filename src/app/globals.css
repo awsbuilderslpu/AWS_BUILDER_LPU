@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+:root {
+  /* Core Theme Tokens */
+  --background: #050B18;
+  --foreground: #FFFFFF;
+
+  /* Card Surfaces & Borders */
+  --card: #081226;
+  --card-foreground: #FFFFFF;
+  --card-border: #162846;
+
+  /* Brand Accents */
+  --primary: #FF9900;
+  --primary-foreground: #050B18;
+  --primary-hover: #E68A00;
+
+  --accent: #2F8CFF;
+  --accent-foreground: #FFFFFF;
+  --accent-hover: #1A7BFA;
+
+  --success: #22C55E;
+  --success-foreground: #050B18;
+
+  /* Muted Text & Secondary Surfaces */
+  --muted: #0F1D38;
+  --muted-foreground: #A8B3C7;
+
+  /* UI Elements */
+  --border: #162846;
+  --input: #0B1730;
+  --ring: #FF9900;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-border: var(--card-border);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-hover: var(--accent-hover);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Specific AWS Brand palette */
+  --color-aws-navy: #050B18;
+  --color-aws-card: #081226;
+  --color-aws-card-border: #162846;
+  --color-aws-orange: #FF9900;
+  --color-aws-blue: #2F8CFF;
+  --color-aws-muted: #A8B3C7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}

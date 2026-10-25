@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 90" fill="#9D48FA">
+  <!-- Top Comb -->
+  <path d="M20 20 V0 H30 V10 H40 V0 H50 V10 H60 V0 H70 V20 Z" />
+  <!-- Bottom Comb -->
+  <path d="M20 70 H70 V90 H60 V80 H50 V90 H40 V80 H30 V90 H20 Z" />
+  <!-- Left Comb -->
+  <path d="M20 20 V70 H0 V60 H10 V50 H0 V40 H10 V30 H0 V20 Z" />
+  <!-- Right Comb -->
+  <path d="M70 20 H90 V30 H80 V40 H90 V50 H80 V60 H90 V70 H70 Z" />
+</svg>
