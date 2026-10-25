@@ -59,8 +59,7 @@ export function getDefaultMonth(eventsList: EventItem[]): Date {
     eventsList.find((e) => e.status !== "past") || eventsList[0];
 
   if (!activeEvent) {
-    const now = new Date();
-    return new Date(now.getFullYear(), now.getMonth(), 1);
+    return new Date(2026, 0, 1);
   }
 
   const d = parseISODate(activeEvent.startDate);

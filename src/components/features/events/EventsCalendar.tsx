@@ -15,6 +15,12 @@ export interface EventsCalendarProps {
 }
 
 export function EventsCalendar({ events, className }: EventsCalendarProps) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [month, setMonth] = React.useState<Date>(() => getDefaultMonth(events));
 
   const { workshop, hackathon, talk, other } = React.useMemo(() => {
@@ -22,6 +28,10 @@ export function EventsCalendar({ events, className }: EventsCalendarProps) {
     const h: Date[] = [];
     const t: Date[] = [];
     const o: Date[] = [];
+
+    if (!mounted) {
+      return { workshop: w, hackathon: h, talk: t, other: o };
+    }
 
     for (const event of events) {
       const days = expandEventDays(event);
@@ -37,7 +47,7 @@ export function EventsCalendar({ events, className }: EventsCalendarProps) {
     }
 
     return { workshop: w, hackathon: h, talk: t, other: o };
-  }, [events]);
+  }, [events, mounted]);
 
   return (
     <div
@@ -58,62 +68,68 @@ export function EventsCalendar({ events, className }: EventsCalendarProps) {
       </div>
 
       {/* DayPicker with month nav and styling via classNames */}
-      <DayPicker
-        month={month}
-        onMonthChange={setMonth}
-        showOutsideDays
-        formatters={{
-          formatCaption: (d) =>
-            `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`,
-          formatWeekdayName: (d) =>
-            ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()],
-        }}
-        labels={{
-          labelPrevious: () => "Previous month",
-          labelNext: () => "Next month",
-        }}
-        components={{
-          Chevron: ({ orientation }) =>
-            orientation === "left" ? (
-              <ChevronLeft className="size-4 shrink-0" aria-hidden="true" />
-            ) : (
-              <ChevronRight className="size-4 shrink-0" aria-hidden="true" />
-            ),
-        }}
-        modifiers={{
-          workshop,
-          hackathon,
-          talk,
-          other,
-        }}
-        modifiersClassNames={{
-          workshop: legendGroups[0].calendarDayClass,
-          hackathon: legendGroups[1].calendarDayClass,
-          talk: legendGroups[2].calendarDayClass,
-          other: legendGroups[3].calendarDayClass,
-        }}
-        classNames={{
-          root: "w-full",
-          months: "relative flex flex-col items-center w-full mt-5",
-          month: "w-full flex flex-col items-center",
-          nav: "absolute top-0 inset-x-0 mx-auto w-[190px] h-8 flex items-center justify-between pointer-events-none z-10",
-          button_previous:
-            "pointer-events-auto flex items-center justify-center size-7 text-muted-foreground hover:text-foreground transition-colors cursor-pointer",
-          button_next:
-            "pointer-events-auto flex items-center justify-center size-7 text-muted-foreground hover:text-foreground transition-colors cursor-pointer",
-          month_caption: "flex items-center justify-center h-8 w-full",
-          caption_label:
-            "text-sm font-medium uppercase text-foreground select-none",
-          month_grid: "w-full border-collapse mt-4",
-          weekdays: "grid grid-cols-7 mb-2 text-center w-full",
-          weekday: "text-xs text-muted-foreground font-normal",
-          weeks: "w-full flex flex-col gap-1",
-          week: "grid grid-cols-7 text-center items-center justify-items-center h-9 w-full",
-          day: "flex size-9 items-center justify-center text-sm text-foreground font-normal select-none",
-          outside: "opacity-20 text-muted-foreground pointer-events-none",
-          today: "",
-        }}
-      />
+      {mounted ? (
+        <DayPicker
+          month={month}
+          onMonthChange={setMonth}
+          showOutsideDays
+          formatters={{
+            formatCaption: (d) =>
+              `${MONTH_NAMES[d.getMonth()]} ${d.getFullYear()}`,
+            formatWeekdayName: (d) =>
+              ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()],
+          }}
+          labels={{
+            labelPrevious: () => "Previous month",
+            labelNext: () => "Next month",
+          }}
+          components={{
+            Chevron: ({ orientation }) =>
+              orientation === "left" ? (
+                <ChevronLeft className="size-4 shrink-0" aria-hidden="true" />
+              ) : (
+                <ChevronRight className="size-4 shrink-0" aria-hidden="true" />
+              ),
+          }}
+          modifiers={{
+            workshop,
+            hackathon,
+            talk,
+            other,
+          }}
+          modifiersClassNames={{
+            workshop: legendGroups[0].calendarDayClass,
+            hackathon: legendGroups[1].calendarDayClass,
+            talk: legendGroups[2].calendarDayClass,
+            other: legendGroups[3].calendarDayClass,
+          }}
+          classNames={{
+            root: "w-full",
+            months: "relative flex flex-col items-center w-full mt-5",
+            month: "w-full flex flex-col items-center",
+            nav: "absolute top-0 inset-x-0 mx-auto w-[190px] h-8 flex items-center justify-between pointer-events-none z-10",
+            button_previous:
+              "pointer-events-auto flex items-center justify-center size-7 text-muted-foreground hover:text-foreground transition-colors cursor-pointer",
+            button_next:
+              "pointer-events-auto flex items-center justify-center size-7 text-muted-foreground hover:text-foreground transition-colors cursor-pointer",
+            month_caption: "flex items-center justify-center h-8 w-full",
+            caption_label:
+              "text-sm font-medium uppercase text-foreground select-none",
+            month_grid: "w-full border-collapse mt-4",
+            weekdays: "grid grid-cols-7 mb-2 text-center w-full",
+            weekday: "text-xs text-muted-foreground font-normal",
+            weeks: "w-full flex flex-col gap-1",
+            week: "grid grid-cols-7 text-center items-center justify-items-center h-9 w-full",
+            day: "flex size-9 items-center justify-center text-sm text-foreground font-normal select-none",
+            outside: "opacity-20 text-muted-foreground pointer-events-none",
+            today: "",
+          }}
+        />
+      ) : (
+        <div className="flex min-h-[290px] w-full items-center justify-center">
+          <div className="size-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      )}
 
       {/* Legend at the bottom (mt-auto pt-4) */}
       <div className="mt-auto flex flex-wrap items-center gap-5 pt-4">
