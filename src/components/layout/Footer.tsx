@@ -99,6 +99,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
+                      scroll={link.href.startsWith("?") ? false : undefined}
                       className="text-xs text-muted-foreground transition-colors duration-200 hover:text-primary sm:text-sm"
                     >
                       {link.label}
@@ -182,6 +183,7 @@ export function Footer() {
               <React.Fragment key={link.label}>
                 <Link
                   href={link.href}
+                  scroll={link.href.startsWith("?") ? false : undefined}
                   className="transition-colors duration-200 hover:text-primary"
                 >
                   {link.label}

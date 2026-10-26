@@ -7,6 +7,7 @@ export interface SiteConfig {
   website: string;
   address: string;
   joinUrl: string;
+  signInUrl: string;
   description: string;
   tagline: string;
 }
@@ -40,7 +41,8 @@ export const siteConfig: SiteConfig = {
   email: "awsbuilders.lpu@gmail.com",
   website: "awslpu.in",
   address: "Lovely Professional University, Phagwara, Punjab, India",
-  joinUrl: "/contact", // TODO: real join form later
+  joinUrl: "?auth=register",
+  signInUrl: "?auth=signin",
   description:
     "Official student-led community for AWS Student Builder Group LPU. Building, learning, and scaling cloud-native systems.",
   tagline: "A stronger cloud community together.",
@@ -78,7 +80,7 @@ export const footerLinks: FooterLinkGroup[] = [
       { label: "Project Showcase", href: "/projects" },
       { label: "Cloud Guides", href: "#" },
       { label: "Career Opportunities", href: "#" },
-      { label: "Join the Club", href: "/contact" },
+      { label: "Join the Club", href: "?auth=register" },
     ],
   },
   {

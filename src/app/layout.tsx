@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
@@ -5,6 +6,7 @@ import { PageBackground } from "@/components/layout/PageBackground";
 import { Navbar } from "@/components/layout/Navbar";
 import { CTABanner } from "@/components/layout/CTABanner";
 import { Footer } from "@/components/layout/Footer";
+import { AuthModal } from "@/components/features/auth/AuthModal";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -48,6 +50,9 @@ export default function RootLayout({
           <main className="flex-1">{children}</main>
           <CTABanner />
           <Footer />
+          <Suspense fallback={null}>
+            <AuthModal />
+          </Suspense>
         </div>
       </body>
     </html>

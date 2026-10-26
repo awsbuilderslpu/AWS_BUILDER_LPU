@@ -36,7 +36,12 @@ export function JoinCard({ data, className }: JoinCardProps) {
               "border-primary/70 hover:border-primary text-foreground"
           )}
         >
-          <Link href={data.cta.href}>{data.cta.label}</Link>
+          <Link
+            href={data.cta.href}
+            scroll={data.cta.href.startsWith("?") ? false : undefined}
+          >
+            {data.cta.label}
+          </Link>
         </Button>
       </div>
     </div>

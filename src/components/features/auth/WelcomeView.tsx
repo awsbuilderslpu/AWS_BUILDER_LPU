@@ -1,0 +1,96 @@
+"use client";
+
+import * as React from "react";
+import { Mail } from "lucide-react";
+import { authCopy } from "@/data/auth";
+import { signInWithGoogle } from "@/lib/auth/service";
+import { GoogleButton } from "@/components/ui/GoogleButton";
+import { OrDivider } from "@/components/ui/OrDivider";
+import { Button } from "@/components/ui/button";
+import { AuthSwitchRow } from "@/components/features/auth/AuthSwitchRow";
+
+export interface WelcomeViewProps {
+  onUseEmail?: () => void;
+}
+
+export function WelcomeView({ onUseEmail }: WelcomeViewProps) {
+  const [googleError, setGoogleError] = React.useState<string | null>(null);
+  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
+
+  const headingRef = React.useRef<HTMLHeadingElement>(null);
+
+  React.useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
+
+  const handleGoogleClick = async () => {
+    setGoogleError(null);
+    setIsGoogleLoading(true);
+    try {
+      const res = await signInWithGoogle();
+      if (!res.ok) {
+        setGoogleError(res.error);
+      }
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-1 flex-col">
+      <AuthSwitchRow />
+
+      {/* Centered content block */}
+      <div className="mx-auto my-auto w-full max-w-[560px] py-6">
+        <h2
+          ref={headingRef}
+          id="auth-view-heading"
+          tabIndex={-1}
+          className="text-[clamp(26px,2.3vw,34px)] font-bold leading-[1.15] text-white tracking-tight outline-none"
+        >
+          {authCopy.welcome.title}
+        </h2>
+
+        <p className="mt-3 max-w-[460px] text-[16px] leading-[1.5] text-muted-foreground">
+          {authCopy.welcome.subtitle}
+        </p>
+
+        <div className="mt-8">
+          <GoogleButton
+            label={authCopy.welcome.google}
+            onClick={handleGoogleClick}
+            loading={isGoogleLoading}
+          />
+
+          {googleError && (
+            <div
+              role="alert"
+              className="mt-4 rounded-md border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-300"
+            >
+              {googleError}
+            </div>
+          )}
+
+          <OrDivider className="my-5" text={authCopy.welcome.divider} />
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onUseEmail}
+            className="h-12 w-full text-[15px] font-medium text-white hover:bg-white/5"
+          >
+            <Mail
+              className="size-5! text-muted-foreground shrink-0"
+              aria-hidden="true"
+            />
+            <span>{authCopy.welcome.email}</span>
+          </Button>
+        </div>
+
+        <p className="mt-8 mx-auto max-w-[420px] text-center text-[13.5px] italic text-muted-foreground leading-relaxed">
+          {authCopy.welcome.note}
+        </p>
+      </div>
+    </div>
+  );
+}

@@ -76,7 +76,7 @@ export function Navbar() {
             withArrow
             className="h-10 rounded-lg px-5 text-sm font-medium"
           >
-            <Link href={siteConfig.joinUrl}>Sign in</Link>
+            <Link href={siteConfig.signInUrl} scroll={false}>Sign in</Link>
           </Button>
         </div>
 
@@ -138,16 +138,28 @@ export function Navbar() {
               </div>
 
               {/* Mobile Drawer Footer CTA */}
-              <div className="pt-6">
+              <div className="flex flex-col gap-3 pt-6">
                 <Button
                   asChild
-                  variant="outlineOrange"
+                  variant="primary"
                   withArrow
                   className="w-full justify-center"
                   onClick={() => setIsOpen(false)}
                 >
-                  <Link href={siteConfig.joinUrl}>Sign in</Link>
+                  <Link href={siteConfig.joinUrl} scroll={false}>
+                    Join the Club
+                  </Link>
                 </Button>
+                <div className="text-center">
+                  <Link
+                    href={siteConfig.signInUrl}
+                    scroll={false}
+                    onClick={() => setIsOpen(false)}
+                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    Sign in
+                  </Link>
+                </div>
               </div>
             </SheetContent>
           </Sheet>

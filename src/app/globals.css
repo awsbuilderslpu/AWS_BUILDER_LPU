@@ -22,6 +22,9 @@
   --success: #22C55E;
   --success-foreground: #050B18;
 
+  --violet: #A855F7;
+  --violet-foreground: #050B18;
+
   /* Muted Text & Secondary Surfaces */
   --muted: #0F1D38;
   --muted-foreground: #A8B3C7;
@@ -54,6 +57,9 @@
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
 
+  --color-violet: var(--violet);
+  --color-violet-foreground: var(--violet-foreground);
+
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
 
@@ -79,5 +85,28 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   min-height: 100vh;
+}
+
+/* Thin dark scrollbar for auth modal right panel */
+.auth-scrollable {
+  scrollbar-width: thin;
+  scrollbar-color: var(--card-border) transparent;
+}
+
+.auth-scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.auth-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.auth-scrollable::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 9999px;
+}
+
+.auth-scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(168, 179, 199, 0.4);
 }
 

@@ -69,7 +69,9 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
               size="lg"
               className="font-medium"
             >
-              <Link href={siteConfig.joinUrl}>Join the Club</Link>
+              <Link href={siteConfig.joinUrl} scroll={false}>
+                Join the Club
+              </Link>
             </Button>
           </div>
 

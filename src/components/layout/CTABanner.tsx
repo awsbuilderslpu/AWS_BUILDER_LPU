@@ -78,7 +78,9 @@ export function CTABanner() {
                   size="default"
                   className="rounded-md font-semibold text-sm px-6 h-11"
                 >
-                  <Link href={siteConfig.joinUrl}>Join the Club</Link>
+                  <Link href={siteConfig.joinUrl} scroll={false}>
+                    Join the Club
+                  </Link>
                 </Button>
                 <Button
                   asChild
