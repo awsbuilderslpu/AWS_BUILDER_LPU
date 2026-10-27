@@ -3,8 +3,7 @@
 import * as React from "react";
 import { Mail } from "lucide-react";
 import { authCopy } from "@/data/auth";
-import { signInWithGoogle } from "@/lib/auth/service";
-import { GoogleButton } from "@/components/ui/GoogleButton";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { OrDivider } from "@/components/ui/OrDivider";
 import { Button } from "@/components/ui/button";
 import { AuthSwitchRow } from "@/components/features/auth/AuthSwitchRow";
@@ -14,27 +13,11 @@ export interface WelcomeViewProps {
 }
 
 export function WelcomeView({ onUseEmail }: WelcomeViewProps) {
-  const [googleError, setGoogleError] = React.useState<string | null>(null);
-  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
-
   const headingRef = React.useRef<HTMLHeadingElement>(null);
 
   React.useEffect(() => {
     headingRef.current?.focus();
   }, []);
-
-  const handleGoogleClick = async () => {
-    setGoogleError(null);
-    setIsGoogleLoading(true);
-    try {
-      const res = await signInWithGoogle();
-      if (!res.ok) {
-        setGoogleError(res.error);
-      }
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  };
 
   return (
     <div className="flex flex-1 flex-col">
@@ -56,20 +39,9 @@ export function WelcomeView({ onUseEmail }: WelcomeViewProps) {
         </p>
 
         <div className="mt-8">
-          <GoogleButton
-            label={authCopy.welcome.google}
-            onClick={handleGoogleClick}
-            loading={isGoogleLoading}
-          />
-
-          {googleError && (
-            <div
-              role="alert"
-              className="mt-4 rounded-md border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-300"
-            >
-              {googleError}
-            </div>
-          )}
+          <GoogleSignInButton redirectTo="/members">
+            {authCopy.welcome.google}
+          </GoogleSignInButton>
 
           <OrDivider className="my-5" text={authCopy.welcome.divider} />
 

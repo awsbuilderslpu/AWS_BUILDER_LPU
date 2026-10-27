@@ -7,10 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, Lock, Check, Loader2 } from "lucide-react";
 import { authCopy, authParam } from "@/data/auth";
 import { signInSchema, type SignInValues } from "@/lib/auth/schemas";
-import { signInWithGoogle, signInWithPassword } from "@/lib/auth/service";
+import { signInWithPassword } from "@/lib/auth/service";
 import { TextField } from "@/components/ui/TextField";
 import { PasswordField } from "@/components/ui/PasswordField";
-import { GoogleButton } from "@/components/ui/GoogleButton";
+import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { OrDivider } from "@/components/ui/OrDivider";
 import { Button } from "@/components/ui/button";
 
@@ -19,8 +19,6 @@ export function SignInView() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [googleError, setGoogleError] = React.useState<string | null>(null);
-  const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
   const [formError, setFormError] = React.useState<string | null>(null);
   const [showForgotNotice, setShowForgotNotice] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
@@ -48,19 +46,6 @@ export function SignInView() {
     const params = new URLSearchParams(searchParams.toString());
     params.set(authParam, "register");
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  };
-
-  const handleGoogleClick = async () => {
-    setGoogleError(null);
-    setIsGoogleLoading(true);
-    try {
-      const res = await signInWithGoogle();
-      if (!res.ok) {
-        setGoogleError(res.error);
-      }
-    } finally {
-      setIsGoogleLoading(false);
-    }
   };
 
   const {
@@ -112,20 +97,9 @@ export function SignInView() {
         </p>
 
         <div className="mt-5">
-          <GoogleButton
-            label={authCopy.welcome.google}
-            onClick={handleGoogleClick}
-            loading={isGoogleLoading}
-          />
-
-          {googleError && (
-            <div
-              role="alert"
-              className="mt-3 rounded-md border border-red-400/40 bg-red-400/10 px-4 py-2.5 text-sm text-red-300"
-            >
-              {googleError}
-            </div>
-          )}
+          <GoogleSignInButton redirectTo="/members">
+            {authCopy.welcome.google}
+          </GoogleSignInButton>
 
           <OrDivider className="my-4" text={authCopy.welcome.divider} />
         </div>
