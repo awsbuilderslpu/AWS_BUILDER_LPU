@@ -39,10 +39,10 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
 
     return (
       <div className="w-full">
-        <div className="mb-1.5 flex items-center justify-between">
+        <div className="mb-1 flex items-center justify-between">
           <label
             htmlFor={id}
-            className="block text-[13.5px] font-medium text-white"
+            className="block text-[12.5px] font-medium text-white"
           >
             {label}
             {required && (
@@ -56,7 +56,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
         <div className="relative flex items-center">
           {Icon && (
             <Icon
-              className="pointer-events-none absolute left-3.5 size-5 text-muted-foreground"
+              className="pointer-events-none absolute left-3 size-4 text-muted-foreground"
               aria-hidden="true"
             />
           )}
@@ -68,25 +68,25 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
             aria-describedby={describedBy}
             className={cn(
               fieldClass,
-              "h-11 bg-card/40 text-[14.5px] px-3.5 placeholder:text-muted-foreground",
-              Icon && "pl-11",
-              rightSlot && "pr-12",
+              "h-10 bg-card/40 text-[13px] px-3 placeholder:text-[12px] placeholder:text-muted-foreground/75",
+              Icon && "pl-9",
+              rightSlot && "pr-9",
               className
             )}
             {...props}
           />
           {rightSlot && (
-            <div className="absolute right-3.5 flex items-center">
+            <div className="absolute right-2.5 flex items-center">
               {rightSlot}
             </div>
           )}
         </div>
         {error ? (
-          <p id={errorId} role="alert" className="mt-1.5 text-[13px] text-red-400">
+          <p id={errorId} role="alert" className="mt-1 text-[12px] text-red-400">
             {error}
           </p>
         ) : hint ? (
-          <p id={hintId} className="mt-1.5 text-[13px] text-muted-foreground">
+          <p id={hintId} className="mt-1 text-[12px] text-muted-foreground">
             {hint}
           </p>
         ) : null}

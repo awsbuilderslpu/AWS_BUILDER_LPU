@@ -23,7 +23,7 @@ export function AuthSwitchRow({ className }: AuthSwitchRowProps) {
   return (
     <div
       className={cn(
-        "flex items-center justify-end gap-1.5 pr-12 text-[14px]",
+        "flex items-center justify-end gap-1.5 pr-9 text-[12.5px]",
         className
       )}
     >

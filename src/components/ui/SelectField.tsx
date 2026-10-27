@@ -47,7 +47,7 @@ export const SelectField = React.forwardRef<
       <div className="w-full">
         <label
           htmlFor={id}
-          className="mb-1.5 block text-[13.5px] font-medium text-white"
+          className="mb-1 block text-[12.5px] font-medium text-white"
         >
           {label}
           {required && (
@@ -65,7 +65,7 @@ export const SelectField = React.forwardRef<
             aria-describedby={describedBy}
             className={cn(
               fieldClass,
-              "h-11 appearance-none pl-4 pr-10 text-[14.5px] bg-card/40 [color-scheme:dark] invalid:text-muted-foreground cursor-pointer [&_option]:bg-card [&_option]:text-foreground",
+              "h-10 appearance-none pl-3 pr-8 text-[13px] bg-card/40 [color-scheme:dark] invalid:text-muted-foreground cursor-pointer [&_option]:bg-card [&_option]:text-foreground",
               className
             )}
             {...props}
@@ -82,7 +82,7 @@ export const SelectField = React.forwardRef<
             ))}
           </select>
           <ChevronDown
-            className="pointer-events-none absolute right-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
             aria-hidden="true"
           />
         </div>

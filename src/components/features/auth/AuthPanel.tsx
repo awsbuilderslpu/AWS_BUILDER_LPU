@@ -38,7 +38,7 @@ export function AuthPanel({ variant, className }: AuthPanelProps) {
   return (
     <div
       className={cn(
-        "relative hidden lg:flex flex-col overflow-hidden border-r border-border bg-card p-6 xl:p-8 select-none",
+        "relative hidden lg:flex flex-col overflow-hidden border-r border-border bg-card p-5 xl:p-6 select-none",
         className
       )}
     >
@@ -62,13 +62,13 @@ export function AuthPanel({ variant, className }: AuthPanelProps) {
       <div className="relative z-10 flex flex-1 flex-col">
         {/* Top: Logo + Tagline */}
         <div>
-          <Logo className="origin-left scale-100" />
-          <div className="mt-3 flex items-center gap-2.5 text-[11px] font-medium tracking-[0.14em] text-white uppercase">
+          <Logo className="origin-left scale-95" />
+          <div className="mt-2.5 flex items-center gap-2 text-[10.5px] font-medium tracking-[0.14em] text-white uppercase">
             {authCopy.panel.tagline.map((item, idx) => (
               <React.Fragment key={item}>
                 <span>{item}</span>
                 {idx < authCopy.panel.tagline.length - 1 && (
-                  <span className="h-2.5 w-px bg-white/20" aria-hidden="true" />
+                  <span className="h-2 w-px bg-white/20" aria-hidden="true" />
                 )}
               </React.Fragment>
             ))}
@@ -78,7 +78,7 @@ export function AuthPanel({ variant, className }: AuthPanelProps) {
         {/* Center content */}
         {variant === "welcome" ? (
           <div>
-            <h2 className="mt-5 text-[clamp(22px,2vw,28px)] font-bold leading-[1.12] text-white tracking-tight">
+            <h2 className="mt-4 text-[clamp(20px,1.8vw,25px)] font-bold leading-[1.12] text-white tracking-tight">
               <span>{authCopy.panel.welcomeHeading.line1}</span>
               <br />
               <span>{authCopy.panel.welcomeHeading.line2Prefix}</span>
@@ -87,29 +87,29 @@ export function AuthPanel({ variant, className }: AuthPanelProps) {
               </span>
             </h2>
 
-            <p className="mt-2 text-[13px] leading-[1.4] text-muted-foreground max-w-[340px]">
+            <p className="mt-1.5 text-[12.5px] leading-[1.4] text-muted-foreground max-w-[320px]">
               {authCopy.panel.welcomeText}
             </p>
 
-            <div className="mt-4 flex flex-col gap-2">
+            <div className="mt-3.5 flex flex-col gap-1.5">
               {authCopy.panel.benefits.map((b) => {
                 const Icon = b.icon;
                 const toneStyle = toneClasses[b.tone];
                 return (
-                  <div key={b.text} className="flex items-center gap-3">
+                  <div key={b.text} className="flex items-center gap-2.5">
                     <div
                       aria-hidden="true"
                       className={cn(
-                        "flex size-8 shrink-0 items-center justify-center rounded-lg border",
+                        "flex size-7 shrink-0 items-center justify-center rounded-lg border",
                         toneStyle.tile
                       )}
                     >
                       <Icon
-                        className={cn("size-4", toneStyle.icon)}
+                        className={cn("size-3.5", toneStyle.icon)}
                         strokeWidth={1.5}
                       />
                     </div>
-                    <span className="max-w-[250px] text-[12.5px] leading-[1.3] text-white font-normal">
+                    <span className="max-w-[240px] text-[12px] leading-[1.3] text-white font-normal">
                       {b.text}
                     </span>
                   </div>
@@ -119,7 +119,7 @@ export function AuthPanel({ variant, className }: AuthPanelProps) {
           </div>
         ) : (
           <div>
-            <h2 className="mt-6 text-[clamp(28px,2.8vw,38px)] font-bold leading-[1.1] text-white tracking-tight">
+            <h2 className="mt-4 text-[clamp(24px,2.4vw,32px)] font-bold leading-[1.1] text-white tracking-tight">
               {authCopy.panel.signinHeading.map((word, idx) => (
                 <span
                   key={word}
@@ -134,7 +134,7 @@ export function AuthPanel({ variant, className }: AuthPanelProps) {
               ))}
             </h2>
 
-            <div className="mt-4 flex flex-col text-[14px] font-medium uppercase tracking-[0.12em] text-accent leading-[1.4]">
+            <div className="mt-3.5 flex flex-col text-[13px] font-medium uppercase tracking-[0.12em] text-accent leading-[1.4]">
               {authCopy.panel.footerGroups[0].map((line) => (
                 <span key={line}>{line}</span>
               ))}

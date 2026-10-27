@@ -3,8 +3,8 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { User, Mail, IdCard, CalendarDays, Lock, Info } from "lucide-react";
-import { registrationCopy, countryCodes } from "@/data/registration";
+import { User, Mail, IdCard, CalendarDays, Lock, Info, AlertCircle } from "lucide-react";
+import { registrationCopy, registrationConstants, countryCodes } from "@/data/registration";
 import { basicInfoSchema, type BasicInfoValues } from "@/lib/auth/schemas";
 import { useRegistration } from "@/components/features/auth/RegistrationProvider";
 import { RegisterStepFrame } from "@/components/features/auth/RegisterStepFrame";
@@ -19,6 +19,14 @@ export function BasicInfoStep() {
   const [showRegInfo, setShowRegInfo] = React.useState(false);
 
   const emailInputRef = React.useRef<HTMLInputElement | null>(null);
+
+  const maxDateOfBirth = React.useMemo(() => {
+    const today = new Date();
+    const maxYear = today.getFullYear() - registrationConstants.minAge;
+    const m = String(today.getMonth() + 1).padStart(2, "0");
+    const d = String(today.getDate()).padStart(2, "0");
+    return `${maxYear}-${m}-${d}`;
+  }, []);
 
   const {
     register,
@@ -54,9 +62,8 @@ export function BasicInfoStep() {
     goToStep(2);
   };
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    void handleSubmit(onSubmit)(e);
+  const onInvalid = (formErrors: typeof errors) => {
+    console.warn("BasicInfoStep validation errors:", formErrors);
   };
 
   return (
@@ -66,8 +73,8 @@ export function BasicInfoStep() {
       subtitle={registrationCopy.basic.subtitle}
       autoFocusHeading={!state.focusEmail}
     >
-      <form noValidate onSubmit={handleFormSubmit} className="space-y-3.5">
-        <div className="grid gap-3 sm:grid-cols-2">
+      <form noValidate onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-2">
+        <div className="grid gap-2 sm:gap-2.5 sm:grid-cols-2">
           {/* First Name & Last Name */}
           <TextField
             label={registrationCopy.basic.fields.firstName.label}
@@ -151,6 +158,7 @@ export function BasicInfoStep() {
             autoComplete="bday"
             icon={CalendarDays}
             required
+            max={maxDateOfBirth}
             className="[color-scheme:dark]"
             error={errors.dateOfBirth?.message}
             {...register("dateOfBirth")}
@@ -181,7 +189,7 @@ export function BasicInfoStep() {
         </div>
 
         {/* Spanning full width: Password hint */}
-        <p className="text-[13px] text-muted-foreground">
+        <p className="text-[11.5px] leading-snug text-muted-foreground">
           {registrationCopy.basic.passwordHint}
         </p>
 
@@ -214,19 +222,29 @@ export function BasicInfoStep() {
           }
         />
 
+        {Object.keys(errors).length > 0 && (
+          <div
+            role="alert"
+            className="flex items-center gap-2 rounded-md border border-red-500/40 bg-red-500/10 px-3 py-2 text-[12px] text-red-300"
+          >
+            <AlertCircle className="size-4 shrink-0 text-red-400" />
+            <span>Please check and correct the highlighted fields above to continue.</span>
+          </div>
+        )}
+
         {/* Full-width Next Button */}
         <Button
           type="submit"
           variant="primary"
           withArrow
           disabled={isSubmitting}
-          className="h-11 w-full text-[14.5px] font-semibold"
+          className="h-10 w-full text-[13.5px] font-semibold"
         >
           Next
         </Button>
 
         {/* Below form note */}
-        <p className="mt-4 text-center text-[12.5px] italic text-muted-foreground leading-relaxed">
+        <p className="mt-2 text-center text-[11.5px] italic text-muted-foreground leading-relaxed">
           {registrationCopy.basic.note}
         </p>
       </form>

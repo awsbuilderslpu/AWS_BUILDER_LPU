@@ -82,45 +82,45 @@ export function SignInView() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="mx-auto my-auto w-full max-w-[520px] py-2 sm:py-3">
+      <div className="mx-auto my-auto w-full max-w-[460px] py-1 sm:py-2">
         <h2
           ref={headingRef}
           id="auth-view-heading"
           tabIndex={-1}
-          className="text-[clamp(22px,2vw,28px)] font-bold leading-[1.15] text-white tracking-tight outline-none"
+          className="text-[clamp(20px,1.8vw,25px)] font-bold leading-[1.15] text-white tracking-tight outline-none"
         >
           {authCopy.signin.title}
         </h2>
 
-        <p className="mt-1.5 max-w-[460px] text-[14px] leading-[1.45] text-muted-foreground">
+        <p className="mt-1 max-w-[420px] text-[13px] leading-[1.4] text-muted-foreground">
           {authCopy.signin.subtitle}
         </p>
 
-        <div className="mt-5">
+        <div className="mt-3.5">
           <GoogleSignInButton redirectTo="/members">
             {authCopy.welcome.google}
           </GoogleSignInButton>
 
-          <OrDivider className="my-4" text={authCopy.welcome.divider} />
+          <OrDivider className="my-3" text={authCopy.welcome.divider} />
         </div>
 
         {isSuccess ? (
           <div
             role="status"
-            className="flex flex-col items-center gap-4 py-8 text-center"
+            className="flex flex-col items-center gap-3.5 py-6 text-center"
           >
             <div
               aria-hidden="true"
-              className="flex size-12 shrink-0 items-center justify-center rounded-full border border-success/50 bg-success/10"
+              className="flex size-11 shrink-0 items-center justify-center rounded-full border border-success/50 bg-success/10"
             >
-              <Check className="size-6 text-success" />
+              <Check className="size-5 text-success" />
             </div>
 
-            <h3 className="text-[20px] font-semibold text-white">
+            <h3 className="text-[18px] font-semibold text-white">
               {authCopy.signin.success}
             </h3>
 
-            <p className="max-w-[360px] text-[13.5px] text-muted-foreground">
+            <p className="max-w-[340px] text-[13px] text-muted-foreground">
               {authCopy.signin.successNote}
             </p>
           </div>
@@ -129,7 +129,7 @@ export function SignInView() {
             noValidate
             aria-busy={isSubmitting}
             onSubmit={handleFormSubmit}
-            className="mt-4 grid gap-3.5"
+            className="mt-3 grid gap-3"
           >
             <TextField
               label={authCopy.signin.emailField.label}
@@ -186,7 +186,7 @@ export function SignInView() {
               variant="primary"
               disabled={isSubmitting}
               withArrow={!isSubmitting}
-              className="h-11 w-full text-[14.5px] font-semibold"
+              className="h-10 w-full text-[14px] font-semibold"
             >
               {isSubmitting ? (
                 <>

@@ -45,11 +45,6 @@ export function InterestsStep() {
     goToStep(2);
   };
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    void handleSubmit(onSubmit)(e);
-  };
-
   const currentRoleMeta = roleMeta[selectedRole];
 
   return (
@@ -58,7 +53,7 @@ export function InterestsStep() {
       title={registrationCopy.interests.title}
       subtitle={registrationCopy.interests.subtitle}
     >
-      <form noValidate onSubmit={handleFormSubmit} className="space-y-6">
+      <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Fieldset 1: Interests */}
         <fieldset className="border-none p-0">
           <legend className="text-[14px] font-medium text-white">
@@ -194,12 +189,12 @@ export function InterestsStep() {
         </fieldset>
 
         {/* Navigation Buttons: Back and Next in grid-cols-[1fr_2fr] */}
-        <div className="grid grid-cols-[1fr_2fr] gap-3.5 pt-2">
+        <div className="grid grid-cols-[1fr_2fr] gap-2.5 pt-1.5">
           <Button
             type="button"
             variant="outline"
             onClick={handleBack}
-            className="h-11 text-[14.5px] font-medium"
+            className="h-10 text-[13.5px] font-medium"
           >
             <ArrowLeft className="size-4 shrink-0" aria-hidden="true" />
             <span>Back</span>
@@ -210,7 +205,7 @@ export function InterestsStep() {
             variant="primary"
             withArrow
             disabled={isSubmitting}
-            className="h-11 text-[14.5px] font-semibold"
+            className="h-10 text-[13.5px] font-semibold"
           >
             Next
           </Button>

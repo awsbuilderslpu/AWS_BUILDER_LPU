@@ -20,14 +20,14 @@ export const PasswordField = React.forwardRef<
         <button
           type="button"
           onClick={() => setShowPassword((prev) => !prev)}
-          className="flex items-center justify-center rounded p-1 text-muted-foreground transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="flex items-center justify-center rounded p-0.5 text-muted-foreground transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           aria-label={showPassword ? "Hide password" : "Show password"}
           aria-pressed={showPassword}
         >
           {showPassword ? (
-            <EyeOff className="size-5" aria-hidden="true" />
+            <EyeOff className="size-4" aria-hidden="true" />
           ) : (
-            <Eye className="size-5" aria-hidden="true" />
+            <Eye className="size-4" aria-hidden="true" />
           )}
         </button>
       }

@@ -75,18 +75,13 @@ export function AcademicStep() {
     goToStep(1);
   };
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    void handleSubmit(onSubmit)(e);
-  };
-
   return (
     <RegisterStepFrame
       step={2}
       title={registrationCopy.academic.title}
       subtitle={registrationCopy.academic.subtitle}
     >
-      <form noValidate onSubmit={handleFormSubmit} className="space-y-3.5">
+      <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-2.5">
         {/* Full width: University (single option preselected) */}
         <SelectField
           label={registrationCopy.academic.fields.university.label}
@@ -97,7 +92,7 @@ export function AcademicStep() {
         />
 
         {/* Programme and Branch / Department side by side */}
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-2.5 sm:grid-cols-2">
           <SelectField
             label={registrationCopy.academic.fields.programme.label}
             placeholder={
@@ -122,7 +117,7 @@ export function AcademicStep() {
         </div>
 
         {/* Current Year and Current Semester side by side */}
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-2.5 sm:grid-cols-2">
           <SelectField
             label={registrationCopy.academic.fields.year.label}
             placeholder={registrationCopy.academic.fields.year.placeholder}
@@ -143,7 +138,7 @@ export function AcademicStep() {
         </div>
 
         {/* Expected Graduation Year at half width */}
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-2.5 sm:grid-cols-2">
           <SelectField
             label={registrationCopy.academic.fields.graduationYear.label}
             placeholder={
@@ -157,12 +152,12 @@ export function AcademicStep() {
         </div>
 
         {/* Navigation Buttons: Back and Next in grid-cols-[1fr_2fr] */}
-        <div className="grid grid-cols-[1fr_2fr] gap-3.5 pt-2">
+        <div className="grid grid-cols-[1fr_2fr] gap-2.5 pt-1.5">
           <Button
             type="button"
             variant="outline"
             onClick={handleBack}
-            className="h-11 text-[14.5px] font-medium"
+            className="h-10 text-[13.5px] font-medium"
           >
             <ArrowLeft className="size-4 shrink-0" aria-hidden="true" />
             <span>Back</span>
@@ -173,7 +168,7 @@ export function AcademicStep() {
             variant="primary"
             withArrow
             disabled={isSubmitting}
-            className="h-11 text-[14.5px] font-semibold"
+            className="h-10 text-[13.5px] font-semibold"
           >
             Next
           </Button>

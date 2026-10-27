@@ -81,10 +81,10 @@ export function AuthModal() {
           "p-0 gap-0 border border-border bg-background shadow-2xl overflow-hidden",
           // Below sm: full screen, no radius
           "inset-0 left-0 top-0 translate-x-0 translate-y-0 w-full h-full max-w-none rounded-none flex flex-col",
-          // Sm to lg: centered card, max-w-[540px], rounded-2xl
-          "sm:fixed sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[92vw] sm:max-w-[540px] sm:h-auto sm:max-h-[92vh] sm:rounded-2xl sm:flex sm:flex-col",
-          // At lg: 2-column grid, compact and clean, fits laptop displays beautifully without zoom hacks
-          "lg:w-[min(940px,calc(100vw-40px))] lg:h-[min(620px,calc(100svh-32px))] lg:max-w-[940px] lg:max-h-[620px] lg:rounded-[24px] lg:grid lg:grid-cols-[46fr_54fr]"
+          // Sm to lg: centered card, max-w-[486px] (10% smaller than 540px), rounded-2xl
+          "sm:fixed sm:left-1/2 sm:top-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[92vw] sm:max-w-[486px] sm:h-auto sm:max-h-[90vh] sm:rounded-2xl sm:flex sm:flex-col",
+          // At lg: 2-column grid, 846px x 580px (~10% smaller than 940px x 620px)
+          "lg:w-[min(846px,calc(100vw-36px))] lg:h-[min(580px,calc(100svh-24px))] lg:max-w-[846px] lg:max-h-[580px] lg:rounded-[20px] lg:grid lg:grid-cols-[44fr_56fr]"
         )}
       >
         {/* Radix Accessible Title & Description */}
@@ -101,15 +101,15 @@ export function AuthModal() {
         <AuthPanel variant={view === "signin" ? "signin" : "welcome"} />
 
         {/* Right Panel */}
-        <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden auth-scrollable px-6 py-5 sm:px-8 sm:py-6">
-          {/* Close button: absolute right-4 top-4 z-20, 36px circle */}
+        <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden auth-scrollable px-4.5 py-3.5 sm:px-6 sm:py-4">
+          {/* Close button: absolute right-3.5 top-3.5 z-20, compact circle */}
           <button
             type="button"
             onClick={handleClose}
             aria-label="Close"
-            className="absolute right-4 top-4 z-20 flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
+            className="absolute right-3.5 top-3.5 z-20 flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
           >
-            <X className="size-5" aria-hidden="true" />
+            <X className="size-4.5" aria-hidden="true" />
           </button>
 
           {/* Logo at top below lg */}

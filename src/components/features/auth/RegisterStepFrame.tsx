@@ -32,23 +32,23 @@ export function RegisterStepFrame({
     <div className="flex flex-1 flex-col">
       <AuthSwitchRow />
 
-      <div className="mx-auto my-auto w-full max-w-[580px] py-2 sm:py-3">
-        <Stepper steps={registerSteps} current={step} className="mb-4" />
+      <div className="mx-auto my-auto w-full max-w-[500px] py-1 sm:py-1.5">
+        <Stepper steps={registerSteps} current={step} className="mb-2 sm:mb-2.5" />
 
         <h2
           ref={headingRef}
           id="auth-view-heading"
           tabIndex={-1}
-          className="text-[clamp(20px,1.8vw,26px)] font-bold leading-[1.15] text-white tracking-tight outline-none"
+          className="text-[19px] sm:text-[21px] font-bold leading-tight text-white tracking-tight outline-none"
         >
           {title}
         </h2>
 
-        <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
+        <p className="mt-0.5 text-[12.5px] leading-snug text-muted-foreground">
           {subtitle}
         </p>
 
-        <div className="mt-4">{children}</div>
+        <div className="mt-2.5 sm:mt-3">{children}</div>
       </div>
     </div>
   );

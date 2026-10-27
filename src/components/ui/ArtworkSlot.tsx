@@ -39,6 +39,16 @@ export const ARTWORK_REGISTRY: Record<string, ArtworkConfig> = {
     alt: "AWS neon cloud computing network",
     objectPosition: "object-center",
   },
+  "Auth: globe + floating clouds": {
+    src: encodeURI("/images/artwork/Digital Globe with Neon Network Arcs.png"),
+    alt: "Digital globe with neon network arcs",
+    objectPosition: "object-center",
+  },
+  "Auth: campus at night": {
+    src: encodeURI("/images/artwork/Neon Cloud Computing Cityscape.png"),
+    alt: "Neon campus and cloud computing cityscape at night",
+    objectPosition: "object-bottom",
+  },
 };
 
 export interface ArtworkSlotProps extends React.HTMLAttributes<HTMLDivElement> {

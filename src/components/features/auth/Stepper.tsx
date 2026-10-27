@@ -35,7 +35,7 @@ export function Stepper({ steps, current, className }: StepperProps) {
               {idx < steps.length - 1 && (
                 <div
                   className={cn(
-                    "absolute left-1/2 top-[17px] sm:top-[18px] -translate-y-1/2 w-full h-px z-0",
+                    "absolute left-1/2 top-[14px] -translate-y-1/2 w-full h-px z-0",
                     isCompleted ? "bg-primary/50" : "bg-border"
                   )}
                   aria-hidden="true"
@@ -45,7 +45,7 @@ export function Stepper({ steps, current, className }: StepperProps) {
               {/* Circle */}
               <div
                 className={cn(
-                  "relative z-10 flex size-[34px] sm:size-9 items-center justify-center rounded-full text-sm transition-colors",
+                  "relative z-10 flex size-7 items-center justify-center rounded-full text-xs transition-colors",
                   isCurrent && "bg-primary font-bold text-background",
                   isCompleted &&
                     "border border-primary/60 bg-background text-primary",
@@ -56,7 +56,7 @@ export function Stepper({ steps, current, className }: StepperProps) {
               >
                 {isCompleted ? (
                   <Check
-                    className="size-4 text-primary stroke-[2.5]"
+                    className="size-3.5 text-primary stroke-[2.5]"
                     aria-hidden="true"
                   />
                 ) : (
@@ -67,7 +67,7 @@ export function Stepper({ steps, current, className }: StepperProps) {
               {/* Label */}
               <div
                 className={cn(
-                  "mt-2.5 text-[14px] leading-tight transition-colors text-center",
+                  "mt-1.5 text-[11px] sm:text-[11.5px] leading-tight transition-colors text-center",
                   isCurrent && "font-semibold text-white",
                   isCompleted && "font-medium text-muted-foreground/90",
                   !isCurrent && !isCompleted && "text-muted-foreground"
