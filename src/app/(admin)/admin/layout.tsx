@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth/server";
 import { AdminShell } from "@/components/features/admin/AdminShell";
 
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: {
     default: "Admin",
