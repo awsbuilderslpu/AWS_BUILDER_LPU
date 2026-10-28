@@ -1,193 +1,150 @@
 import * as React from "react";
 import Image from "next/image";
-import {
-  ExternalLink,
-  Star,
-  Layers,
-  Cpu,
-  Users,
-} from "lucide-react";
-import { FaGithub } from "react-icons/fa6";
+import { Star, Heart, Eye, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Avatar } from "@/components/ui/Avatar";
 import type { Project } from "@/data/projects";
 
 export interface ProjectCardProps {
   project: Project;
+  isSelected?: boolean;
+  onSelect?: (project: Project) => void;
   className?: string;
 }
 
-export function ProjectCard({ project, className }: ProjectCardProps) {
-  const getStatusColor = (status: Project["status"]) => {
+export function ProjectCard({
+  project,
+  isSelected = false,
+  onSelect,
+  className,
+}: ProjectCardProps) {
+  const getStatusBadge = (status: Project["status"]) => {
     switch (status) {
-      case "Live":
-        return "text-emerald-400 bg-emerald-950/80 border-emerald-500/40";
-      case "Open Source":
-        return "text-sky-300 bg-sky-950/80 border-sky-500/40";
-      case "In Development":
-        return "text-amber-300 bg-amber-950/80 border-amber-500/40";
+      case "Ongoing":
+        return "border-emerald-500/40 bg-emerald-950/80 text-emerald-400";
+      case "Completed":
+        return "border-purple-500/40 bg-purple-950/80 text-purple-300";
+      case "Under Review":
+        return "border-amber-500/40 bg-amber-950/80 text-amber-300";
+      case "Archived":
+        return "border-border bg-card/80 text-muted-foreground";
       default:
-        return "text-muted-foreground bg-muted/80 border-border";
+        return "border-border bg-card/80 text-muted-foreground";
     }
   };
 
   return (
     <article
+      onClick={() => onSelect?.(project)}
       className={cn(
-        "group relative flex h-full flex-col justify-between overflow-hidden rounded-xl border border-border bg-card/60 backdrop-blur-sm",
-        "transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-card/90 hover:shadow-[0_12px_36px_rgba(255,153,0,0.15)]",
+        "group relative flex flex-col justify-between overflow-hidden rounded-xl border bg-card/60 backdrop-blur-sm cursor-pointer select-none",
+        "transition-all duration-300 hover:-translate-y-1 hover:border-primary/50 hover:bg-card/90 hover:shadow-[0_10px_30px_rgba(255,153,0,0.15)]",
+        isSelected
+          ? "border-primary ring-1 ring-primary shadow-[0_0_24px_rgba(255,153,0,0.22)]"
+          : "border-border/80",
         className
       )}
     >
       <div>
-        {/* Project Thumbnail Image */}
-        {project.image && (
-          <div className="relative aspect-[16/9] w-full overflow-hidden bg-background">
-            <Image
-              src={project.image}
-              alt={project.title}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            {/* Subtle dark gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-card via-black/20 to-black/40" />
+        {/* 16:9 Thumbnail Image */}
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-background">
+          <Image
+            src={project.image}
+            alt={project.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
 
-            {/* Floating Badges over Image */}
-            <div className="absolute inset-x-3.5 top-3.5 flex items-center justify-between gap-2 z-10 pointer-events-none">
-              <div className="flex items-center gap-1.5">
-                <span className="inline-flex items-center gap-1 rounded-md border border-primary/40 bg-black/60 px-2.5 py-1 text-[11.5px] font-semibold text-primary backdrop-blur-md">
-                  <Layers className="size-3" />
-                  {project.category}
-                </span>
+          {/* Subtle dark gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-black/20 to-black/40" />
 
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-[11px] font-medium leading-none backdrop-blur-md",
-                    getStatusColor(project.status)
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "size-1.5 rounded-full",
-                      project.status === "Live"
-                        ? "bg-emerald-400 animate-pulse"
-                        : project.status === "Open Source"
-                        ? "bg-sky-400"
-                        : "bg-amber-400"
-                    )}
-                    aria-hidden="true"
-                  />
-                  {project.status}
-                </span>
-              </div>
+          {/* Floating Badges */}
+          <div className="absolute inset-x-3.5 top-3.5 z-10 flex items-center justify-between gap-2 pointer-events-none">
+            {/* Featured Badge */}
+            {project.featured ? (
+              <span className="inline-flex items-center gap-1 rounded-md border border-amber-500/50 bg-black/70 px-2 py-0.5 text-[11px] font-semibold text-amber-300 backdrop-blur-md shadow-xs">
+                <Star className="size-3 fill-amber-400 text-amber-400" />
+                Featured
+              </span>
+            ) : (
+              <span />
+            )}
 
-              {project.stars !== undefined && (
-                <div className="flex items-center gap-1 rounded-md border border-white/10 bg-black/60 px-2 py-1 text-xs text-foreground font-mono backdrop-blur-md">
-                  <Star className="size-3.5 fill-amber-400 text-amber-400" />
-                  <span>{project.stars}</span>
-                </div>
+            {/* Status Badge */}
+            <span
+              className={cn(
+                "inline-flex items-center rounded-md border px-2.5 py-0.5 text-[11px] font-medium leading-normal backdrop-blur-md shadow-xs",
+                getStatusBadge(project.status)
               )}
-            </div>
+            >
+              {project.status}
+            </span>
           </div>
-        )}
+        </div>
 
         {/* Content Body */}
-        <div className="p-5">
-          {/* Fallback Badges if no image */}
-          {!project.image && (
-            <div className="mb-4 flex items-center justify-between gap-2">
-              <span className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                <Layers className="size-3" />
-                {project.category}
-              </span>
-              <span
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-[11px] font-medium leading-none",
-                  getStatusColor(project.status)
-                )}
-              >
-                {project.status}
-              </span>
-            </div>
-          )}
-
+        <div className="p-4 sm:p-5">
           {/* Title */}
-          <h3 className="text-[17px] font-semibold leading-snug text-foreground transition-colors duration-200 group-hover:text-primary">
+          <h3 className="text-[17px] font-bold leading-snug text-white transition-colors duration-200 group-hover:text-primary">
             {project.title}
           </h3>
 
-          {/* Description */}
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-3">
-            {project.description}
+          {/* Tagline / Snippet */}
+          <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-muted-foreground line-clamp-2">
+            {project.tagline || project.description}
           </p>
 
-          {/* AWS Services Highlights */}
-          <div className="mt-4">
-            <span className="flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-muted-foreground/80">
-              <Cpu className="size-3 text-primary" />
-              AWS Architecture
-            </span>
-            <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {project.awsServices.map((service) => (
-                <span
-                  key={service}
-                  className="inline-flex items-center rounded border border-[#FF9900]/30 bg-[#FF9900]/10 px-2 py-0.5 text-[11.5px] font-medium text-foreground/95"
-                >
-                  {service}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Tech Stack */}
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {project.techStack.map((tech) => (
+          {/* Tech Stack Pills */}
+          <div className="mt-3.5 flex flex-wrap gap-1.5">
+            {project.techStack.slice(0, 5).map((tech) => (
               <span
                 key={tech}
-                className="inline-flex items-center rounded border border-border bg-background/50 px-2 py-0.5 text-[11px] font-mono text-muted-foreground"
+                className="inline-flex items-center rounded border border-border bg-card/70 px-2 py-0.5 text-[11px] font-mono text-muted-foreground"
               >
                 {tech}
               </span>
             ))}
+            {project.techStack.length > 5 && (
+              <span className="inline-flex items-center rounded border border-border bg-card/40 px-1.5 py-0.5 text-[10.5px] font-mono text-muted-foreground/80">
+                +{project.techStack.length - 5}
+              </span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Card Footer: Contributors & Action Links */}
-      <div className="mx-5 mb-5 flex items-center justify-between gap-3 border-t border-border/80 pt-4">
-        {/* Contributors */}
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-0">
-          <Users className="size-3.5 shrink-0 text-primary" />
-          <span className="truncate">
-            {project.contributors.join(", ")}
+      {/* Card Footer: Author + Metrics */}
+      <div className="mx-4 sm:mx-5 mb-4 sm:mb-5 flex items-center justify-between gap-2 border-t border-border/70 pt-3.5">
+        {/* Author Avatar & Name */}
+        <div className="flex items-center gap-2 min-w-0">
+          <Avatar
+            name={project.author.name}
+            src={project.author.avatar}
+            size={24}
+            className="ring-1 ring-border shrink-0"
+          />
+          <span className="truncate text-xs font-medium text-foreground/90">
+            {project.author.name}
           </span>
         </div>
 
-        {/* Action Links */}
-        <div className="flex items-center gap-2 shrink-0">
-          {project.githubUrl && (
-            <a
-              href={project.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${project.title} on GitHub`}
-              className="flex size-8 items-center justify-center rounded-lg border border-border bg-card/40 text-muted-foreground transition-all duration-200 hover:border-primary/50 hover:bg-card hover:text-primary"
-            >
-              <FaGithub className="size-4" />
-            </a>
-          )}
+        {/* Metrics: Likes, Views, Date */}
+        <div className="flex items-center gap-2.5 sm:gap-3 text-xs text-muted-foreground shrink-0 font-mono">
+          <div className="flex items-center gap-1 text-rose-400/90" title={`${project.stats.likes} Likes`}>
+            <Heart className="size-3.5 fill-rose-500/20 text-rose-400" />
+            <span>{project.stats.likes}</span>
+          </div>
 
-          {project.demoUrl && (
-            <a
-              href={project.demoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`Live demo for ${project.title}`}
-              className="flex size-8 items-center justify-center rounded-lg border border-border bg-card/40 text-muted-foreground transition-all duration-200 hover:border-primary/50 hover:bg-card hover:text-primary"
-            >
-              <ExternalLink className="size-4" />
-            </a>
-          )}
+          <div className="flex items-center gap-1 text-sky-400/90" title={`${project.stats.views} Views`}>
+            <Eye className="size-3.5 text-sky-400" />
+            <span>{project.stats.views}</span>
+          </div>
+
+          <div className="flex items-center gap-1 text-muted-foreground/80">
+            <Calendar className="size-3.5 text-muted-foreground" />
+            <span className="hidden sm:inline">{project.date}</span>
+          </div>
         </div>
       </div>
     </article>
