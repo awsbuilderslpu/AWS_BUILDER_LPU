@@ -2,7 +2,13 @@ import { Users, Cloud, UsersRound, Trophy, type LucideIcon } from "lucide-react"
 import { siteConfig } from "@/data/site";
 
 export const authParam = "auth" as const;
-export type AuthView = "signin" | "register" | "verified";
+export type AuthView =
+  | "signin"
+  | "register"
+  | "verified"
+  | "forgot"
+  | "reset"
+  | "complete";
 
 export interface BenefitItem {
   icon: LucideIcon;
@@ -33,13 +39,60 @@ export interface SigninCopy {
     placeholder: string;
   };
   forgot: string;
-  forgotNotice: string;
   submit: string;
   submitting: string;
   success: string;
   successNote: string;
   prompt: string;
   link: string;
+}
+
+export interface ForgotCopy {
+  title: string;
+  subtitle: string;
+  submit: string;
+  submitting: string;
+  sentTitle: string;
+  sentText: string;
+  again: string;
+  againIn: (s: number) => string;
+  back: string;
+}
+
+export interface ResetCopy {
+  title: string;
+  subtitle: string;
+  passwordField: {
+    label: string;
+    placeholder: string;
+  };
+  confirmField: {
+    label: string;
+    placeholder: string;
+  };
+  submit: string;
+  submitting: string;
+  successTitle: string;
+  successText: string;
+  successCta: string;
+  expiredTitle: string;
+  expiredText: string;
+  expiredCta: string;
+}
+
+export interface CompleteCopy {
+  title: string;
+  subtitle: string;
+  emailHint: string;
+  submit: string;
+  submitting: string;
+  loading: string;
+  loadFailed: string;
+  saveFailed: string;
+  retry: string;
+  successTitle: string;
+  successText: string;
+  successCta: string;
 }
 
 export interface AuthErrors {
@@ -55,6 +108,7 @@ export interface AuthErrors {
   linkExpired: string;
   googleFailed: string;
   generic: string;
+  samePassword: string;
 }
 
 export interface PanelCopy {
@@ -97,9 +151,15 @@ export interface AccountPageCopy {
   profileComplete: string;
   profileIncomplete: string;
   profileHint: string;
+  incompleteNotice: string;
+  incompleteCta: string;
   activeStatus: string;
   inactiveStatus: string;
   signOut: string;
+}
+
+export interface MenuCopy {
+  finish: string;
 }
 
 const { name, org, website } = siteConfig;
@@ -107,11 +167,15 @@ const { name, org, website } = siteConfig;
 export const authCopy: {
   welcome: WelcomeCopy;
   signin: SigninCopy;
+  forgot: ForgotCopy;
+  reset: ResetCopy;
+  complete: CompleteCopy;
   errors: AuthErrors;
   panel: PanelCopy;
   confirmPage: ConfirmPageCopy;
   signinSuccess: SigninSuccessCopy;
   account: AccountPageCopy;
+  menu: MenuCopy;
 } = {
   welcome: {
     title: "Create your account",
@@ -135,13 +199,61 @@ export const authCopy: {
       placeholder: "Enter your password",
     },
     forgot: "Forgot Password?",
-    forgotNotice: "Password reset will be available once accounts go live.",
     submit: "Sign In",
     submitting: "Signing in...",
     success: "You're signed in",
     successNote: "Redirecting to your account dashboard...",
     prompt: "Don't have an account?",
     link: "Register here",
+  },
+  forgot: {
+    title: "Reset your password",
+    subtitle: "Enter your email and we'll send you a link to set a new password.",
+    submit: "Send Reset Link",
+    submitting: "Sending...",
+    sentTitle: "Check your email",
+    sentText:
+      "If an account exists for that email, a reset link is on its way. It can take a minute to arrive.",
+    again: "Send again",
+    againIn: (s: number) => `Send again (${s}s)`,
+    back: "Back to sign in",
+  },
+  reset: {
+    title: "Set a new password",
+    subtitle: "Choose a new password for your account.",
+    passwordField: {
+      label: "New Password",
+      placeholder: "Create a new password",
+    },
+    confirmField: {
+      label: "Confirm New Password",
+      placeholder: "Confirm your new password",
+    },
+    submit: "Update Password",
+    submitting: "Updating...",
+    successTitle: "Password updated",
+    successText: "You can now use your new password to sign in.",
+    successCta: "Go to my account",
+    expiredTitle: "This link has expired",
+    expiredText:
+      "Reset links work once and expire after a while. Request a new one.",
+    expiredCta: "Request a new link",
+  },
+  complete: {
+    title: "Complete your registration",
+    subtitle:
+      "Just a few more details before the club admins can review your registration.",
+    emailHint: "From your account",
+    submit: "Finish Registration",
+    submitting: "Saving...",
+    loading: "Loading your details...",
+    loadFailed: "We couldn't load your details. Please try again.",
+    saveFailed: "We couldn't save your details. Please try again.",
+    retry: "Try again",
+    successTitle: "You're all set",
+    successText:
+      "Thanks! The club admins will review your registration and email you once it's approved.",
+    successCta: "Go to my account",
   },
   errors: {
     email: "Please enter a valid email address.",
@@ -157,6 +269,7 @@ export const authCopy: {
     linkExpired: "This confirmation link has expired or has already been used.",
     googleFailed: "Could not sign in with Google. Please try again or use email.",
     generic: "An unexpected error occurred. Please try again.",
+    samePassword: "Choose a password you haven't used before.",
   },
   panel: {
     tagline: ["Learn", "Build", "Share", "Grow Together"],
@@ -223,9 +336,15 @@ export const authCopy: {
     profileIncomplete: "Incomplete",
     profileHint:
       "All required student and academic details have been submitted. Profile updates will be available in the member directory.",
+    incompleteNotice:
+      "Your profile is incomplete. Finish it so the club admins can review your registration.",
+    incompleteCta: "Finish registration",
     activeStatus: "Active",
     inactiveStatus: "Inactive",
     signOut: "Sign out",
+  },
+  menu: {
+    finish: "Finish registration",
   },
 };
 
@@ -235,6 +354,7 @@ export const authCopy: {
 export const errorParams: Record<string, string> = {
   access_denied: "Sign in was canceled or access was denied.",
   oauth_failed: authCopy.errors.googleFailed,
+  google: authCopy.errors.googleFailed,
   exchange_failed: "Could not establish a secure session. Please try again.",
   link_expired: authCopy.errors.linkExpired,
 };

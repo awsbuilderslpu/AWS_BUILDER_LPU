@@ -13,19 +13,7 @@ import {
 } from "@/data/registration";
 import { signupRoles } from "@/data/roles";
 
-export const signInSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .email({ message: authCopy.errors.email }),
-  password: z
-    .string()
-    .min(1, { message: authCopy.errors.password }),
-});
-
-export type SignInValues = z.infer<typeof signInSchema>;
-
-// Shared field definitions for Basic Information
+// Shared field definitions
 const firstNameField = z
   .string()
   .trim()
@@ -129,7 +117,114 @@ const termsAcceptedField = z.literal(true, {
   message: registrationCopy.errors.terms,
 });
 
+const universityField = z
+  .string()
+  .trim()
+  .refine((val) => universities.some((u) => u.value === val), {
+    message: registrationCopy.errors.university,
+  });
+
+const programmeField = z
+  .string()
+  .trim()
+  .refine((val) => (programmes as readonly string[]).includes(val), {
+    message: registrationCopy.errors.programme,
+  });
+
+const departmentField = z
+  .string()
+  .trim()
+  .refine((val) => departments.some((d) => d.value === val), {
+    message: registrationCopy.errors.department,
+  });
+
+const yearField = z
+  .string()
+  .trim()
+  .refine((val) => (yearOptions as readonly string[]).includes(val), {
+    message: registrationCopy.errors.year,
+  });
+
+const semesterField = z
+  .string()
+  .trim()
+  .refine((val) => (semesterOptions as readonly string[]).includes(val), {
+    message: registrationCopy.errors.semester,
+  });
+
+const graduationYearField = z
+  .string()
+  .trim()
+  .refine(
+    (val) => {
+      const y = Number(val);
+      const currentYear = new Date().getFullYear();
+      return (
+        /^\d{4}$/.test(val) &&
+        !isNaN(y) &&
+        y >= currentYear &&
+        y <= currentYear + registrationConstants.graduationSpan
+      );
+    },
+    {
+      message: registrationCopy.errors.graduationYear,
+    }
+  );
+
+const interestsField = z.array(
+  z
+    .string()
+    .refine((val) => (interestOptions as readonly string[]).includes(val))
+);
+
+const requestedRoleField = z
+  .string()
+  .refine((val) => (signupRoles as readonly string[]).includes(val), {
+    message: registrationCopy.errors.role,
+  });
+
+// Validate phone according to country code
+const phoneRefinement = (data: { countryCode: string; phone: string }) => {
+  if (data.countryCode === "+91") {
+    return /^[6-9]\d{9}$/.test(data.phone);
+  }
+  return /^\d{6,14}$/.test(data.phone);
+};
+
+// ============================================================================
+// Sign In Schema
+// ============================================================================
+export const signInSchema = z.object({
+  email: z.string().trim().email({ message: authCopy.errors.email }),
+  password: z.string().min(1, { message: authCopy.errors.password }),
+});
+
+export type SignInValues = z.infer<typeof signInSchema>;
+
+// ============================================================================
+// Password Reset Schemas
+// ============================================================================
+export const forgotPasswordSchema = z.object({
+  email: emailField,
+});
+
+export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z
+  .object({
+    password: passwordField,
+    confirmPassword: z.string().min(1, { message: registrationCopy.errors.confirmPassword }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: registrationCopy.errors.confirmPassword,
+    path: ["confirmPassword"],
+  });
+
+export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
+
+// ============================================================================
 // Step 1: Basic Information Schema
+// ============================================================================
 export const basicInfoSchema = z
   .object({
     firstName: firstNameField,
@@ -143,18 +238,10 @@ export const basicInfoSchema = z
     confirmPassword: z.string(),
     termsAccepted: termsAcceptedField,
   })
-  .refine(
-    (data) => {
-      if (data.countryCode === "+91") {
-        return /^[6-9]\d{9}$/.test(data.phone);
-      }
-      return /^\d{6,14}$/.test(data.phone);
-    },
-    {
-      message: registrationCopy.errors.phone,
-      path: ["phone"],
-    }
-  )
+  .refine(phoneRefinement, {
+    message: registrationCopy.errors.phone,
+    path: ["phone"],
+  })
   .refine((data) => data.password === data.confirmPassword, {
     message: registrationCopy.errors.confirmPassword,
     path: ["confirmPassword"],
@@ -162,77 +249,51 @@ export const basicInfoSchema = z
 
 export type BasicInfoValues = z.infer<typeof basicInfoSchema>;
 
+// Complete Basic Info Schema (without email, password, confirmPassword)
+export const completeBasicInfoSchema = z
+  .object({
+    firstName: firstNameField,
+    lastName: lastNameField,
+    countryCode: countryCodeField,
+    phone: phoneField,
+    registrationNumber: registrationNumberField,
+    dateOfBirth: dateOfBirthField,
+    termsAccepted: termsAcceptedField,
+  })
+  .refine(phoneRefinement, {
+    message: registrationCopy.errors.phone,
+    path: ["phone"],
+  });
+
+export type CompleteBasicInfoValues = z.infer<typeof completeBasicInfoSchema>;
+
+// ============================================================================
 // Step 2: Academic Details Schema
+// ============================================================================
 export const academicSchema = z.object({
-  university: z
-    .string()
-    .trim()
-    .refine((val) => universities.some((u) => u.value === val), {
-      message: registrationCopy.errors.university,
-    }),
-  programme: z
-    .string()
-    .trim()
-    .refine((val) => (programmes as readonly string[]).includes(val), {
-      message: registrationCopy.errors.programme,
-    }),
-  department: z
-    .string()
-    .trim()
-    .refine((val) => departments.some((d) => d.value === val), {
-      message: registrationCopy.errors.department,
-    }),
-  year: z
-    .string()
-    .trim()
-    .refine((val) => (yearOptions as readonly string[]).includes(val), {
-      message: registrationCopy.errors.year,
-    }),
-  semester: z
-    .string()
-    .trim()
-    .refine((val) => (semesterOptions as readonly string[]).includes(val), {
-      message: registrationCopy.errors.semester,
-    }),
-  graduationYear: z
-    .string()
-    .trim()
-    .refine(
-      (val) => {
-        const y = Number(val);
-        const currentYear = new Date().getFullYear();
-        return (
-          /^\d{4}$/.test(val) &&
-          !isNaN(y) &&
-          y >= currentYear &&
-          y <= currentYear + registrationConstants.graduationSpan
-        );
-      },
-      {
-        message: registrationCopy.errors.graduationYear,
-      }
-    ),
+  university: universityField,
+  programme: programmeField,
+  department: departmentField,
+  year: yearField,
+  semester: semesterField,
+  graduationYear: graduationYearField,
 });
 
 export type AcademicValues = z.infer<typeof academicSchema>;
 
+// ============================================================================
 // Step 3: Interests & Role Schema
+// ============================================================================
 export const interestsSchema = z.object({
-  interests: z.array(
-    z
-      .string()
-      .refine((val) => (interestOptions as readonly string[]).includes(val))
-  ),
-  requestedRole: z
-    .string()
-    .refine((val) => (signupRoles as readonly string[]).includes(val), {
-      message: registrationCopy.errors.role,
-    }),
+  interests: interestsField,
+  requestedRole: requestedRoleField,
 });
 
 export type InterestsValues = z.infer<typeof interestsSchema>;
 
-// Full Registration Schema (without confirmPassword)
+// ============================================================================
+// Step 4: Full Registration Schema
+// ============================================================================
 export const registerSchema = z
   .object({
     firstName: firstNameField,
@@ -244,76 +305,44 @@ export const registerSchema = z
     dateOfBirth: dateOfBirthField,
     password: passwordField,
     termsAccepted: termsAcceptedField,
-    university: z
-      .string()
-      .trim()
-      .refine((val) => universities.some((u) => u.value === val), {
-        message: registrationCopy.errors.university,
-      }),
-    programme: z
-      .string()
-      .trim()
-      .refine((val) => (programmes as readonly string[]).includes(val), {
-        message: registrationCopy.errors.programme,
-      }),
-    department: z
-      .string()
-      .trim()
-      .refine((val) => departments.some((d) => d.value === val), {
-        message: registrationCopy.errors.department,
-      }),
-    year: z
-      .string()
-      .trim()
-      .refine((val) => (yearOptions as readonly string[]).includes(val), {
-        message: registrationCopy.errors.year,
-      }),
-    semester: z
-      .string()
-      .trim()
-      .refine((val) => (semesterOptions as readonly string[]).includes(val), {
-        message: registrationCopy.errors.semester,
-      }),
-    graduationYear: z
-      .string()
-      .trim()
-      .refine(
-        (val) => {
-          const y = Number(val);
-          const currentYear = new Date().getFullYear();
-          return (
-            /^\d{4}$/.test(val) &&
-            !isNaN(y) &&
-            y >= currentYear &&
-            y <= currentYear + registrationConstants.graduationSpan
-          );
-        },
-        {
-          message: registrationCopy.errors.graduationYear,
-        }
-      ),
-    interests: z.array(
-      z
-        .string()
-        .refine((val) => (interestOptions as readonly string[]).includes(val))
-    ),
-    requestedRole: z
-      .string()
-      .refine((val) => (signupRoles as readonly string[]).includes(val), {
-        message: registrationCopy.errors.role,
-      }),
+    university: universityField,
+    programme: programmeField,
+    department: departmentField,
+    year: yearField,
+    semester: semesterField,
+    graduationYear: graduationYearField,
+    interests: interestsField,
+    requestedRole: requestedRoleField,
   })
-  .refine(
-    (data) => {
-      if (data.countryCode === "+91") {
-        return /^[6-9]\d{9}$/.test(data.phone);
-      }
-      return /^\d{6,14}$/.test(data.phone);
-    },
-    {
-      message: registrationCopy.errors.phone,
-      path: ["phone"],
-    }
-  );
+  .refine(phoneRefinement, {
+    message: registrationCopy.errors.phone,
+    path: ["phone"],
+  });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+// Full Complete Registration Schema
+export const completeRegistrationSchema = z
+  .object({
+    firstName: firstNameField,
+    lastName: lastNameField,
+    countryCode: countryCodeField,
+    phone: phoneField,
+    registrationNumber: registrationNumberField,
+    dateOfBirth: dateOfBirthField,
+    termsAccepted: termsAcceptedField,
+    university: universityField,
+    programme: programmeField,
+    department: departmentField,
+    year: yearField,
+    semester: semesterField,
+    graduationYear: graduationYearField,
+    interests: interestsField,
+    requestedRole: requestedRoleField,
+  })
+  .refine(phoneRefinement, {
+    message: registrationCopy.errors.phone,
+    path: ["phone"],
+  });
+
+export type CompleteRegistrationValues = z.infer<typeof completeRegistrationSchema>;

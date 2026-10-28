@@ -4,6 +4,7 @@ import * as React from "react";
 import { registerSteps } from "@/data/registration";
 import { AuthSwitchRow } from "@/components/features/auth/AuthSwitchRow";
 import { Stepper } from "@/components/features/auth/Stepper";
+import { useRegistration } from "@/components/features/auth/RegistrationProvider";
 
 export interface RegisterStepFrameProps {
   step: number;
@@ -20,6 +21,7 @@ export function RegisterStepFrame({
   children,
   autoFocusHeading = true,
 }: RegisterStepFrameProps) {
+  const { state } = useRegistration();
   const headingRef = React.useRef<HTMLHeadingElement>(null);
 
   React.useEffect(() => {
@@ -30,7 +32,7 @@ export function RegisterStepFrame({
 
   return (
     <div className="flex flex-1 flex-col">
-      <AuthSwitchRow />
+      {state.mode !== "complete" && <AuthSwitchRow />}
 
       <div className="mx-auto my-auto w-full max-w-[500px] py-1 sm:py-1.5">
         <Stepper steps={registerSteps} current={step} className="mb-2 sm:mb-2.5" />

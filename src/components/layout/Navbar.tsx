@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 
 import { siteConfig, navLinks } from "@/data/site";
+import { authCopy } from "@/data/auth";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/layout/Logo";
 import { NotificationBell } from "@/components/layout/NotificationBell";
@@ -162,6 +163,18 @@ export function Navbar() {
                         </p>
                       </div>
                     </div>
+                    {!account.profileComplete && (
+                      <Button
+                        asChild
+                        variant="primary"
+                        className="w-full justify-center"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Link href="?auth=complete" scroll={false}>
+                          {authCopy.menu.finish}
+                        </Link>
+                      </Button>
+                    )}
                     <Button
                       asChild
                       variant="outline"

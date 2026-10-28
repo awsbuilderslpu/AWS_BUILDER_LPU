@@ -2,10 +2,34 @@ import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { safeNext } from "@/lib/auth/safe-next";
 import { authCopy } from "@/data/auth";
-import { registrationCopy } from "@/data/registration";
-import type { SignInValues, RegisterInput } from "@/lib/auth/schemas";
+import { registrationCopy, universities } from "@/data/registration";
+import type {
+  SignInValues,
+  RegisterInput,
+  CompleteRegistrationValues,
+} from "@/lib/auth/schemas";
 
 export type AuthResult = { ok: true } | { ok: false; error: string };
+
+export interface OwnProfileData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  countryCode: string;
+  phone: string;
+  registrationNumber: string | null;
+  dateOfBirth: string | null;
+  university: string;
+  programme: string;
+  department: string;
+  year: string;
+  semester: string;
+  graduationYear: string;
+  interests: string[];
+  termsAcceptedAt: string | null;
+  status: string | null;
+  requestedRole: string | null;
+}
 
 /**
  * Maps raw registration form inputs into structured user metadata
@@ -198,6 +222,259 @@ export async function resendVerificationEmail(
       }
 
       return { ok: false, error: registrationCopy.errors.resendFailed };
+    }
+
+    return { ok: true };
+  } catch {
+    return { ok: false, error: authCopy.errors.network };
+  }
+}
+
+/**
+ * Sends a password reset link to the given email address.
+ * Always returns { ok: true } (unless rate-limited or offline) to prevent enumeration.
+ */
+export async function requestPasswordReset(email: string): Promise<AuthResult> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: authCopy.errors.unavailable };
+  }
+
+  try {
+    const supabase = createClient();
+    // Reset link destination comes from the Supabase email template configuration
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[auth] Reset password error:", error.code);
+      }
+
+      if (
+        error.status === 429 ||
+        error.code === "over_email_send_rate_limit" ||
+        error.code === "over_request_rate_limit"
+      ) {
+        return { ok: false, error: authCopy.errors.rateLimited };
+      }
+
+      // Enumeration defense: do not reveal non-existence of user
+    }
+
+    return { ok: true };
+  } catch {
+    return { ok: false, error: authCopy.errors.network };
+  }
+}
+
+/**
+ * Updates the user's password for the active recovery session.
+ * Terminates all other active sessions on success.
+ */
+export async function updatePassword(
+  newPassword: string
+): Promise<AuthResult & { expired?: boolean }> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: authCopy.errors.unavailable };
+  }
+
+  try {
+    const supabase = createClient();
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[auth] Update password error:", error.code);
+      }
+
+      if (error.code === "same_password") {
+        return { ok: false, error: authCopy.errors.samePassword };
+      }
+
+      if (error.code === "weak_password") {
+        return { ok: false, error: registrationCopy.errors.password };
+      }
+
+      const msg = error.message.toLowerCase();
+      if (
+        error.code === "session_not_found" ||
+        error.code === "auth_session_missing" ||
+        msg.includes("session") ||
+        msg.includes("expired") ||
+        error.status === 401
+      ) {
+        return {
+          ok: false,
+          error: authCopy.errors.linkExpired,
+          expired: true,
+        };
+      }
+
+      return { ok: false, error: authCopy.errors.generic };
+    }
+
+    // Terminate all other sessions on success
+    try {
+      await supabase.auth.signOut({ scope: "others" });
+    } catch {
+      // Ignore failure of background other-session termination
+    }
+
+    return { ok: true };
+  } catch {
+    return { ok: false, error: authCopy.errors.network };
+  }
+}
+
+/**
+ * Reads the caller's own profile and registration record from the client.
+ */
+export async function loadOwnProfile(): Promise<
+  { ok: true; data: OwnProfileData } | { ok: false; error: string }
+> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: authCopy.errors.unavailable };
+  }
+
+  try {
+    const supabase = createClient();
+    const {
+      data: { user },
+      error: userErr,
+    } = await supabase.auth.getUser();
+
+    if (userErr || !user) {
+      return { ok: false, error: authCopy.complete.loadFailed };
+    }
+
+    const [profileRes, regRes] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select(
+          "first_name, last_name, email, phone_country_code, phone_number, registration_number, date_of_birth, university, programme, department, study_year, semester, graduation_year, interests, terms_accepted_at"
+        )
+        .eq("id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("registrations")
+        .select("status, requested_role")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]);
+
+    if (profileRes.error || regRes.error) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          "[auth] loadOwnProfile query error:",
+          profileRes.error?.code || regRes.error?.code
+        );
+      }
+      return { ok: false, error: authCopy.complete.loadFailed };
+    }
+
+    const p = profileRes.data;
+    const r = regRes.data;
+
+    const data: OwnProfileData = {
+      firstName: p?.first_name || "",
+      lastName: p?.last_name || "",
+      email: p?.email || user.email || "",
+      countryCode: p?.phone_country_code || "+91",
+      phone: p?.phone_number || "",
+      registrationNumber: p?.registration_number || null,
+      dateOfBirth: p?.date_of_birth || null,
+      university: p?.university || universities[0].value,
+      programme: p?.programme || "",
+      department: p?.department || "",
+      year: p?.study_year || "",
+      semester: p?.semester || "",
+      graduationYear: p?.graduation_year ? String(p.graduation_year) : "",
+      interests: Array.isArray(p?.interests) ? p.interests : [],
+      termsAcceptedAt: p?.terms_accepted_at || null,
+      status: r?.status || null,
+      requestedRole: r?.requested_role || null,
+    };
+
+    return { ok: true, data };
+  } catch {
+    return { ok: false, error: authCopy.errors.network };
+  }
+}
+
+/**
+ * Saves completed registration details to the caller's own profile and registration record.
+ * Protects locked fields from being re-sent if already populated.
+ */
+export async function completeRegistration(
+  values: CompleteRegistrationValues,
+  current: OwnProfileData
+): Promise<AuthResult> {
+  if (!isSupabaseConfigured()) {
+    return { ok: false, error: authCopy.errors.unavailable };
+  }
+
+  try {
+    const supabase = createClient();
+    const {
+      data: { user },
+      error: userErr,
+    } = await supabase.auth.getUser();
+
+    if (userErr || !user) {
+      return { ok: false, error: authCopy.complete.saveFailed };
+    }
+
+    const profileUpdate: Record<string, unknown> = {
+      first_name: values.firstName,
+      last_name: values.lastName,
+      phone_country_code: values.countryCode,
+      phone_number: values.phone,
+      university: values.university,
+      programme: values.programme,
+      department: values.department,
+      study_year: values.year,
+      semester: values.semester,
+      graduation_year: Number(values.graduationYear),
+      interests: values.interests,
+    };
+
+    // Never re-send registration_number, date_of_birth, or terms_accepted_at if already set
+    if (!current.registrationNumber) {
+      profileUpdate.registration_number = values.registrationNumber;
+    }
+    if (!current.dateOfBirth) {
+      profileUpdate.date_of_birth = values.dateOfBirth;
+    }
+    if (!current.termsAcceptedAt) {
+      profileUpdate.terms_accepted_at = new Date().toISOString();
+    }
+
+    const { data: updatedProfile, error: profileErr } = await supabase
+      .from("profiles")
+      .update(profileUpdate)
+      .eq("id", user.id)
+      .select("id");
+
+    if (profileErr || !updatedProfile || updatedProfile.length === 0) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[auth] completeRegistration profile error:", profileErr?.code);
+      }
+      return { ok: false, error: authCopy.complete.saveFailed };
+    }
+
+    // Only update requested_role if registration status is pending
+    if (current.status === "pending") {
+      const { data: updatedReg, error: regErr } = await supabase
+        .from("registrations")
+        .update({ requested_role: values.requestedRole })
+        .eq("user_id", user.id)
+        .select("id");
+
+      if (regErr || !updatedReg || updatedReg.length === 0) {
+        if (process.env.NODE_ENV !== "production") {
+          console.warn("[auth] completeRegistration registration error:", regErr?.code);
+        }
+        return { ok: false, error: authCopy.complete.saveFailed };
+      }
     }
 
     return { ok: true };

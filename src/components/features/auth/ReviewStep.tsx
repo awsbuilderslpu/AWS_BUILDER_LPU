@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
   UserRound,
   GraduationCap,
@@ -8,16 +9,22 @@ import {
   ArrowLeft,
   Pencil,
   Loader2,
+  Check,
 } from "lucide-react";
+import { authCopy, authParam } from "@/data/auth";
 import {
   registrationCopy,
   universities,
   departments,
 } from "@/data/registration";
 import { roleMeta, type Role } from "@/data/roles";
-import { registerSchema } from "@/lib/auth/schemas";
-import { registerAccount } from "@/lib/auth/service";
+import {
+  registerSchema,
+  completeRegistrationSchema,
+} from "@/lib/auth/schemas";
+import { registerAccount, completeRegistration } from "@/lib/auth/service";
 import { formatDob } from "@/lib/auth/format";
+import { safeNext } from "@/lib/auth/safe-next";
 import { useRegistration } from "@/components/features/auth/RegistrationProvider";
 import { RegisterStepFrame } from "@/components/features/auth/RegisterStepFrame";
 import { Avatar } from "@/components/ui/Avatar";
@@ -25,10 +32,16 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function ReviewStep() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { state, goToStep, markSubmitted } = useRegistration();
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [completeSuccess, setCompleteSuccess] = React.useState(false);
+
+  const isCompleteMode = state.mode === "complete";
 
   const fullName = `${state.data.firstName ?? ""} ${state.data.lastName ?? ""}`.trim();
 
@@ -53,11 +66,51 @@ export function ReviewStep() {
   const roleKey = (state.data.requestedRole as Role) || "student";
   const roleInfo = roleMeta[roleKey];
 
+  const handleFinishCta = () => {
+    const next = safeNext(searchParams.get("next"), "/account");
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete(authParam);
+    params.delete("next");
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    router.refresh();
+    router.push(next);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // Validate full data against registerSchema
+    if (isCompleteMode) {
+      const parsed = completeRegistrationSchema.safeParse(state.data);
+      if (!parsed.success) {
+        goToStep(1);
+        return;
+      }
+
+      if (!state.currentProfile) {
+        setError(authCopy.complete.saveFailed);
+        return;
+      }
+
+      setIsSubmitting(true);
+      try {
+        const result = await completeRegistration(
+          parsed.data,
+          state.currentProfile
+        );
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
+        setCompleteSuccess(true);
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    // Standard register mode
     const parsed = registerSchema.safeParse(state.data);
     if (!parsed.success) {
       goToStep(1);
@@ -76,6 +129,43 @@ export function ReviewStep() {
       setIsSubmitting(false);
     }
   };
+
+  if (completeSuccess) {
+    return (
+      <div className="flex flex-1 flex-col">
+        <div className="mx-auto my-auto flex w-full max-w-[500px] flex-col items-center py-6 text-center">
+          <div
+            aria-hidden="true"
+            className="flex size-20 items-center justify-center rounded-full border-2 border-emerald-500 bg-emerald-500/10 shadow-[0_0_25px_rgba(16,185,129,0.3)] select-none"
+          >
+            <Check className="size-10 text-emerald-400 stroke-[2.5]" />
+          </div>
+
+          <h2
+            id="auth-view-heading"
+            tabIndex={-1}
+            className="mt-6 text-[clamp(24px,2vw,30px)] font-bold leading-tight text-white tracking-tight outline-none"
+          >
+            {authCopy.complete.successTitle}
+          </h2>
+
+          <p className="mt-3 max-w-[420px] text-[15px] leading-relaxed text-muted-foreground">
+            {authCopy.complete.successText}
+          </p>
+
+          <Button
+            type="button"
+            variant="primary"
+            withArrow
+            onClick={handleFinishCta}
+            className="mt-8 h-12 w-full text-[15px] font-semibold"
+          >
+            {authCopy.complete.successCta}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <RegisterStepFrame
@@ -102,199 +192,163 @@ export function ReviewStep() {
               </div>
             </div>
           </div>
-          <Button
+          <button
             type="button"
-            variant="outline"
-            size="sm"
             onClick={() => goToStep(1)}
-            disabled={isSubmitting}
-            className="h-9 shrink-0 gap-1.5"
+            aria-label="Edit personal information"
+            className="text-muted-foreground transition-colors hover:text-primary cursor-pointer p-1"
           >
-            <Pencil className="size-3.5" aria-hidden="true" />
-            <span>Edit</span>
-          </Button>
+            <Pencil className="size-4.5" />
+          </button>
         </div>
 
-        {/* Details Card */}
-        <div className="rounded-lg border border-border bg-card/60 p-5">
-          {/* Section 1: Personal Information */}
-          <div>
-            <div className="flex items-center justify-between pb-3">
-              <div className="flex items-center gap-2 text-[15px] font-semibold text-white">
-                <UserRound
-                  className="size-5 text-primary"
-                  aria-hidden="true"
-                />
-                <span>{registrationCopy.review.sections.personal}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => goToStep(1)}
-                disabled={isSubmitting}
-                className="text-[13px] font-medium text-primary transition-colors hover:underline cursor-pointer"
-              >
-                Edit
-              </button>
+        {/* Section 1: Personal Information */}
+        <div className="rounded-lg border border-border bg-card/40 p-5">
+          <div className="flex items-center justify-between border-b border-border/60 pb-3">
+            <div className="flex items-center gap-2">
+              <UserRound className="size-4 text-primary" />
+              <h3 className="text-[15px] font-semibold text-white">
+                {registrationCopy.review.sections.personal}
+              </h3>
             </div>
-
-            <div className="grid gap-x-4 gap-y-3 sm:grid-cols-2">
-              <div>
-                <div className="text-[13px] text-muted-foreground">
-                  {registrationCopy.review.labels.fullName}
-                </div>
-                <div className="text-[14px] text-white break-words">
-                  {fullName || "—"}
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[13px] text-muted-foreground">
-                  {registrationCopy.review.labels.registrationNumber}
-                </div>
-                <div className="text-[14px] text-white break-words">
-                  {state.data.registrationNumber || "—"}
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[13px] text-muted-foreground">
-                  {registrationCopy.review.labels.phone}
-                </div>
-                <div className="text-[14px] text-white break-words">
-                  {state.data.countryCode} {state.data.phone || "—"}
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[13px] text-muted-foreground">
-                  {registrationCopy.review.labels.dateOfBirth}
-                </div>
-                <div className="text-[14px] text-white break-words">
-                  {formatDob(state.data.dateOfBirth) || "—"}
-                </div>
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => goToStep(1)}
+              className="flex items-center gap-1 text-[13px] text-primary transition-colors hover:text-primary-hover cursor-pointer"
+            >
+              <Pencil className="size-3.5" />
+              <span>Edit</span>
+            </button>
           </div>
 
-          <div className="my-5 border-t border-border" />
-
-          {/* Section 2: Academic Information */}
-          <div>
-            <div className="flex items-center justify-between pb-3">
-              <div className="flex items-center gap-2 text-[15px] font-semibold text-white">
-                <GraduationCap
-                  className="size-5 text-accent"
-                  aria-hidden="true"
-                />
-                <span>{registrationCopy.review.sections.academic}</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => goToStep(2)}
-                disabled={isSubmitting}
-                className="text-[13px] font-medium text-primary transition-colors hover:underline cursor-pointer"
-              >
-                Edit
-              </button>
+          <div className="mt-4 grid grid-cols-2 gap-4 text-[13.5px]">
+            <div>
+              <span className="text-muted-foreground">
+                {registrationCopy.review.labels.registrationNumber}
+              </span>
+              <p className="mt-0.5 font-medium text-white">
+                {state.data.registrationNumber || "—"}
+              </p>
             </div>
-
-            <div className="grid gap-x-4 gap-y-3 sm:grid-cols-2">
-              <div>
-                <div className="text-[13px] text-muted-foreground">
-                  {registrationCopy.review.labels.university}
-                </div>
-                <div className="text-[14px] text-white break-words">
-                  {universityLabel || "—"}
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[13px] text-muted-foreground">
-                  {registrationCopy.review.labels.programme}
-                </div>
-                <div className="text-[14px] text-white break-words">
-                  {programmeDisplay || "—"}
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[13px] text-muted-foreground">
-                  {registrationCopy.review.labels.year}
-                </div>
-                <div className="text-[14px] text-white break-words">
-                  {yearDisplay || "—"}
-                </div>
-              </div>
-
-              <div>
-                <div className="text-[13px] text-muted-foreground">
-                  {registrationCopy.review.labels.graduation}
-                </div>
-                <div className="text-[14px] text-white break-words">
-                  {state.data.graduationYear || "—"}
-                </div>
-              </div>
+            <div>
+              <span className="text-muted-foreground">
+                {registrationCopy.review.labels.phone}
+              </span>
+              <p className="mt-0.5 font-medium text-white">
+                {state.data.phone
+                  ? `${state.data.countryCode ?? "+91"} ${state.data.phone}`
+                  : "—"}
+              </p>
+            </div>
+            <div className="col-span-2">
+              <span className="text-muted-foreground">
+                {registrationCopy.review.labels.dateOfBirth}
+              </span>
+              <p className="mt-0.5 font-medium text-white">
+                {formatDob(state.data.dateOfBirth) || "—"}
+              </p>
             </div>
           </div>
+        </div>
 
-          <div className="my-5 border-t border-border" />
-
-          {/* Section 3: Interests */}
-          <div>
-            <div className="flex items-center justify-between pb-2">
-              <div className="text-[15px] font-semibold text-white">
-                {registrationCopy.review.sections.interests}
-              </div>
-              <button
-                type="button"
-                onClick={() => goToStep(3)}
-                disabled={isSubmitting}
-                className="text-[13px] font-medium text-primary transition-colors hover:underline cursor-pointer"
-              >
-                Edit
-              </button>
+        {/* Section 2: Academic Information */}
+        <div className="rounded-lg border border-border bg-card/40 p-5">
+          <div className="flex items-center justify-between border-b border-border/60 pb-3">
+            <div className="flex items-center gap-2">
+              <GraduationCap className="size-4 text-primary" />
+              <h3 className="text-[15px] font-semibold text-white">
+                {registrationCopy.review.sections.academic}
+              </h3>
             </div>
+            <button
+              type="button"
+              onClick={() => goToStep(2)}
+              className="flex items-center gap-1 text-[13px] text-primary transition-colors hover:text-primary-hover cursor-pointer"
+            >
+              <Pencil className="size-3.5" />
+              <span>Edit</span>
+            </button>
+          </div>
 
-            <div className="flex flex-wrap gap-2 pt-1">
-              {state.data.interests && state.data.interests.length > 0 ? (
-                state.data.interests.map((interest) => (
+          <div className="mt-4 grid grid-cols-2 gap-4 text-[13.5px]">
+            <div className="col-span-2">
+              <span className="text-muted-foreground">
+                {registrationCopy.review.labels.university}
+              </span>
+              <p className="mt-0.5 font-medium text-white">
+                {universityLabel || "—"}
+              </p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">
+                {registrationCopy.review.labels.programme}
+              </span>
+              <p className="mt-0.5 font-medium text-white">
+                {programmeDisplay || "—"}
+              </p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">
+                {registrationCopy.review.labels.year}
+              </span>
+              <p className="mt-0.5 font-medium text-white">
+                {yearDisplay || "—"}
+              </p>
+            </div>
+            <div className="col-span-2">
+              <span className="text-muted-foreground">
+                {registrationCopy.review.labels.graduation}
+              </span>
+              <p className="mt-0.5 font-medium text-white">
+                {state.data.graduationYear || "—"}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 3: Interests & Role */}
+        <div className="rounded-lg border border-border bg-card/40 p-5">
+          <div className="flex items-center justify-between border-b border-border/60 pb-3">
+            <h3 className="text-[15px] font-semibold text-white">
+              {registrationCopy.review.sections.interests}
+            </h3>
+            <button
+              type="button"
+              onClick={() => goToStep(3)}
+              className="flex items-center gap-1 text-[13px] text-primary transition-colors hover:text-primary-hover cursor-pointer"
+            >
+              <Pencil className="size-3.5" />
+              <span>Edit</span>
+            </button>
+          </div>
+
+          <div className="mt-4">
+            {state.data.interests && state.data.interests.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {state.data.interests.map((item) => (
                   <span
-                    key={interest}
-                    className="inline-flex h-6 items-center rounded border border-primary/60 px-2.5 text-[12.5px] font-medium text-primary"
+                    key={item}
+                    className="rounded-md border border-border bg-card/60 px-3 py-1 text-[13px] text-foreground"
                   >
-                    {interest}
+                    {item}
                   </span>
-                ))
-              ) : (
-                <span className="text-[14px] text-muted-foreground">
-                  {registrationCopy.review.none}
-                </span>
-              )}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[13px] text-muted-foreground">
+                {registrationCopy.review.none}
+              </p>
+            )}
           </div>
 
-          <div className="my-5 border-t border-border" />
-
-          {/* Section 4: Role */}
-          <div>
-            <div className="flex items-center justify-between pb-2">
-              <div className="text-[15px] font-semibold text-white">
-                {registrationCopy.review.sections.role}
-              </div>
-              <button
-                type="button"
-                onClick={() => goToStep(3)}
-                disabled={isSubmitting}
-                className="text-[13px] font-medium text-primary transition-colors hover:underline cursor-pointer"
-              >
-                Edit
-              </button>
-            </div>
-
-            <div className="flex items-center pt-1">
+          <div className="mt-5 border-t border-border/60 pt-4">
+            <span className="text-[13.5px] text-muted-foreground">
+              {registrationCopy.review.sections.role}:
+            </span>
+            <div className="mt-2 flex items-center">
               <span
                 className={cn(
-                  "inline-flex items-center rounded px-3 py-1 text-[13px] font-medium border",
+                  "inline-flex items-center rounded-full border px-3 py-1 text-[13px] font-semibold",
                   roleInfo.tone.border,
                   roleInfo.tone.bg,
                   roleInfo.tone.text
@@ -322,7 +376,7 @@ export function ReviewStep() {
           </div>
         )}
 
-        {/* Navigation Buttons: Back and Create Account */}
+        {/* Navigation Buttons: Back and Submit */}
         <div className="grid grid-cols-[1fr_2fr] gap-2.5 pt-1.5">
           <Button
             type="button"
@@ -347,12 +401,20 @@ export function ReviewStep() {
                   className="size-4 animate-spin shrink-0"
                   aria-hidden="true"
                 />
-                <span>{registrationCopy.review.submitting}</span>
+                <span>
+                  {isCompleteMode
+                    ? authCopy.complete.submitting
+                    : registrationCopy.review.submitting}
+                </span>
               </>
             ) : (
               <>
                 <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
-                <span>{registrationCopy.review.submit}</span>
+                <span>
+                  {isCompleteMode
+                    ? authCopy.complete.submit
+                    : registrationCopy.review.submit}
+                </span>
               </>
             )}
           </Button>

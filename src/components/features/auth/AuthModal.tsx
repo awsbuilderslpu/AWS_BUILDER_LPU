@@ -14,7 +14,11 @@ import {
 import { AuthPanel } from "@/components/features/auth/AuthPanel";
 import { RegisterFlow } from "@/components/features/auth/RegisterFlow";
 import { SignInView } from "@/components/features/auth/SignInView";
+import { ForgotPasswordView } from "@/components/features/auth/ForgotPasswordView";
+import { ResetPasswordView } from "@/components/features/auth/ResetPasswordView";
+import { CompleteFlow } from "@/components/features/auth/CompleteFlow";
 import { RegistrationProvider } from "@/components/features/auth/RegistrationProvider";
+import { useAuth } from "@/components/features/auth/AuthProvider";
 import { Logo } from "@/components/layout/Logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -58,15 +62,25 @@ export function AuthModal() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { account, isLoading: authLoading } = useAuth();
 
   const authValue = searchParams.get(authParam);
   const isOpen =
-    authValue === "signin" || authValue === "register" || authValue === "verified";
+    authValue === "signin" ||
+    authValue === "register" ||
+    authValue === "verified" ||
+    authValue === "forgot" ||
+    authValue === "reset" ||
+    authValue === "complete";
+
   const view: AuthView =
-    authValue === "signin"
-      ? "signin"
-      : authValue === "verified"
-      ? "verified"
+    authValue === "signin" ||
+    authValue === "register" ||
+    authValue === "verified" ||
+    authValue === "forgot" ||
+    authValue === "reset" ||
+    authValue === "complete"
+      ? authValue
       : "register";
 
   const errorParam = searchParams.get("error");
@@ -75,6 +89,30 @@ export function AuthModal() {
     : null;
 
   const previousActiveElementRef = React.useRef<HTMLElement | null>(null);
+
+  // Guard complete view: if not logged in -> redirect to signin; if already complete -> go to /account
+  React.useEffect(() => {
+    if (!isOpen || authLoading || authValue !== "complete") return;
+
+    if (!account) {
+      const nextParam = searchParams.get("next");
+      const params = new URLSearchParams();
+      params.set(authParam, "signin");
+      if (nextParam) {
+        params.set("next", safeNext(nextParam, "/account"));
+      }
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    } else if (account.profileComplete) {
+      const next = safeNext(searchParams.get("next"), "/account");
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete(authParam);
+      params.delete("next");
+      params.delete("error");
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      router.push(next);
+    }
+  }, [isOpen, authLoading, authValue, account, pathname, router, searchParams]);
 
   // Remember active element when popup opens
   React.useEffect(() => {
@@ -101,6 +139,7 @@ export function AuthModal() {
   const handleClose = React.useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete(authParam);
+    params.delete("next");
     params.delete("error");
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
@@ -113,6 +152,45 @@ export function AuthModal() {
       previousActiveElementRef.current = null;
     }
   };
+
+  const getAccessibleTitle = () => {
+    switch (view) {
+      case "register":
+        return authCopy.welcome.title;
+      case "verified":
+        return authCopy.signinSuccess.title;
+      case "forgot":
+        return authCopy.forgot.title;
+      case "reset":
+        return authCopy.reset.title;
+      case "complete":
+        return authCopy.complete.title;
+      case "signin":
+      default:
+        return authCopy.signin.title;
+    }
+  };
+
+  const getAccessibleDescription = () => {
+    switch (view) {
+      case "register":
+        return authCopy.welcome.subtitle;
+      case "verified":
+        return authCopy.signinSuccess.description;
+      case "forgot":
+        return authCopy.forgot.subtitle;
+      case "reset":
+        return authCopy.reset.subtitle;
+      case "complete":
+        return authCopy.complete.subtitle;
+      case "signin":
+      default:
+        return authCopy.signin.subtitle;
+    }
+  };
+
+  const isSigninFamily =
+    view === "signin" || view === "forgot" || view === "reset";
 
   return (
     <Dialog
@@ -137,23 +215,13 @@ export function AuthModal() {
         )}
       >
         {/* Radix Accessible Title & Description */}
-        <DialogTitle className="sr-only">
-          {view === "register"
-            ? authCopy.welcome.title
-            : view === "verified"
-            ? authCopy.signinSuccess.title
-            : authCopy.signin.title}
-        </DialogTitle>
+        <DialogTitle className="sr-only">{getAccessibleTitle()}</DialogTitle>
         <DialogDescription className="sr-only">
-          {view === "register"
-            ? authCopy.welcome.subtitle
-            : view === "verified"
-            ? authCopy.signinSuccess.description
-            : authCopy.signin.subtitle}
+          {getAccessibleDescription()}
         </DialogDescription>
 
         {/* Left Panel: AuthPanel (hidden below lg) */}
-        <AuthPanel variant={view === "signin" ? "signin" : "welcome"} />
+        <AuthPanel variant={isSigninFamily ? "signin" : "welcome"} />
 
         {/* Right Panel */}
         <div className="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden auth-scrollable px-4.5 py-3.5 sm:px-6 sm:py-4">
@@ -172,16 +240,22 @@ export function AuthModal() {
             <Logo />
           </div>
 
-          {/* RegistrationProvider wraps views */}
-          <RegistrationProvider>
-            {view === "register" ? (
+          {/* View rendering */}
+          {view === "register" ? (
+            <RegistrationProvider>
               <RegisterFlow />
-            ) : view === "verified" ? (
-              <VerifiedView onClose={handleClose} />
-            ) : (
-              <SignInView urlError={urlErrorMessage} />
-            )}
-          </RegistrationProvider>
+            </RegistrationProvider>
+          ) : view === "verified" ? (
+            <VerifiedView onClose={handleClose} />
+          ) : view === "forgot" ? (
+            <ForgotPasswordView />
+          ) : view === "reset" ? (
+            <ResetPasswordView />
+          ) : view === "complete" ? (
+            <CompleteFlow />
+          ) : (
+            <SignInView urlError={urlErrorMessage} />
+          )}
         </div>
       </DialogContent>
     </Dialog>

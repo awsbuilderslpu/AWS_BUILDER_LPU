@@ -45,6 +45,7 @@ Follow this guide step by step to initialize and verify the Supabase backend fou
      3. **`003_new_user_trigger.sql`** (`handle_new_user` trigger on `auth.users`, trigger attachments, revoking execute privileges)
      4. **`004_security_policies.sql`** (Role evaluation helpers, RLS enabled on all 9 tables, table grants, and RLS policies)
      5. **`005_storage.sql`** (Buckets `avatars`, `covers`, `event-images`, `blog-images`, MIME restrictions, and storage RLS)
+     6. **`006_owner_completion.sql`** (Lets people finish their own registration, sets column grants on terms_accepted_at and requested_role, and guards identity fields)
    - If any file fails, stop immediately, inspect the error, and resolve it before proceeding.
 
 7. **Run Database Audit**

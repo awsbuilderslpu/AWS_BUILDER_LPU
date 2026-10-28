@@ -29,7 +29,6 @@ export function SignInView({ urlError }: SignInViewProps) {
 
   const [formError, setFormError] = React.useState<string | null>(urlError ?? null);
   const [prevUrlError, setPrevUrlError] = React.useState(urlError);
-  const [showForgotNotice, setShowForgotNotice] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [unconfirmedEmail, setUnconfirmedEmail] = React.useState<string | null>(null);
   const [resending, setResending] = React.useState(false);
@@ -65,6 +64,12 @@ export function SignInView({ urlError }: SignInViewProps) {
   const handleSwitchToRegister = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.set(authParam, "register");
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  const handleSwitchToForgot = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(authParam, "forgot");
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
@@ -203,19 +208,14 @@ export function SignInView({ urlError }: SignInViewProps) {
                 {...register("password")}
               />
 
-              <div className="mt-1.5 flex flex-col items-end gap-1">
+              <div className="mt-1.5 flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setShowForgotNotice((prev) => !prev)}
+                  onClick={handleSwitchToForgot}
                   className="text-[13px] text-primary underline underline-offset-4 transition-colors hover:text-primary-hover cursor-pointer"
                 >
                   {authCopy.signin.forgot}
                 </button>
-                {showForgotNotice && (
-                  <p role="status" className="text-[12.5px] text-muted-foreground">
-                    {authCopy.signin.forgotNotice}
-                  </p>
-                )}
               </div>
             </div>
 

@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Supabase Row Level Security & Database Foundation Audit Queries
--- Run these queries in the Supabase SQL Editor after applying migrations 001-005.
+-- Run these queries in the Supabase SQL Editor after applying migrations 001-006.
 -- ============================================================================
 
 -- 1 tables in schema public with row level security off (expect: no rows)
@@ -23,7 +23,7 @@ where schemaname = 'public'
   )
   and rowsecurity = false;
 
--- 2 every policy in schemas public and storage (schemaname, tablename, policyname, roles, cmd), ordered
+-- 2 every policy in schemas public and storage (schemaname, tablename, policyname, roles, cmd), ordered (expect: exactly 4 policies on public.registrations)
 select
   schemaname,
   tablename,

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
   Mail,
   UserCheck,
@@ -9,6 +10,7 @@ import { requireUser } from "@/lib/auth/server";
 import { roleMeta, type Role } from "@/data/roles";
 import { authCopy } from "@/data/auth";
 import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/button";
 import { SignOutButton } from "./SignOutButton";
 import { cn } from "@/lib/utils";
 
@@ -151,7 +153,7 @@ export default async function AccountPage() {
 
         {/* Profile Completeness Card */}
         <div className="rounded-xl border border-border bg-card/40 p-6 sm:col-span-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="flex size-10 items-center justify-center rounded-lg border border-border bg-white/5">
                 <CheckCircle2
@@ -174,19 +176,30 @@ export default async function AccountPage() {
                 </p>
               </div>
             </div>
-            <span
-              className={cn(
-                "rounded-full px-3 py-1 text-xs font-semibold",
-                account.profileComplete
-                  ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/30"
-                  : "bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/30"
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  "rounded-full px-3 py-1 text-xs font-semibold",
+                  account.profileComplete
+                    ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/30"
+                    : "bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/30"
+                )}
+              >
+                {account.profileComplete ? "Ready" : "Action Needed"}
+              </span>
+              {!account.profileComplete && (
+                <Button asChild variant="primary" size="sm">
+                  <Link href="?auth=complete" scroll={false}>
+                    {authCopy.account.incompleteCta}
+                  </Link>
+                </Button>
               )}
-            >
-              {account.profileComplete ? "Ready" : "Action Needed"}
-            </span>
+            </div>
           </div>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-            {authCopy.account.profileHint}
+            {!account.profileComplete
+              ? authCopy.account.incompleteNotice
+              : authCopy.account.profileHint}
           </p>
         </div>
       </div>

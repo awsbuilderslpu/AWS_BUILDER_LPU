@@ -4,8 +4,14 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User, Mail, IdCard, CalendarDays, Lock, Info, AlertCircle } from "lucide-react";
+import { authCopy } from "@/data/auth";
 import { registrationCopy, registrationConstants, countryCodes } from "@/data/registration";
-import { basicInfoSchema, type BasicInfoValues } from "@/lib/auth/schemas";
+import {
+  basicInfoSchema,
+  completeBasicInfoSchema,
+  type BasicInfoValues,
+  type CompleteBasicInfoValues,
+} from "@/lib/auth/schemas";
 import { useRegistration } from "@/components/features/auth/RegistrationProvider";
 import { RegisterStepFrame } from "@/components/features/auth/RegisterStepFrame";
 import { TextField } from "@/components/ui/TextField";
@@ -20,6 +26,10 @@ export function BasicInfoStep() {
 
   const emailInputRef = React.useRef<HTMLInputElement | null>(null);
 
+  const isCompleteMode = state.mode === "complete";
+  const hasExistingRegNo = Boolean(state.currentProfile?.registrationNumber);
+  const hasExistingDob = Boolean(state.currentProfile?.dateOfBirth);
+
   const maxDateOfBirth = React.useMemo(() => {
     const today = new Date();
     const maxYear = today.getFullYear() - registrationConstants.minAge;
@@ -32,8 +42,10 @@ export function BasicInfoStep() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<BasicInfoValues>({
-    resolver: zodResolver(basicInfoSchema),
+  } = useForm<BasicInfoValues | CompleteBasicInfoValues>({
+    resolver: zodResolver(
+      isCompleteMode ? completeBasicInfoSchema : basicInfoSchema
+    ),
     mode: "onTouched",
     defaultValues: {
       firstName: state.data.firstName ?? "",
@@ -43,27 +55,33 @@ export function BasicInfoStep() {
       phone: state.data.phone ?? "",
       registrationNumber: state.data.registrationNumber ?? "",
       dateOfBirth: state.data.dateOfBirth ?? "",
-      password: state.data.password ?? "",
-      confirmPassword: state.data.confirmPassword ?? "",
+      ...(isCompleteMode
+        ? {}
+        : {
+            password: state.data.password ?? "",
+            confirmPassword: state.data.confirmPassword ?? "",
+          }),
       termsAccepted: state.data.termsAccepted ?? true,
     },
   });
 
-  const { ref: emailFormRef, ...emailFieldProps } = register("email");
+  const { ref: emailFormRef, ...emailFieldProps } = register("email" as const);
 
   React.useEffect(() => {
-    if (state.focusEmail) {
+    if (state.focusEmail && !isCompleteMode) {
       emailInputRef.current?.focus();
     }
-  }, [state.focusEmail]);
+  }, [state.focusEmail, isCompleteMode]);
 
-  const onSubmit = (values: BasicInfoValues) => {
+  const onSubmit = (values: BasicInfoValues | CompleteBasicInfoValues) => {
     saveData(values);
     goToStep(2);
   };
 
   const onInvalid = (formErrors: typeof errors) => {
-    console.warn("BasicInfoStep validation errors:", formErrors);
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("BasicInfoStep validation errors:", formErrors);
+    }
   };
 
   return (
@@ -71,7 +89,7 @@ export function BasicInfoStep() {
       step={1}
       title={registrationCopy.basic.title}
       subtitle={registrationCopy.basic.subtitle}
-      autoFocusHeading={!state.focusEmail}
+      autoFocusHeading={!state.focusEmail || isCompleteMode}
     >
       <form noValidate onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-2">
         <div className="grid gap-2 sm:gap-2.5 sm:grid-cols-2">
@@ -105,7 +123,9 @@ export function BasicInfoStep() {
             autoComplete="email"
             icon={Mail}
             required
-            error={errors.email?.message}
+            disabled={isCompleteMode}
+            hint={isCompleteMode ? authCopy.complete.emailHint : undefined}
+            error={"email" in errors ? (errors.email as { message?: string })?.message : undefined}
             {...emailFieldProps}
             ref={(node) => {
               emailFormRef(node);
@@ -134,6 +154,7 @@ export function BasicInfoStep() {
             autoComplete="off"
             icon={IdCard}
             required
+            disabled={isCompleteMode && hasExistingRegNo}
             error={errors.registrationNumber?.message}
             hint={
               showRegInfo ? registrationCopy.basic.registrationInfo : undefined
@@ -158,40 +179,51 @@ export function BasicInfoStep() {
             autoComplete="bday"
             icon={CalendarDays}
             required
+            disabled={isCompleteMode && hasExistingDob}
             max={maxDateOfBirth}
             className="[color-scheme:dark]"
             error={errors.dateOfBirth?.message}
             {...register("dateOfBirth")}
           />
 
-          {/* Password & Confirm Password */}
-          <PasswordField
-            label={registrationCopy.basic.fields.password.label}
-            placeholder={registrationCopy.basic.fields.password.placeholder}
-            autoComplete="new-password"
-            icon={Lock}
-            required
-            error={errors.password?.message}
-            {...register("password")}
-          />
+          {/* Password & Confirm Password (hidden in complete mode) */}
+          {!isCompleteMode && (
+            <>
+              <PasswordField
+                label={registrationCopy.basic.fields.password.label}
+                placeholder={registrationCopy.basic.fields.password.placeholder}
+                autoComplete="new-password"
+                icon={Lock}
+                required
+                error={"password" in errors ? (errors.password as { message?: string })?.message : undefined}
+                {...register("password" as const)}
+              />
 
-          <PasswordField
-            label={registrationCopy.basic.fields.confirmPassword.label}
-            placeholder={
-              registrationCopy.basic.fields.confirmPassword.placeholder
-            }
-            autoComplete="new-password"
-            icon={Lock}
-            required
-            error={errors.confirmPassword?.message}
-            {...register("confirmPassword")}
-          />
+              <PasswordField
+                label={registrationCopy.basic.fields.confirmPassword.label}
+                placeholder={
+                  registrationCopy.basic.fields.confirmPassword.placeholder
+                }
+                autoComplete="new-password"
+                icon={Lock}
+                required
+                error={
+                  "confirmPassword" in errors
+                    ? (errors.confirmPassword as { message?: string })?.message
+                    : undefined
+                }
+                {...register("confirmPassword" as const)}
+              />
+            </>
+          )}
         </div>
 
-        {/* Spanning full width: Password hint */}
-        <p className="text-[11.5px] leading-snug text-muted-foreground">
-          {registrationCopy.basic.passwordHint}
-        </p>
+        {/* Spanning full width: Password hint (hidden in complete mode) */}
+        {!isCompleteMode && (
+          <p className="text-[11.5px] leading-snug text-muted-foreground">
+            {registrationCopy.basic.passwordHint}
+          </p>
+        )}
 
         {/* Spanning full width: Terms checkbox */}
         <CheckboxField

@@ -6,9 +6,11 @@ import type {
   AcademicValues,
   InterestsValues,
 } from "@/lib/auth/schemas";
+import type { OwnProfileData } from "@/lib/auth/service";
 
 export type RegistrationStage = "welcome" | "steps" | "verify" | "success";
 export type RegistrationStepNumber = 1 | 2 | 3 | 4;
+export type RegistrationMode = "register" | "complete";
 
 export type RegistrationData = Partial<
   BasicInfoValues & AcademicValues & InterestsValues
@@ -19,18 +21,9 @@ export interface RegistrationState {
   step: RegistrationStepNumber;
   data: RegistrationData;
   focusEmail: boolean;
+  mode: RegistrationMode;
+  currentProfile: OwnProfileData | null;
 }
-
-const initialState: RegistrationState = {
-  stage: "welcome",
-  step: 1,
-  data: {
-    countryCode: "+91",
-    requestedRole: "student",
-    interests: [],
-  },
-  focusEmail: false,
-};
 
 type RegistrationAction =
   | { type: "START_STEPS" }
@@ -40,6 +33,26 @@ type RegistrationAction =
   | { type: "CHANGE_EMAIL" }
   | { type: "MARK_VERIFIED" }
   | { type: "RESET" };
+
+function createInitialState(
+  mode: RegistrationMode = "register",
+  initialData?: RegistrationData,
+  currentProfile: OwnProfileData | null = null
+): RegistrationState {
+  return {
+    stage: mode === "complete" ? "steps" : "welcome",
+    step: 1,
+    data: {
+      countryCode: "+91",
+      requestedRole: "student",
+      interests: [],
+      ...initialData,
+    },
+    focusEmail: false,
+    mode,
+    currentProfile,
+  };
+}
 
 function registrationReducer(
   state: RegistrationState,
@@ -94,7 +107,7 @@ function registrationReducer(
         focusEmail: false,
       };
     case "RESET":
-      return initialState;
+      return createInitialState(state.mode, undefined, state.currentProfile);
     default:
       return state;
   }
@@ -114,14 +127,22 @@ export interface RegistrationContextValue {
 const RegistrationContext =
   React.createContext<RegistrationContextValue | null>(null);
 
-export function RegistrationProvider({
-  children,
-}: {
+export interface RegistrationProviderProps {
+  mode?: RegistrationMode;
+  initialData?: RegistrationData;
+  currentProfile?: OwnProfileData | null;
   children: React.ReactNode;
-}) {
+}
+
+export function RegistrationProvider({
+  mode = "register",
+  initialData,
+  currentProfile = null,
+  children,
+}: RegistrationProviderProps) {
   const [state, dispatch] = React.useReducer(
     registrationReducer,
-    initialState
+    createInitialState(mode, initialData, currentProfile)
   );
 
   const startSteps = React.useCallback(() => {
