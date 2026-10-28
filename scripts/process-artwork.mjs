@@ -13,6 +13,8 @@ const MAX_WIDTHS = {
   "blogs-laptop": 1200,
   "contact-scene": 1200,
   "campus-night": 1800,
+  "admin-sidebar-cloud": 700,
+  "profile-cover": 1800,
 };
 
 const DEFAULT_MAX_WIDTH = 1600;

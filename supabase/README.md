@@ -109,3 +109,24 @@ Follow this guide step by step to initialize and verify the Supabase backend fou
 - Duplicate event registrations are blocked by `uq_event_registrations_event_user (event_id, user_id)`.
 - Capacity limits and registration deadlines are strictly enforced by the `private.handle_event_registration()` trigger.
 - The trigger uses `SELECT ... FOR UPDATE` to lock the target event record during registration, guaranteeing serialized capacity tracking and preventing overselling under high concurrency.
+
+---
+
+### Security Simulation
+
+The script [`supabase/audit/rls-simulation.sql`](file:///F:/AWS/AWS_BUILDER_LPU/supabase/audit/rls-simulation.sql) tests all Row Level Security (RLS) policies, column-level grants, and role guard triggers from the database side under simulated `authenticated` sessions.
+
+#### How to Run:
+1. In the Supabase SQL Editor, run:
+   ```sql
+   select id, email, created_at from auth.users order by created_at;
+   ```
+2. Copy the UUID of your active Admin account and the UUID of a regular non-admin registered member.
+3. Open [`supabase/audit/rls-simulation.sql`](file:///F:/AWS/AWS_BUILDER_LPU/supabase/audit/rls-simulation.sql) and paste the two UUIDs into `v_admin` and `v_user` at the top of the block.
+4. Run the entire script in the SQL Editor.
+
+#### Interpreting the Results:
+- **`ALL PASS`**: The first row (`SUMMARY`) shows `ALL PASS` with `pass = true`. This proves all security rules, isolation barriers, and role restrictions are functioning with 100% integrity.
+- **Safety**: Every test executes within a subtransaction ending in an immediate rollback (`SIM_ROLLBACK`). No data is modified. Output contains only SQLSTATE codes and row counts (zero personal data).
+- **Mandatory Re-run**: You must run this simulation again after any step that modifies or touches policies.
+- **Failure Protocol**: If any test fails, **STOP and do NOT proceed to Step 16b**. Share the summary table output for diagnosis.

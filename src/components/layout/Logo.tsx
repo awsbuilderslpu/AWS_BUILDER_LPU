@@ -28,10 +28,10 @@ export function LogoIcon({
   );
 }
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, href = "/" }: { className?: string; href?: string }) {
   return (
     <Link
-      href="/"
+      href={href}
       className={`group flex items-center gap-3 transition-opacity hover:opacity-95 select-none ${className ?? ""}`}
       aria-label={`${siteConfig.name} Home`}
     >

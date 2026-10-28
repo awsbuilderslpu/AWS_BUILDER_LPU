@@ -3,9 +3,6 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { PageBackground } from "@/components/layout/PageBackground";
-import { Navbar } from "@/components/layout/Navbar";
-import { CTABanner } from "@/components/layout/CTABanner";
-import { Footer } from "@/components/layout/Footer";
 import { AuthModal } from "@/components/features/auth/AuthModal";
 import { AuthProvider } from "@/components/features/auth/AuthProvider";
 
@@ -48,15 +45,10 @@ export default function RootLayout({
       <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary">
         <AuthProvider>
           <PageBackground />
-          <div className="relative z-10 flex min-h-screen flex-col">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <CTABanner />
-            <Footer />
-            <Suspense fallback={null}>
-              <AuthModal />
-            </Suspense>
-          </div>
+          {children}
+          <Suspense fallback={null}>
+            <AuthModal />
+          </Suspense>
         </AuthProvider>
       </body>
     </html>

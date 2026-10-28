@@ -96,6 +96,11 @@ export function ForgotPasswordView() {
     }
   };
 
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    void handleSubmit(onSubmit)(e);
+  };
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="mx-auto my-auto w-full max-w-[460px] py-2 sm:py-3">
@@ -168,7 +173,7 @@ export function ForgotPasswordView() {
           <form
             noValidate
             aria-busy={isSubmitting}
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleFormSubmit}
             className="mt-5 grid gap-4"
           >
             <TextField

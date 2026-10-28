@@ -18,7 +18,9 @@ export type ArtworkKey =
   | "contactScene"
   | "contactGlobe"
   | "authGlobe"
-  | "authCampus";
+  | "authCampus"
+  | "adminSidebarCloud"
+  | "adminProfileCover";
 
 export interface ArtworkInfo {
   label: string;
@@ -102,6 +104,16 @@ export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
     label: "Auth: campus at night",
     file: "campus-night.webp",
     imageClass: "object-cover object-bottom",
+  },
+  adminSidebarCloud: {
+    label: "Admin: sidebar cloud",
+    file: "admin-sidebar-cloud.webp",
+    imageClass: "object-contain object-center",
+  },
+  adminProfileCover: {
+    label: "Profile: cover banner",
+    file: "profile-cover.webp",
+    imageClass: "object-cover object-center",
   },
 };
 
