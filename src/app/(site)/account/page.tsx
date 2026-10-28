@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { SignOutButton } from "./SignOutButton";
 import { cn } from "@/lib/utils";
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "My Account | AWS Builder Group LPU",
   description: "View your account details and club membership status.",
