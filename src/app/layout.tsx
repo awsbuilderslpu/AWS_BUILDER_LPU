@@ -7,6 +7,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { CTABanner } from "@/components/layout/CTABanner";
 import { Footer } from "@/components/layout/Footer";
 import { AuthModal } from "@/components/features/auth/AuthModal";
+import { AuthProvider } from "@/components/features/auth/AuthProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -22,7 +23,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "AWS Builder Group LPU",
-  description: "Official website for AWS Builder Group LPU - Learn, Build, and Grow with Cloud Computing.",
+  description:
+    "Official website for AWS Builder Group LPU - Learn, Build, and Grow with Cloud Computing.",
   icons: {
     icon: [
       { url: "/images/logo.svg", type: "image/svg+xml" },
@@ -44,16 +46,18 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} dark`}
     >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary">
-        <PageBackground />
-        <div className="relative z-10 flex min-h-screen flex-col">
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <CTABanner />
-          <Footer />
-          <Suspense fallback={null}>
-            <AuthModal />
-          </Suspense>
-        </div>
+        <AuthProvider>
+          <PageBackground />
+          <div className="relative z-10 flex min-h-screen flex-col">
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <CTABanner />
+            <Footer />
+            <Suspense fallback={null}>
+              <AuthModal />
+            </Suspense>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

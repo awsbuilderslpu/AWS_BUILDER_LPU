@@ -9,7 +9,7 @@ import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { PageHeading } from "@/components/ui/PageHeading";
 import { Button } from "@/components/ui/button";
 import { StatsRow } from "@/components/ui/StatsRow";
-import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
+import { Artwork } from "@/components/ui/Artwork";
 import { HeroDecor } from "@/components/features/home/HeroDecor";
 
 export interface HomeHeroProps extends React.HTMLAttributes<HTMLElement> {
@@ -26,8 +26,10 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
       {...props}
     >
       {/* Right Artwork (Desktop xl and up, absolute layer z-0) */}
-      <ArtworkSlot
-        name="Home: cloud + servers"
+      <Artwork
+        slot="homeCloudServers"
+        priority
+        sizes="(min-width: 1280px) 48vw, 448px"
         className="absolute right-0 top-[3%] bottom-0 hidden w-[48%] aspect-auto z-0 xl:flex"
       />
 
@@ -35,7 +37,7 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
       <HeroDecor />
 
       {/* Main Content Wrapper (z-10) */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-6 py-16 xl:pl-[16%]">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-6 py-16 xl:mx-0 xl:max-w-none xl:px-0 xl:pl-[21.8vw]">
         <div className="flex w-full max-w-[560px] flex-col items-start">
           {/* Eyebrow */}
           <SectionEyebrow lines="after" size="md">
@@ -48,7 +50,7 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
           </div>
 
           {/* Subtitle / Description (24px gap) */}
-          <p className="mt-6 max-w-[540px] text-lg leading-[1.5] text-muted-foreground">
+          <p className="mt-6 max-w-[540px] text-lg leading-[1.5] text-muted-foreground xl:max-w-[clamp(420px,32vw,540px)]">
             {siteConfig.description}
           </p>
 
@@ -83,8 +85,9 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
 
         {/* Right Artwork (Below xl breakpoint, normal flow under content) */}
         <div className="mt-12 mb-10 w-full max-w-md self-center xl:hidden">
-          <ArtworkSlot
-            name="Home: cloud + servers"
+          <Artwork
+            slot="homeCloudServers"
+            sizes="(min-width: 1280px) 48vw, 448px"
             className="aspect-[4/3] w-full"
           />
         </div>

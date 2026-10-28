@@ -2,7 +2,7 @@ import { Users, Cloud, UsersRound, Trophy, type LucideIcon } from "lucide-react"
 import { siteConfig } from "@/data/site";
 
 export const authParam = "auth" as const;
-export type AuthView = "signin" | "register";
+export type AuthView = "signin" | "register" | "verified";
 
 export interface BenefitItem {
   icon: LucideIcon;
@@ -48,6 +48,13 @@ export interface AuthErrors {
   failed: string;
   google: string;
   unavailable: string;
+  emailNotConfirmed: string;
+  resendLink: string;
+  rateLimited: string;
+  network: string;
+  linkExpired: string;
+  googleFailed: string;
+  generic: string;
 }
 
 export interface PanelCopy {
@@ -63,6 +70,38 @@ export interface PanelCopy {
   footerGroups: string[][];
 }
 
+export interface ConfirmPageCopy {
+  title: string;
+  subtitle: string;
+  description: string;
+  button: string;
+  verifying: string;
+  expiredTitle: string;
+  expiredDescription: string;
+  backToSignIn: string;
+}
+
+export interface SigninSuccessCopy {
+  title: string;
+  description: string;
+  cta: string;
+}
+
+export interface AccountPageCopy {
+  title: string;
+  subtitle: string;
+  emailLabel: string;
+  roleLabel: string;
+  statusLabel: string;
+  profileLabel: string;
+  profileComplete: string;
+  profileIncomplete: string;
+  profileHint: string;
+  activeStatus: string;
+  inactiveStatus: string;
+  signOut: string;
+}
+
 const { name, org, website } = siteConfig;
 
 export const authCopy: {
@@ -70,6 +109,9 @@ export const authCopy: {
   signin: SigninCopy;
   errors: AuthErrors;
   panel: PanelCopy;
+  confirmPage: ConfirmPageCopy;
+  signinSuccess: SigninSuccessCopy;
+  account: AccountPageCopy;
 } = {
   welcome: {
     title: "Create your account",
@@ -97,7 +139,7 @@ export const authCopy: {
     submit: "Sign In",
     submitting: "Signing in...",
     success: "You're signed in",
-    successNote: "Demo mode: no real account was used.",
+    successNote: "Redirecting to your account dashboard...",
     prompt: "Don't have an account?",
     link: "Register here",
   },
@@ -107,6 +149,14 @@ export const authCopy: {
     failed: "Incorrect email or password.",
     google: "Google sign-in isn't connected yet.",
     unavailable: "Accounts aren't open yet. Please check back soon.",
+    emailNotConfirmed:
+      "Please confirm your email address before signing in. Check your inbox for the confirmation link.",
+    resendLink: "Resend confirmation email",
+    rateLimited: "Too many sign-in attempts. Please wait a moment and try again.",
+    network: "Network connection error. Please check your internet connection.",
+    linkExpired: "This confirmation link has expired or has already been used.",
+    googleFailed: "Could not sign in with Google. Please try again or use email.",
+    generic: "An unexpected error occurred. Please try again.",
   },
   panel: {
     tagline: ["Learn", "Build", "Share", "Grow Together"],
@@ -145,4 +195,46 @@ export const authCopy: {
       ["Community", "Technology", "Opportunities", "For a brighter", "Tomorrow"],
     ],
   },
+  confirmPage: {
+    title: "Confirm Your Email",
+    subtitle: `Activate your ${name} ${org} account`,
+    description:
+      "To protect against automated scanners and activate your account, click the button below to confirm your email address.",
+    button: "Confirm Email Address",
+    verifying: "Verifying confirmation...",
+    expiredTitle: "Verification Link Expired",
+    expiredDescription:
+      "This verification link has expired, is invalid, or was already used. Please sign in or request a new link.",
+    backToSignIn: "Sign In",
+  },
+  signinSuccess: {
+    title: "Email Verified!",
+    description: "Your email has been confirmed and your account is active.",
+    cta: "Go to My Account",
+  },
+  account: {
+    title: "Account Overview",
+    subtitle: `Your profile and membership details with ${name} ${org}.`,
+    emailLabel: "Email Address",
+    roleLabel: "Assigned Role",
+    statusLabel: "Registration Status",
+    profileLabel: "Profile Completeness",
+    profileComplete: "Complete",
+    profileIncomplete: "Incomplete",
+    profileHint:
+      "All required student and academic details have been submitted. Profile updates will be available in the member directory.",
+    activeStatus: "Active",
+    inactiveStatus: "Inactive",
+    signOut: "Sign out",
+  },
+};
+
+/**
+ * Standard query param error mapping for OAuth callbacks and auth redirects.
+ */
+export const errorParams: Record<string, string> = {
+  access_denied: "Sign in was canceled or access was denied.",
+  oauth_failed: authCopy.errors.googleFailed,
+  exchange_failed: "Could not establish a secure session. Please try again.",
+  link_expired: authCopy.errors.linkExpired,
 };

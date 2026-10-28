@@ -9,7 +9,7 @@ import { OrDivider } from "@/components/ui/OrDivider";
 import { Button } from "@/components/ui/button";
 
 export function VerifyView() {
-  const { state, changeEmail, markVerified } = useRegistration();
+  const { state, changeEmail } = useRegistration();
 
   const email = state.data.email ?? "";
 
@@ -63,7 +63,7 @@ export function VerifyView() {
   return (
     <div className="flex flex-1 flex-col">
       <div className="mx-auto my-auto flex w-full max-w-[560px] flex-col items-center py-6 text-center">
-        {/* 84px Tile with 2px orange outline and soft orange glow */}
+        {/* 84px Tile with 2px primary outline and soft primary glow */}
         <div
           aria-hidden="true"
           className="flex size-[84px] items-center justify-center rounded-2xl border-2 border-primary bg-primary/10 shadow-[0_0_25px_rgba(255,153,0,0.3)] select-none"
@@ -120,7 +120,7 @@ export function VerifyView() {
             </Button>
 
             {resendSuccess && (
-              <p role="status" className="text-[13.5px] text-muted-foreground">
+              <p role="status" className="text-[13.5px] text-emerald-400">
                 {registrationCopy.verify.resent}
               </p>
             )}
@@ -148,22 +148,6 @@ export function VerifyView() {
           <Pencil className="size-4 shrink-0" aria-hidden="true" />
           <span>{registrationCopy.verify.change}</span>
         </Button>
-
-        {/* Demo Mode Action (non-production only) */}
-        {process.env.NODE_ENV !== "production" && (
-          <div className="mt-6 flex w-full flex-col items-center justify-center gap-2.5 rounded-lg border border-dashed border-border p-4 text-[13px] text-muted-foreground">
-            <span>{registrationCopy.verify.demoNote}</span>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={markVerified}
-              className="h-8 text-xs font-medium"
-            >
-              {registrationCopy.verify.demoButton}
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );

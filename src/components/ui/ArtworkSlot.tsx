@@ -10,46 +10,7 @@ export interface ArtworkConfig {
   priority?: boolean;
 }
 
-export const ARTWORK_REGISTRY: Record<string, ArtworkConfig> = {
-  "Home: globe": {
-    src: encodeURI("/images/artwork/Digital Globe with Neon Network Arcs.png"),
-    alt: "Digital globe with neon network arcs",
-    objectPosition: "object-left-bottom",
-    priority: true,
-  },
-  "Home: AWS cube": {
-    src: encodeURI("/images/artwork/Neon Isometric AI Server Cube.png"),
-    alt: "Neon isometric AI server cube",
-    objectPosition: "object-left",
-    priority: true,
-  },
-  "Home: cloud + servers": {
-    src: encodeURI("/images/artwork/Neon Isometric Cloud Computing Network.png"),
-    alt: "AWS neon cloud computing network",
-    objectPosition: "object-center",
-    priority: true,
-  },
-  "CTA cloud + servers": {
-    src: encodeURI("/images/artwork/Neon Cloud Server Network.png"),
-    alt: "Neon cloud server network",
-    objectPosition: "object-center",
-  },
-  "About: AWS cube + cloud": {
-    src: encodeURI("/images/artwork/Neon Isometric Cloud Computing Network.png"),
-    alt: "AWS neon cloud computing network",
-    objectPosition: "object-center",
-  },
-  "Auth: globe + floating clouds": {
-    src: encodeURI("/images/artwork/Digital Globe with Neon Network Arcs.png"),
-    alt: "Digital globe with neon network arcs",
-    objectPosition: "object-center",
-  },
-  "Auth: campus at night": {
-    src: encodeURI("/images/artwork/Neon Cloud Computing Cityscape.png"),
-    alt: "Neon campus and cloud computing cityscape at night",
-    objectPosition: "object-bottom",
-  },
-};
+export const ARTWORK_REGISTRY: Record<string, ArtworkConfig> = {};
 
 export interface ArtworkSlotProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;

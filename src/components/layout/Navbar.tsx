@@ -9,6 +9,9 @@ import { siteConfig, navLinks } from "@/data/site";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/layout/Logo";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { UserMenu } from "@/components/layout/UserMenu";
+import { useAuth } from "@/components/features/auth/AuthProvider";
+import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -21,6 +24,7 @@ import {
 export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
+  const { account, signOut } = useAuth();
 
   const isLinkActive = (href: string) => {
     if (href === "/") {
@@ -69,15 +73,21 @@ export function Navbar() {
         {/* Right: Actions (Desktop) */}
         <div className="hidden items-center gap-3 lg:flex">
           <NotificationBell />
-          <Button
-            asChild
-            variant="outlineOrange"
-            size="sm"
-            withArrow
-            className="h-10 rounded-lg px-5 text-sm font-medium"
-          >
-            <Link href={siteConfig.signInUrl} scroll={false}>Sign in</Link>
-          </Button>
+          {account ? (
+            <UserMenu account={account} />
+          ) : (
+            <Button
+              asChild
+              variant="outlineOrange"
+              size="sm"
+              withArrow
+              className="h-10 rounded-lg px-5 text-sm font-medium"
+            >
+              <Link href={siteConfig.signInUrl} scroll={false}>
+                Sign in
+              </Link>
+            </Button>
+          )}
         </div>
 
         {/* Mobile: Notification and Hamburger */}
@@ -138,28 +148,64 @@ export function Navbar() {
               </div>
 
               {/* Mobile Drawer Footer CTA */}
-              <div className="flex flex-col gap-3 pt-6">
-                <Button
-                  asChild
-                  variant="primary"
-                  withArrow
-                  className="w-full justify-center"
-                  onClick={() => setIsOpen(false)}
-                >
-                  <Link href={siteConfig.joinUrl} scroll={false}>
-                    Join the Club
-                  </Link>
-                </Button>
-                <div className="text-center">
-                  <Link
-                    href={siteConfig.signInUrl}
-                    scroll={false}
-                    onClick={() => setIsOpen(false)}
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                  >
-                    Sign in
-                  </Link>
-                </div>
+              <div className="flex flex-col gap-3 pt-6 border-t border-border">
+                {account ? (
+                  <>
+                    <div className="flex items-center gap-3">
+                      <Avatar name={account.displayName || "User"} size={40} />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-white">
+                          {account.displayName}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {account.email}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="w-full justify-center"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Link href="/account">My Account</Link>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-center text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                      onClick={async () => {
+                        setIsOpen(false);
+                        await signOut();
+                      }}
+                    >
+                      Sign out
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      asChild
+                      variant="primary"
+                      withArrow
+                      className="w-full justify-center"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Link href={siteConfig.joinUrl} scroll={false}>
+                        Join the Club
+                      </Link>
+                    </Button>
+                    <div className="text-center">
+                      <Link
+                        href={siteConfig.signInUrl}
+                        scroll={false}
+                        onClick={() => setIsOpen(false)}
+                        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                      >
+                        Sign in
+                      </Link>
+                    </div>
+                  </>
+                )}
               </div>
             </SheetContent>
           </Sheet>

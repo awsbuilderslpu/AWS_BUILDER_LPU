@@ -7,6 +7,7 @@ import { Check } from "lucide-react";
 import { authParam } from "@/data/auth";
 import { registrationCopy } from "@/data/registration";
 import { useRegistration } from "@/components/features/auth/RegistrationProvider";
+import { useAuth } from "@/components/features/auth/AuthProvider";
 import { Button } from "@/components/ui/button";
 
 export function SuccessView() {
@@ -14,6 +15,7 @@ export function SuccessView() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { reset } = useRegistration();
+  const { account } = useAuth();
 
   const headingRef = React.useRef<HTMLHeadingElement>(null);
 
@@ -21,22 +23,30 @@ export function SuccessView() {
     headingRef.current?.focus();
   }, []);
 
-  const handleGoToLogin = () => {
+  const handleCta = () => {
     reset();
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(authParam, "signin");
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    if (account) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete(authParam);
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      router.push("/account");
+    } else {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set(authParam, "signin");
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    }
   };
 
   return (
     <div className="flex flex-1 flex-col">
       <div className="mx-auto my-auto flex w-full max-w-[560px] flex-col items-center py-6 text-center">
-        {/* 96px circle with 2px border-success, bg-success/10, soft success glow */}
+        {/* 96px circle with 2px border-emerald-500, bg-emerald-500/10, soft success glow */}
         <div
           aria-hidden="true"
-          className="flex size-24 items-center justify-center rounded-full border-2 border-success bg-success/10 shadow-[0_0_25px_rgba(34,197,94,0.3)] select-none"
+          className="flex size-24 items-center justify-center rounded-full border-2 border-emerald-500 bg-emerald-500/10 shadow-[0_0_25px_rgba(16,185,129,0.3)] select-none"
         >
-          <Check className="size-12 text-success stroke-[2.5]" />
+          <Check className="size-12 text-emerald-400 stroke-[2.5]" />
         </div>
 
         {/* Heading */}
@@ -59,15 +69,17 @@ export function SuccessView() {
           {registrationCopy.success.text}
         </p>
 
-        {/* Go to Login Button */}
+        {/* CTA Button */}
         <Button
           type="button"
           variant="primary"
           withArrow
-          onClick={handleGoToLogin}
+          onClick={handleCta}
           className="mt-8 h-12 w-full text-[15.5px] font-semibold"
         >
-          {registrationCopy.success.cta}
+          {account
+            ? registrationCopy.success.cta
+            : registrationCopy.success.ctaSignedOut}
         </Button>
 
         {/* Explore Links Grid */}

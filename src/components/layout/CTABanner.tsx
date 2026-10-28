@@ -5,7 +5,7 @@ import { Users, BookOpen, Rocket } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import { CornerFrame } from "@/components/ui/CornerFrame";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
-import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
+import { Artwork } from "@/components/ui/Artwork";
 import { Button } from "@/components/ui/button";
 
 export function CTABanner() {
@@ -96,8 +96,9 @@ export function CTABanner() {
 
             {/* Right: Artwork Placeholder */}
             <div className="w-full lg:col-span-3">
-              <ArtworkSlot
-                name="CTA cloud + servers"
+              <Artwork
+                slot="ctaCloudServers"
+                sizes="(min-width: 1024px) 28vw, 448px"
                 className="mx-auto max-w-[280px] sm:max-w-[320px] lg:max-w-none"
               />
             </div>

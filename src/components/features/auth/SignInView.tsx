@@ -6,22 +6,34 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, Lock, Check, Loader2 } from "lucide-react";
 import { authCopy, authParam } from "@/data/auth";
+import { safeNext } from "@/lib/auth/safe-next";
 import { signInSchema, type SignInValues } from "@/lib/auth/schemas";
-import { signInWithPassword } from "@/lib/auth/service";
+import {
+  signInWithPassword,
+  resendVerificationEmail,
+} from "@/lib/auth/service";
 import { TextField } from "@/components/ui/TextField";
 import { PasswordField } from "@/components/ui/PasswordField";
 import GoogleSignInButton from "@/components/GoogleSignInButton";
 import { OrDivider } from "@/components/ui/OrDivider";
 import { Button } from "@/components/ui/button";
 
-export function SignInView() {
+export interface SignInViewProps {
+  urlError?: string | null;
+}
+
+export function SignInView({ urlError }: SignInViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [formError, setFormError] = React.useState<string | null>(null);
+  const [formError, setFormError] = React.useState<string | null>(urlError ?? null);
+  const [prevUrlError, setPrevUrlError] = React.useState(urlError);
   const [showForgotNotice, setShowForgotNotice] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
+  const [unconfirmedEmail, setUnconfirmedEmail] = React.useState<string | null>(null);
+  const [resending, setResending] = React.useState(false);
+  const [resendStatus, setResendStatus] = React.useState<string | null>(null);
 
   const headingRef = React.useRef<HTMLHeadingElement>(null);
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
@@ -35,9 +47,17 @@ export function SignInView() {
     };
   }, []);
 
+  if (urlError !== prevUrlError) {
+    setPrevUrlError(urlError);
+    setFormError(urlError ?? null);
+  }
+
+  const nextDestination = safeNext(searchParams.get("next"), "/account");
+
   const handleClose = React.useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete(authParam);
+    params.delete("error");
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }, [pathname, router, searchParams]);
@@ -51,6 +71,7 @@ export function SignInView() {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm<SignInValues>({
     resolver: zodResolver(signInSchema),
@@ -63,16 +84,42 @@ export function SignInView() {
 
   const onSubmit = async (values: SignInValues) => {
     setFormError(null);
+    setUnconfirmedEmail(null);
+    setResendStatus(null);
+
     const result = await signInWithPassword(values);
     if (!result.ok) {
       setFormError(result.error);
+      if (result.error === authCopy.errors.emailNotConfirmed) {
+        setUnconfirmedEmail(values.email);
+      }
       return;
     }
 
     setIsSuccess(true);
     timerRef.current = setTimeout(() => {
       handleClose();
-    }, 1500);
+      router.push(nextDestination);
+      router.refresh();
+    }, 1200);
+  };
+
+  const handleResend = async () => {
+    const email = unconfirmedEmail || getValues("email");
+    if (!email) return;
+
+    setResending(true);
+    setResendStatus(null);
+    try {
+      const res = await resendVerificationEmail(email);
+      if (res.ok) {
+        setResendStatus("Confirmation email sent! Check your inbox.");
+      } else {
+        setResendStatus(res.error);
+      }
+    } finally {
+      setResending(false);
+    }
   };
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -97,7 +144,7 @@ export function SignInView() {
         </p>
 
         <div className="mt-3.5">
-          <GoogleSignInButton redirectTo="/members">
+          <GoogleSignInButton redirectTo={nextDestination}>
             {authCopy.welcome.google}
           </GoogleSignInButton>
 
@@ -111,9 +158,9 @@ export function SignInView() {
           >
             <div
               aria-hidden="true"
-              className="flex size-11 shrink-0 items-center justify-center rounded-full border border-success/50 bg-success/10"
+              className="flex size-11 shrink-0 items-center justify-center rounded-full border border-emerald-500/50 bg-emerald-500/10"
             >
-              <Check className="size-5 text-success" />
+              <Check className="size-5 text-emerald-400" />
             </div>
 
             <h3 className="text-[18px] font-semibold text-white">
@@ -177,7 +224,24 @@ export function SignInView() {
                 role="alert"
                 className="rounded-md border border-red-400/40 bg-red-400/10 px-4 py-2.5 text-sm text-red-300"
               >
-                {formError}
+                <p>{formError}</p>
+                {unconfirmedEmail && (
+                  <div className="mt-2 pt-2 border-t border-red-400/20">
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      disabled={resending}
+                      className="text-xs font-semibold text-primary underline underline-offset-2 hover:text-primary-hover disabled:opacity-50"
+                    >
+                      {resending ? "Sending link..." : authCopy.errors.resendLink}
+                    </button>
+                    {resendStatus && (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {resendStatus}
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 

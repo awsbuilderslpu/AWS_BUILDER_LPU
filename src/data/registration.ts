@@ -235,14 +235,13 @@ export const registrationCopy = {
     resendIn: (s: number) => `Resend Email (${s}s)`,
     resent: "Verification email sent again.",
     change: "Change Email Address",
-    demoNote: "Demo mode: no email was sent.",
-    demoButton: "Simulate clicking the link",
   },
   success: {
     title: "Registration Successful!",
     welcome: `Welcome to ${name} ${org} 🎉`,
     text: "Your account has been created and verified. Club admins will review your registration, and you'll get an email once it's approved.",
-    cta: "Go to Login",
+    cta: "Go to my account",
+    ctaSignedOut: "Sign in",
     links: [
       { label: "Events", href: "/events", icon: CalendarDays },
       { label: "Blogs", href: "/blogs", icon: FileText },

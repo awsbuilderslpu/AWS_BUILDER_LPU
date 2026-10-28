@@ -4,7 +4,7 @@ import { StackedLabel } from "@/components/ui/decor/StackedLabel";
 import { DotGrid } from "@/components/ui/decor/DotGrid";
 import { PlusMark } from "@/components/ui/decor/PlusMark";
 import { InlineLabel } from "@/components/ui/decor/InlineLabel";
-import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
+import { Artwork } from "@/components/ui/Artwork";
 import { decorLabels } from "@/data/home";
 
 export interface HeroDecorProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -92,16 +92,18 @@ export function HeroDecor({ className, ...props }: HeroDecorProps) {
         className="absolute left-[30.5%] top-[90%]"
       />
 
-      {/* 13. ArtworkSlot Home: AWS cube */}
-      <ArtworkSlot
-        name="Home: AWS cube"
-        className="absolute left-0 top-[15%] h-[55%] w-[20%] aspect-auto"
+      {/* 13. Artwork Home: AWS cube */}
+      <Artwork
+        slot="homeCube"
+        sizes="24vw"
+        className="absolute left-0 top-[15%] h-[55%] w-[24%] aspect-auto"
       />
 
-      {/* 14. ArtworkSlot Home: globe */}
-      <ArtworkSlot
-        name="Home: globe"
-        className="absolute bottom-0 left-0 h-[29%] w-[30%] aspect-auto"
+      {/* 14. Artwork Home: globe */}
+      <Artwork
+        slot="homeGlobe"
+        sizes="42vw"
+        className="absolute bottom-0 left-0 h-[52%] w-[42%] aspect-auto"
       />
     </div>
   );
