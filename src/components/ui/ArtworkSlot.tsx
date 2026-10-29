@@ -10,7 +10,19 @@ export interface ArtworkConfig {
   priority?: boolean;
 }
 
-export const ARTWORK_REGISTRY: Record<string, ArtworkConfig> = {};
+export const ARTWORK_REGISTRY: Record<string, ArtworkConfig> = {
+  "Blogs: laptop + servers + cloud": {
+    src: "/images/artwork/Neon AWS Cloud Computing Network.png",
+    alt: "Neon AWS Cloud Computing Network",
+    objectFit: "contain",
+  },
+  "Blogs: cube + globe": {
+    src: "/images/artwork/Neon Orbital Network Overlay.png",
+    alt: "Neon Orbital Network Overlay",
+    objectFit: "contain",
+    objectPosition: "object-left",
+  },
+};
 
 export interface ArtworkSlotProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
@@ -20,6 +32,7 @@ export interface ArtworkSlotProps extends React.HTMLAttributes<HTMLDivElement> {
   priority?: boolean;
   objectFit?: "contain" | "cover";
   objectPosition?: string;
+  imageClassName?: string;
 }
 
 export function ArtworkSlot({
@@ -30,6 +43,7 @@ export function ArtworkSlot({
   priority: explicitPriority,
   objectFit: explicitFit,
   objectPosition: explicitPos,
+  imageClassName,
   ...props
 }: ArtworkSlotProps) {
   const registered = ARTWORK_REGISTRY[name];
@@ -58,7 +72,8 @@ export function ArtworkSlot({
           className={cn(
             "pointer-events-none select-none transition-opacity duration-300",
             fit === "contain" ? "object-contain" : "object-cover",
-            pos
+            pos,
+            imageClassName
           )}
         />
       </div>
@@ -80,4 +95,3 @@ export function ArtworkSlot({
     </div>
   );
 }
-

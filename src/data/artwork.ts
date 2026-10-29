@@ -67,13 +67,13 @@ export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
   },
   blogsLaptop: {
     label: "Blogs: laptop + servers + cloud",
-    file: "blogs-laptop.webp",
+    file: "Neon AWS Cloud Computing Network.png",
     imageClass: "object-contain",
   },
   blogsGlobe: {
     label: "Blogs: cube + globe",
-    file: "globe-tall.webp",
-    imageClass: "object-cover object-left-bottom",
+    file: "Neon Orbital Network Overlay.png",
+    imageClass: "object-contain object-left",
   },
   membersScene: {
     label: "Members: AWS cloud + builders",

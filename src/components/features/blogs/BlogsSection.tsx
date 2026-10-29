@@ -5,6 +5,7 @@ import { PageHeading } from "@/components/ui/PageHeading";
 import { blogsHeading, blogsIntro } from "@/data/blogs";
 import { BlogsDecor } from "@/components/features/blogs/BlogsDecor";
 import { BlogsExplorer } from "@/components/features/blogs/BlogsExplorer";
+import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
 
 export interface BlogsSectionProps extends React.HTMLAttributes<HTMLElement> {
   className?: string;
@@ -16,7 +17,7 @@ export function BlogsSection({ className, ...props }: BlogsSectionProps) {
       className={cn("relative overflow-hidden pb-12", className)}
       {...props}
     >
-      {/* Direct child 1: BlogsDecor */}
+      {/* Direct child 1: BlogsDecor (Desktop xl and up) */}
       <BlogsDecor />
 
       {/* Direct child 2: Header */}
@@ -34,6 +35,22 @@ export function BlogsSection({ className, ...props }: BlogsSectionProps) {
           <p className="text-base leading-[1.47] text-muted-foreground xl:mt-14 xl:max-w-[clamp(280px,21vw,352px)]">
             {blogsIntro}
           </p>
+        </div>
+
+        {/* Mobile / Tablet Artwork (Below xl breakpoint) */}
+        <div className="relative mx-auto mt-6 flex h-[180px] w-full max-w-sm items-center justify-center sm:h-[220px] xl:hidden">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10 scale-110 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-2xl"
+          />
+          <ArtworkSlot
+            name="Blogs: laptop + servers + cloud"
+            src="/images/artwork/Neon AWS Cloud Computing Network.png"
+            alt="AWS Cloud Computing Network"
+            priority
+            className="h-full w-full aspect-auto overflow-visible"
+            imageClassName="drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]"
+          />
         </div>
       </div>
 
