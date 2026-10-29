@@ -1,7 +1,6 @@
 import * as React from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
 import { type ArtworkKey, artworkManifest, getArtworkSrc } from "@/data/artwork";
 
 export interface ArtworkProps {
@@ -16,8 +15,7 @@ export function Artwork({ slot, className, sizes, priority }: ArtworkProps) {
   const src = getArtworkSrc(slot);
 
   if (!src) {
-    const label = entry ? entry.label : slot;
-    return <ArtworkSlot name={label} className={className} />;
+    return null;
   }
 
   return (

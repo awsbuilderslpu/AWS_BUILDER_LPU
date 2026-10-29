@@ -25,8 +25,8 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
       )}
       {...props}
     >
-      {/* Right Artwork (Desktop xl and up, absolute layer z-0) */}
-      <div className="absolute right-0 top-[3%] bottom-0 hidden w-[48%] aspect-auto z-0 xl:flex items-center justify-end">
+      {/* Right Artwork (Desktop xl and up, absolute layer z-0, elevated more up) */}
+      <div className="absolute right-[5%] xl:right-[7%] 2xl:right-[8%] top-[-8%] bottom-[18%] hidden w-[52%] 2xl:w-[48%] aspect-auto z-0 xl:flex items-center justify-center">
         {/* Ambient atmospheric glow behind the cloud servers */}
         <div
           aria-hidden="true"
@@ -35,7 +35,7 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
         <Artwork
           slot="homeCloudServers"
           priority
-          sizes="(min-width: 1280px) 48vw, 448px"
+          sizes="(min-width: 1280px) 50vw, 448px"
           className="h-full w-full aspect-auto overflow-visible"
         />
       </div>
@@ -44,8 +44,8 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
       <HeroDecor />
 
       {/* Main Content Wrapper (z-10) */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-6 py-16 xl:mx-0 xl:max-w-none xl:px-0 xl:pl-[21.8vw]">
-        <div className="flex w-full max-w-[560px] flex-col items-start">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-6 py-16 xl:mx-0 xl:max-w-none xl:px-0 xl:pl-[10%]">
+        <div className="flex w-full max-w-[580px] flex-col items-start origin-left scale-90 -translate-y-10">
           {/* Eyebrow */}
           <SectionEyebrow lines="after" size="md">
             {siteConfig.name} / {siteConfig.org}

@@ -33,7 +33,7 @@ export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
   homeCloudServers: {
     label: "Home: cloud + servers",
     file: "Futuristic AWS Cloud Infrastructure Network.png",
-    imageClass: "object-contain object-center xl:object-right drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]",
+    imageClass: "object-contain object-center drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]",
   },
   homeCube: {
     label: "Home: AWS cube",
