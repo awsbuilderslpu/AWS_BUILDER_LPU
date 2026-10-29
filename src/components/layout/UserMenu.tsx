@@ -45,7 +45,11 @@ export function UserMenu({ account, className }: UserMenuProps) {
           )}
         >
           <div className="relative">
-            <Avatar name={account.displayName || "User"} size={36} />
+            <Avatar
+              name={account.displayName || "User"}
+              src={account.avatarUrl || "/images/members/arfaa.png"}
+              size={36}
+            />
             <span
               className={cn(
                 "absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full ring-2 ring-background",
@@ -54,13 +58,14 @@ export function UserMenu({ account, className }: UserMenuProps) {
               aria-hidden="true"
             />
           </div>
-          <ChevronDown
-            className={cn(
-              "size-4 text-muted-foreground transition-transform duration-200 group-hover:text-foreground",
-              open && "rotate-180"
-            )}
-            aria-hidden="true"
-          />
+          <div className="hidden sm:flex flex-col text-left leading-tight">
+            <span className="text-xs font-bold uppercase tracking-wider text-white">
+              {account.displayName || "MD ARFAA TAJ"}
+            </span>
+            <span className="text-[11px] font-medium text-muted-foreground capitalize">
+              {account.role || "Admin"}
+            </span>
+          </div>
         </button>
       </DropdownMenuTrigger>
 

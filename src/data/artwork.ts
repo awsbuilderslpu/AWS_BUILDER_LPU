@@ -9,6 +9,7 @@ export type ArtworkKey =
   | "homeGlobe"
   | "ctaCloudServers"
   | "aboutScene"
+  | "aboutGlobe"
   | "eventsCubes"
   | "eventsGlobe"
   | "blogsLaptop"
@@ -55,6 +56,11 @@ export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
     file: "Neon AWS Cloud Network Isometric Illustration.png",
     imageClass: "object-contain object-right",
   },
+  aboutGlobe: {
+    label: "About: orbital network overlay",
+    file: "Neon Orbital Network Overlay.png",
+    imageClass: "object-contain object-left",
+  },
   eventsCubes: {
     label: "Events: cloud + cubes",
     file: "events-cubes.webp",
@@ -62,8 +68,8 @@ export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
   },
   eventsGlobe: {
     label: "Events: cubes + globe",
-    file: "globe-tall.webp",
-    imageClass: "object-cover object-left-bottom",
+    file: "Neon Orbital Network Overlay.png",
+    imageClass: "object-contain object-left",
   },
   blogsLaptop: {
     label: "Blogs: laptop + servers + cloud",
@@ -77,23 +83,23 @@ export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
   },
   membersScene: {
     label: "Members: AWS cloud + builders",
-    file: "members-builders.webp",
-    imageClass: "object-contain",
+    file: "Neon Cloud Network Team.png",
+    imageClass: "object-contain drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]",
   },
   membersGlobe: {
     label: "Members: globe",
-    file: "globe-tall.webp",
-    imageClass: "object-cover object-left-bottom",
+    file: "Neon Orbital Network Overlay.png",
+    imageClass: "object-contain object-left",
   },
   contactScene: {
     label: "Contact: cloud + mail",
-    file: "contact-scene.webp",
-    imageClass: "object-contain",
+    file: "Neon Cyber Contact Network.png",
+    imageClass: "object-contain drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]",
   },
   contactGlobe: {
     label: "Contact: globe",
-    file: "globe-tall.webp",
-    imageClass: "object-cover object-left-bottom",
+    file: "Neon Orbital Network Overlay.png",
+    imageClass: "object-contain object-left",
   },
   authGlobe: {
     label: "Auth: globe + floating clouds",

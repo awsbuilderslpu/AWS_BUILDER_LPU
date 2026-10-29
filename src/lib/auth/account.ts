@@ -22,6 +22,7 @@ export interface AccountSummary {
   isActive: boolean;
   registrationStatus: RegistrationStatus | null;
   profileComplete: boolean;
+  avatarUrl?: string;
 }
 
 /**

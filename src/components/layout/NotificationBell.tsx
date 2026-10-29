@@ -125,11 +125,10 @@ export function NotificationBell() {
       >
         <Bell className="size-5 transition-transform duration-200 hover:rotate-6" />
 
-        {/* Pulse Dot indicator when unread */}
+        {/* Unread count badge */}
         {unreadCount > 0 && (
-          <span className="absolute top-2 right-2 flex size-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-            <span className="relative inline-flex size-2 rounded-full bg-primary" />
+          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-black leading-none shadow-sm">
+            {unreadCount}
           </span>
         )}
       </button>

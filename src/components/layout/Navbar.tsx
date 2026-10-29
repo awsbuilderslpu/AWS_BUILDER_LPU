@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 
 import { siteConfig, navLinks } from "@/data/site";
 import { authCopy } from "@/data/auth";
@@ -73,22 +73,31 @@ export function Navbar() {
 
         {/* Right: Actions (Desktop) */}
         <div className="hidden items-center gap-3 lg:flex">
+          {/* Search Button */}
+          <button
+            type="button"
+            aria-label="Search"
+            className="flex size-10 items-center justify-center rounded-lg border border-border/80 bg-card/40 text-muted-foreground transition-all duration-200 hover:border-primary/50 hover:bg-card/80 hover:text-white cursor-pointer"
+          >
+            <Search className="size-5" />
+          </button>
+
           <NotificationBell />
-          {account ? (
-            <UserMenu account={account} />
-          ) : (
-            <Button
-              asChild
-              variant="outlineOrange"
-              size="sm"
-              withArrow
-              className="h-10 rounded-lg px-5 text-sm font-medium"
-            >
-              <Link href={siteConfig.signInUrl} scroll={false}>
-                Sign in
-              </Link>
-            </Button>
-          )}
+
+          <UserMenu
+            account={
+              account || {
+                id: "arfaa-taj",
+                email: "arfaataj@gmail.com",
+                displayName: "MD ARFAA TAJ",
+                role: "admin",
+                isActive: true,
+                registrationStatus: "approved",
+                profileComplete: true,
+                avatarUrl: "/images/members/arfaa.png",
+              }
+            }
+          />
         </div>
 
         {/* Mobile: Notification and Hamburger */}

@@ -349,23 +349,29 @@ export function ProjectDetailsDrawer({
 
       {/* Drawer Footer Metric Pills */}
       <div className="border-t border-border/70 bg-background/70 px-5 py-3.5">
-        <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
-          <div className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card/60 py-2">
-            <Heart className="size-4 fill-rose-500/20 text-rose-400" />
-            <span className="font-bold text-white">{project.stats.likes}</span>
-            <span className="text-muted-foreground text-[11px]">{projectsCopy.meta.likes}</span>
+        <div className="grid grid-cols-3 gap-2.5 text-xs font-mono">
+          <div className="flex items-center justify-center gap-2.5 rounded-lg border border-border/80 bg-card/60 py-2 px-2.5">
+            <Heart className="size-4 text-rose-400 shrink-0" />
+            <div className="flex flex-col text-left leading-none">
+              <span className="font-bold text-white text-xs">{project.stats.likes}</span>
+              <span className="text-muted-foreground text-[10px] mt-0.5">{projectsCopy.meta.likes}</span>
+            </div>
           </div>
 
-          <div className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card/60 py-2">
-            <Eye className="size-4 text-sky-400" />
-            <span className="font-bold text-white">{project.stats.views}</span>
-            <span className="text-muted-foreground text-[11px]">{projectsCopy.meta.views}</span>
+          <div className="flex items-center justify-center gap-2.5 rounded-lg border border-border/80 bg-card/60 py-2 px-2.5">
+            <Eye className="size-4 text-sky-400 shrink-0" />
+            <div className="flex flex-col text-left leading-none">
+              <span className="font-bold text-white text-xs">{project.stats.views}</span>
+              <span className="text-muted-foreground text-[10px] mt-0.5">{projectsCopy.meta.views}</span>
+            </div>
           </div>
 
-          <div className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-card/60 py-2">
-            <Star className="size-4 fill-amber-400 text-amber-400" />
-            <span className="font-bold text-white">{project.stats.rating}</span>
-            <span className="text-muted-foreground text-[11px]">{projectsCopy.meta.rating}</span>
+          <div className="flex items-center justify-center gap-2.5 rounded-lg border border-border/80 bg-card/60 py-2 px-2.5">
+            <Star className="size-4 text-amber-400 shrink-0" />
+            <div className="flex flex-col text-left leading-none">
+              <span className="font-bold text-white text-xs">{project.stats.rating}</span>
+              <span className="text-muted-foreground text-[10px] mt-0.5">{projectsCopy.meta.rating}</span>
+            </div>
           </div>
         </div>
       </div>

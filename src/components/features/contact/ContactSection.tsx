@@ -6,6 +6,7 @@ import { ContactDecor } from "@/components/features/contact/ContactDecor";
 import { ContactForm } from "@/components/features/contact/ContactForm";
 import { ContactInfo } from "@/components/features/contact/ContactInfo";
 import { MapCard } from "@/components/features/contact/MapCard";
+import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
 
 export function ContactSection() {
   return (
@@ -24,6 +25,23 @@ export function ContactSection() {
         <p className="mt-2 text-base leading-6 text-muted-foreground max-w-[clamp(300px,26.6vw,445px)]">
           {contactIntro}
         </p>
+      </div>
+
+      {/* Mobile/Tablet Artwork banner */}
+      <div className="relative mx-auto mt-6 aspect-[3/2] w-full max-w-[420px] px-6 xl:hidden">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 scale-105 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-2xl"
+        />
+        <ArtworkSlot
+          name="Contact: cloud + mail"
+          src="/images/artwork/Neon Cyber Contact Network.png"
+          alt="Neon Cyber Contact Network"
+          priority
+          objectFit="contain"
+          className="h-full w-full aspect-auto overflow-visible"
+          imageClassName="drop-shadow-[0_0_25px_rgba(255,153,0,0.3)]"
+        />
       </div>
 
       {/* Main grid */}

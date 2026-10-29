@@ -172,7 +172,7 @@ export function ProjectsExplorer() {
   const endIndex = Math.min(activePage * pageSize, filteredProjects.length);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto max-w-[1560px] px-4 sm:px-6 lg:px-8 py-8">
       {/* =========================================================================
           FILTER ROW 1: Status Tabs & Search Box
          ========================================================================= */}
@@ -298,16 +298,19 @@ export function ProjectsExplorer() {
         </div>
 
         {/* Reset Link/Button */}
-        {hasActiveFilters && (
-          <button
-            type="button"
-            onClick={handleResetFilters}
-            className="ml-auto inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline cursor-pointer"
-          >
-            <RotateCcw className="size-3" />
-            <span>{projectsCopy.resetFilters}</span>
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleResetFilters}
+          className={cn(
+            "ml-auto inline-flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-colors",
+            hasActiveFilters
+              ? "text-primary hover:underline"
+              : "text-muted-foreground hover:text-white"
+          )}
+        >
+          <RotateCcw className="size-3" />
+          <span>{projectsCopy.resetFilters}</span>
+        </button>
       </div>
 
       {/* =========================================================================
@@ -337,7 +340,7 @@ export function ProjectsExplorer() {
               "grid gap-6 items-start",
               activeProject
                 ? "grid-cols-1 lg:grid-cols-[1fr_390px] xl:grid-cols-[1fr_430px]"
-                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
             )}
           >
             {/* Cards Grid */}
@@ -345,8 +348,8 @@ export function ProjectsExplorer() {
               className={cn(
                 "grid gap-5",
                 activeProject
-                  ? "grid-cols-1 sm:grid-cols-2"
-                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                  ? "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
+                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
               )}
             >
               {paginatedProjects.map((project) => (

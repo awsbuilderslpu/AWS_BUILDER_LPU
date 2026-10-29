@@ -105,11 +105,6 @@ export function ProjectCard({
                 {tech}
               </span>
             ))}
-            {project.techStack.length > 5 && (
-              <span className="inline-flex items-center rounded border border-border bg-card/40 px-1.5 py-0.5 text-[10.5px] font-mono text-muted-foreground/80">
-                +{project.techStack.length - 5}
-              </span>
-            )}
           </div>
         </div>
       </div>

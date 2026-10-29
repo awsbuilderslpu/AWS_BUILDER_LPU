@@ -82,11 +82,23 @@ export function EventsDecor({ className, ...props }: EventsDecorProps) {
         className="absolute right-[10.2%] top-[4.4%] h-[31%] w-[18.5%] aspect-auto"
       />
 
-      {/* 10. ArtworkSlot "Events: cubes + globe" -> left-0 top-[44%] h-[47%] w-[14.5%] */}
-      <ArtworkSlot
-        name="Events: cubes + globe"
-        className="absolute left-0 top-[44%] h-[47%] w-[14.5%] aspect-auto"
-      />
+      {/* 10. ArtworkSlot: Neon Orbital Network Overlay on the left side */}
+      <div className="absolute left-0 top-[140px] h-[640px] xl:h-[720px] 2xl:h-[780px] w-[200px] xl:w-[240px] 2xl:w-[260px]">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-12 top-1/4 -z-10 h-80 w-80 rounded-full bg-gradient-to-tr from-cyan-500/15 via-primary/10 to-transparent blur-3xl"
+        />
+        <ArtworkSlot
+          name="Events: cubes + globe"
+          src="/images/artwork/Neon Orbital Network Overlay.png"
+          alt="Neon Orbital Network Overlay"
+          priority
+          objectFit="contain"
+          objectPosition="object-left"
+          className="h-full w-full aspect-auto overflow-visible"
+          imageClassName="object-left drop-shadow-[0_0_25px_rgba(0,180,255,0.2)]"
+        />
+      </div>
     </div>
   );
 }

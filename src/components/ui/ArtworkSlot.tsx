@@ -22,6 +22,40 @@ export const ARTWORK_REGISTRY: Record<string, ArtworkConfig> = {
     objectFit: "contain",
     objectPosition: "object-left",
   },
+  "About: orbital network overlay": {
+    src: "/images/artwork/Neon Orbital Network Overlay.png",
+    alt: "Neon Orbital Network Overlay",
+    objectFit: "contain",
+    objectPosition: "object-left",
+  },
+  "Events: cubes + globe": {
+    src: "/images/artwork/Neon Orbital Network Overlay.png",
+    alt: "Neon Orbital Network Overlay",
+    objectFit: "contain",
+    objectPosition: "object-left",
+  },
+  "Members: globe": {
+    src: "/images/artwork/Neon Orbital Network Overlay.png",
+    alt: "Neon Orbital Network Overlay",
+    objectFit: "contain",
+    objectPosition: "object-left",
+  },
+  "Contact: globe": {
+    src: "/images/artwork/Neon Orbital Network Overlay.png",
+    alt: "Neon Orbital Network Overlay",
+    objectFit: "contain",
+    objectPosition: "object-left",
+  },
+  "Contact: cloud + mail": {
+    src: "/images/artwork/Neon Cyber Contact Network.png",
+    alt: "Neon Cyber Contact Network",
+    objectFit: "contain",
+  },
+  "Members: AWS cloud + builders": {
+    src: "/images/artwork/Neon Cloud Network Team.png",
+    alt: "Neon Cloud Network Team",
+    objectFit: "contain",
+  },
   "About: AWS cube + cloud": {
     src: "/images/artwork/Neon AWS Cloud Network Isometric Illustration.png",
     alt: "Neon AWS Cloud Network Isometric Illustration",

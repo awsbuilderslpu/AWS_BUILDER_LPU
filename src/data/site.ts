@@ -36,7 +36,7 @@ export interface SocialLink {
 
 export const siteConfig: SiteConfig = {
   name: "AWS Student Builders Group",
-  shortName: "Builder Group",
+  shortName: "Cloud Club",
   org: "LPU",
   university: "Lovely Professional University",
   email: "awsbuilders.lpu@gmail.com",
@@ -55,8 +55,8 @@ export const navLinks: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/about" },
   { label: "Events", href: "/events" },
-  { label: "Projects", href: "/projects" },
   { label: "Blogs", href: "/blogs" },
+  { label: "Projects", href: "/projects" },
   { label: "Members", href: "/members" },
   { label: "Contact", href: "/contact" },
 ];
@@ -68,8 +68,8 @@ export const footerLinks: FooterLinkGroup[] = [
       { label: "Home", href: "/" },
       { label: "About", href: "/about" },
       { label: "Events", href: "/events" },
-      { label: "Projects", href: "/projects" },
       { label: "Blogs", href: "/blogs" },
+      { label: "Projects", href: "/projects" },
       { label: "Members", href: "/members" },
       { label: "Contact", href: "/contact" },
     ],
