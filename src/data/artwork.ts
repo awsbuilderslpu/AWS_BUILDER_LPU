@@ -32,8 +32,8 @@ export interface ArtworkInfo {
 export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
   homeCloudServers: {
     label: "Home: cloud + servers",
-    file: "cloud-servers.webp",
-    imageClass: "object-contain object-center xl:object-right",
+    file: "Futuristic AWS Cloud Infrastructure Network.png",
+    imageClass: "object-contain object-center xl:object-right drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]",
   },
   homeCube: {
     label: "Home: AWS cube",
@@ -47,12 +47,12 @@ export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
   },
   ctaCloudServers: {
     label: "CTA cloud + servers",
-    file: "cloud-servers.webp",
-    imageClass: "object-contain object-center lg:object-right",
+    file: "Futuristic AWS Cloud Infrastructure Network.png",
+    imageClass: "object-contain object-center lg:object-right drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]",
   },
   aboutScene: {
     label: "About: AWS cube + cloud",
-    file: "about-scene.webp",
+    file: "Neon AWS Cloud Network Isometric Illustration.png",
     imageClass: "object-contain object-right",
   },
   eventsCubes: {

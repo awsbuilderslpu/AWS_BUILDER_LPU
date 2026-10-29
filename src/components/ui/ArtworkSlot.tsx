@@ -22,6 +22,23 @@ export const ARTWORK_REGISTRY: Record<string, ArtworkConfig> = {
     objectFit: "contain",
     objectPosition: "object-left",
   },
+  "About: AWS cube + cloud": {
+    src: "/images/artwork/Neon AWS Cloud Network Isometric Illustration.png",
+    alt: "Neon AWS Cloud Network Isometric Illustration",
+    objectFit: "contain",
+    objectPosition: "object-right",
+  },
+  "Home: cloud + servers": {
+    src: "/images/artwork/Futuristic AWS Cloud Infrastructure Network.png",
+    alt: "Futuristic AWS Cloud Infrastructure Network",
+    objectFit: "contain",
+    objectPosition: "object-right",
+  },
+  "CTA cloud + servers": {
+    src: "/images/artwork/Futuristic AWS Cloud Infrastructure Network.png",
+    alt: "Futuristic AWS Cloud Infrastructure Network",
+    objectFit: "contain",
+  },
 };
 
 export interface ArtworkSlotProps extends React.HTMLAttributes<HTMLDivElement> {

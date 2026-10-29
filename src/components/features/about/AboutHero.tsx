@@ -141,10 +141,23 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
       />
 
       {/* 4. Artwork slot */}
-      <ArtworkSlot
-        name="About: AWS cube + cloud"
-        className="mx-6 mb-10 w-[calc(100%-3rem)] max-w-md self-center xl:absolute xl:right-0 xl:top-[3%] xl:z-0 xl:m-0 xl:h-[68%] xl:w-[47%] xl:max-w-none xl:aspect-auto"
-      />
+      <div className="relative mx-6 mb-10 aspect-[4/3] w-[calc(100%-3rem)] max-w-md self-center xl:absolute xl:right-0 xl:top-[3%] xl:z-0 xl:m-0 xl:h-[68%] xl:w-[47%] xl:max-w-none xl:aspect-auto">
+        {/* Ambient atmospheric glow behind the isometric scene */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 scale-105 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-3xl"
+        />
+        <ArtworkSlot
+          name="About: AWS cube + cloud"
+          src="/images/artwork/Neon AWS Cloud Network Isometric Illustration.png"
+          alt="AWS Cloud Network Isometric Illustration"
+          priority
+          objectFit="contain"
+          objectPosition="object-right"
+          className="h-full w-full aspect-auto overflow-visible"
+          imageClassName="object-contain xl:object-right drop-shadow-[0_0_35px_rgba(255,153,0,0.3)]"
+        />
+      </div>
     </section>
   );
 }

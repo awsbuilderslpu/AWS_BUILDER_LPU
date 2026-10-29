@@ -26,12 +26,19 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
       {...props}
     >
       {/* Right Artwork (Desktop xl and up, absolute layer z-0) */}
-      <Artwork
-        slot="homeCloudServers"
-        priority
-        sizes="(min-width: 1280px) 48vw, 448px"
-        className="absolute right-0 top-[3%] bottom-0 hidden w-[48%] aspect-auto z-0 xl:flex"
-      />
+      <div className="absolute right-0 top-[3%] bottom-0 hidden w-[48%] aspect-auto z-0 xl:flex items-center justify-end">
+        {/* Ambient atmospheric glow behind the cloud servers */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 scale-105 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-3xl"
+        />
+        <Artwork
+          slot="homeCloudServers"
+          priority
+          sizes="(min-width: 1280px) 48vw, 448px"
+          className="h-full w-full aspect-auto overflow-visible"
+        />
+      </div>
 
       {/* Hero Decor Layer (xl and up, z-[1]) */}
       <HeroDecor />
@@ -84,11 +91,15 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
         </div>
 
         {/* Right Artwork (Below xl breakpoint, normal flow under content) */}
-        <div className="mt-12 mb-10 w-full max-w-md self-center xl:hidden">
+        <div className="relative mt-12 mb-10 w-full max-w-md self-center xl:hidden">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 -z-10 scale-105 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-3xl"
+          />
           <Artwork
             slot="homeCloudServers"
-            sizes="(min-width: 1280px) 48vw, 448px"
-            className="aspect-[4/3] w-full"
+            sizes="(max-width: 1280px) 100vw, 448px"
+            className="aspect-[4/3] w-full overflow-visible"
           />
         </div>
       </div>
