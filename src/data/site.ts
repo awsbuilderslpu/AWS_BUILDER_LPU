@@ -35,8 +35,8 @@ export interface SocialLink {
 }
 
 export const siteConfig: SiteConfig = {
-  name: "AWS Student Builders Group",
-  shortName: "Cloud Club",
+  name: "AWS Builder Group",
+  shortName: "AWS Builder Group",
   org: "LPU",
   university: "Lovely Professional University",
   email: "awsbuilders.lpu@gmail.com",
@@ -45,7 +45,7 @@ export const siteConfig: SiteConfig = {
   joinUrl: "?auth=register",
   signInUrl: "?auth=signin",
   description:
-    "Official student-led community for AWS Student Builder Group LPU. Building, learning, and scaling cloud-native systems.",
+    "Official student-led community for AWS Builder Group LPU. Building, learning, and scaling cloud-native systems.",
   tagline: "A stronger cloud community together.",
   // The club's time zone; all event and publish times are entered and shown in it.
   timezone: "Asia/Kolkata",

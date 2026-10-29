@@ -10,7 +10,10 @@ import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
 
 export function MembersSection() {
   return (
-    <section className="relative overflow-hidden pb-12">
+    <section
+      className="members-page-section relative overflow-hidden pb-12"
+      style={{ zoom: 0.8 }}
+    >
       <MembersDecor />
 
       {/* Header */}

@@ -37,7 +37,7 @@ export function Logo({ className, href = "/" }: { className?: string; href?: str
     >
       <LogoIcon className="size-9 sm:size-10 shrink-0 text-[#9D48FA] transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_0_12px_rgba(157,72,250,0.5)]" />
       <div className="flex flex-col justify-center leading-none">
-        <span className="text-[20px] sm:text-[22px] font-bold tracking-tight text-foreground">
+        <span className="text-[17px] sm:text-[19px] font-bold tracking-tight text-foreground whitespace-nowrap">
           {siteConfig.shortName}
         </span>
         <span className="text-[10px] font-mono font-medium tracking-[0.22em] text-muted-foreground uppercase mt-1">

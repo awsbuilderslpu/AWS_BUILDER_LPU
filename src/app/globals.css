@@ -92,6 +92,11 @@ body {
   zoom: 0.9;
 }
 
+/* Members page 80% scale (-20%) */
+.members-page-section {
+  zoom: 0.8;
+}
+
 /* Thin dark scrollbar for auth modal right panel */
 .auth-scrollable {
   scrollbar-width: thin;
