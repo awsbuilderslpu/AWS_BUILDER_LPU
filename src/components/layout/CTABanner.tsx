@@ -25,7 +25,7 @@ export function CTABanner() {
   ];
 
   return (
-    <section id="cta" className="w-full scroll-mt-24 mt-12 py-12 md:py-16">
+    <section id="cta" className="w-full scroll-mt-24 mt-0 pt-2 pb-8 md:pt-4 md:pb-12">
       <div className="mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <CornerFrame className="bg-card/70 backdrop-blur-sm">
           <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-10">

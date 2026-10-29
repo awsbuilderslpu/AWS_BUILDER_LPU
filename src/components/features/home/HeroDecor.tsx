@@ -79,7 +79,7 @@ export function HeroDecor({ className, ...props }: HeroDecorProps) {
       <StackedLabel
         lines={decorLabels.strongerCloud}
         line
-        className="absolute right-[4%] top-[81%]"
+        className="absolute right-[4%] top-[74%]"
       />
 
       {/* 12. DotGrid orange 5x4 gap 18 */}
@@ -88,7 +88,7 @@ export function HeroDecor({ className, ...props }: HeroDecorProps) {
         rows={4}
         gap={18}
         tone="orange"
-        className="absolute left-[30.5%] top-[90%]"
+        className="absolute left-[30.5%] top-[89%]"
       />
     </div>
   );
