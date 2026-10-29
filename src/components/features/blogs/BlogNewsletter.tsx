@@ -66,7 +66,7 @@ export function BlogNewsletter({ className, ...props }: BlogNewsletterProps) {
           <label htmlFor="blog-newsletter-email" className="sr-only">
             Email address
           </label>
-          <div className="flex h-[42px] overflow-hidden rounded-md border border-border bg-background/60 transition-colors focus-within:border-primary">
+          <div className="flex items-center gap-2">
             <input
               id="blog-newsletter-email"
               type="email"
@@ -76,14 +76,14 @@ export function BlogNewsletter({ className, ...props }: BlogNewsletterProps) {
                 if (error) setError(null);
               }}
               placeholder={newsletterCopy.placeholder}
-              className="flex-1 bg-transparent px-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+              className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-card/40 px-3.5 text-sm text-foreground placeholder:text-muted-foreground transition-all duration-200 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
             <button
               type="submit"
               aria-label="Subscribe"
-              className="flex w-[46px] shrink-0 items-center justify-center bg-primary text-primary-foreground transition-colors hover:bg-primary-hover cursor-pointer"
+              className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground font-medium transition-all hover:bg-primary-hover hover:scale-105 active:scale-95 cursor-pointer shadow-sm focus:outline-none focus:ring-1 focus:ring-primary"
             >
-              <ArrowRight className="size-4" aria-hidden="true" />
+              <ArrowRight className="size-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
             </button>
           </div>
 
