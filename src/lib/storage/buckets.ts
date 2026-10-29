@@ -52,3 +52,4 @@ export const maxInputPixels = 40_000_000; // 40,000,000 pixels
 export function isBucketKey(x: unknown): x is BucketKey {
   return typeof x === "string" && Object.prototype.hasOwnProperty.call(buckets, x);
 }
+

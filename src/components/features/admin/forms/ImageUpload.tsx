@@ -112,22 +112,18 @@ export function ImageUpload({
     };
   }, [revokeLocalBlob]);
 
-  // Load preview URL when value changes from outside
+  // Load preview URL asynchronously when an existing value is present
   React.useEffect(() => {
+    let cancelled = false;
+
     if (!value) {
       revokeLocalBlob();
-      setPreviewUrl(null);
-      setPreviewFailed(false);
       return;
     }
 
-    // If we just uploaded and have a local preview, maintain it
     if (localBlobUrlRef.current) {
       return;
     }
-
-    let cancelled = false;
-    setPreviewFailed(false);
 
     void getPreviewUrl(bucket, value).then((url) => {
       if (cancelled) return;

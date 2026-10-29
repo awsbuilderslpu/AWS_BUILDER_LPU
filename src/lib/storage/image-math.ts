@@ -75,3 +75,4 @@ export function computeCropRect(
   const y = Math.round((srcH - height) / 2);
   return { x: 0, y, width, height };
 }
+

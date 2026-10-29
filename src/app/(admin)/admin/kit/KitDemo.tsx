@@ -44,6 +44,13 @@ import { type ListConfig } from "@/lib/admin/list-params";
 import { type CsvColumn } from "@/lib/admin/csv";
 import { notify } from "@/lib/admin/notify";
 import { demoItems, type DemoItem } from "@/lib/admin/demo-data";
+import {
+  ImageUpload,
+  DateTimeField,
+  DateField,
+  TimeField,
+} from "@/components/features/admin/forms";
+import { formatIst } from "@/lib/datetime";
 
 const listConfig: ListConfig = {
   tabs: ["all", "pending", "approved", "rejected", "archived"],
@@ -86,6 +93,13 @@ export function KitDemo() {
   const [bulkRejectOpen, setBulkRejectOpen] = React.useState(false);
   const [forceLoading, setForceLoading] = React.useState(false);
   const [forceEmpty, setForceEmpty] = React.useState(false);
+
+  // Form tools demo state
+  const [featuredImage, setFeaturedImage] = React.useState<string | null>(null);
+  const [avatarImage, setAvatarImage] = React.useState<string | null>(null);
+  const [eventStart, setEventStart] = React.useState<string | null>(null);
+  const [demoDate, setDemoDate] = React.useState<string>("");
+  const [demoTime, setDemoTime] = React.useState<string>("");
 
   // Clear selection whenever tab, search, filters, or page change
   // Uses React's recommended render-phase state adjustment pattern
@@ -443,7 +457,82 @@ export function KitDemo() {
         noun="students"
       />
 
-      {/* 9. Detail Drawer */}
+      {/* 9. Form Tools Section */}
+      <section className="rounded-lg border border-border bg-card/40 p-6 space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Form tools</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Image uploads here are real files in your Supabase Storage; delete the demo files afterwards.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {/* Featured Image Upload (Public bucket) */}
+          <div className="space-y-2">
+            <ImageUpload
+              id="demo-featured-image"
+              label="Featured image"
+              bucket="blog-images"
+              value={featuredImage}
+              onChange={setFeaturedImage}
+              aspect={1200 / 630}
+              recommended="1200 x 630"
+            />
+            <p className="text-xs text-muted-foreground">
+              Stored path: <code>{featuredImage ?? "none"}</code>
+            </p>
+          </div>
+
+          {/* Profile Photo Upload (Private bucket, avatar circle) */}
+          <div className="space-y-2">
+            <ImageUpload
+              id="demo-profile-photo"
+              label="Profile photo"
+              bucket="avatars"
+              value={avatarImage}
+              onChange={setAvatarImage}
+              previewShape="circle"
+              aspect={1}
+            />
+            <p className="text-xs text-muted-foreground">
+              Stored path: <code>{avatarImage ?? "none"}</code>
+            </p>
+          </div>
+        </div>
+
+        {/* Date and Time Fields */}
+        <div className="border-t border-border/60 pt-6 space-y-6">
+          <div className="space-y-2 max-w-xl">
+            <DateTimeField
+              id="demo-event-start"
+              label="Event start"
+              value={eventStart}
+              onChange={setEventStart}
+            />
+            <div className="space-y-0.5 text-xs text-muted-foreground">
+              <p>UTC value: {eventStart ?? "none"}</p>
+              <p>Shown to visitors: {eventStart ? formatIst(eventStart) : "none"}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 max-w-xl">
+            <DateField
+              id="demo-date-field"
+              label="Date"
+              value={demoDate}
+              onChange={setDemoDate}
+            />
+            <TimeField
+              id="demo-time-field"
+              label="Time"
+              value={demoTime}
+              onChange={setDemoTime}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 10. Detail Drawer */}
       <DetailDrawer
         open={Boolean(drawerRow)}
         onOpenChange={(open) => !open && setDrawerRow(null)}

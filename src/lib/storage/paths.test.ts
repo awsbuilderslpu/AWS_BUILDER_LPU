@@ -96,3 +96,4 @@ describe("paths storage helper", () => {
     assert.equal(isSafeObjectPath(longPath), false);
   });
 });
+

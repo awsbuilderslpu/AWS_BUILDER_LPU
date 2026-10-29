@@ -46,3 +46,4 @@ describe("image-math storage helper", () => {
     assert.deepEqual(qualitySteps, [0.85, 0.75, 0.65, 0.55]);
   });
 });
+

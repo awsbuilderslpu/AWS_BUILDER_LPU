@@ -16,3 +16,4 @@ export class UploadError extends Error {
     this.code = code;
   }
 }
+

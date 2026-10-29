@@ -36,3 +36,4 @@ export function publicObjectUrl(
 
   return `${base}/storage/v1/object/public/${bucket}/${encodedPath}`;
 }
+

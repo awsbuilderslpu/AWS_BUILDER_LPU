@@ -142,7 +142,7 @@ export async function processImage(
       throw new UploadError("unreadable");
     }
 
-    jpgCtx.fillStyle = "#ffffff";
+    jpgCtx.fillStyle = "white";
     jpgCtx.fillRect(0, 0, target.width, target.height);
     jpgCtx.drawImage(canvas, 0, 0);
 
