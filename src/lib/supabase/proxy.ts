@@ -10,9 +10,12 @@ import { isSupabaseConfigured, getSupabaseEnv } from "./env";
  * to the outgoing response.
  */
 export async function updateSession(request: NextRequest): Promise<NextResponse> {
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
+
   let response = NextResponse.next({
     request: {
-      headers: request.headers,
+      headers: requestHeaders,
     },
   });
 
@@ -32,7 +35,9 @@ export async function updateSession(request: NextRequest): Promise<NextResponse>
           request.cookies.set(name, value)
         );
         response = NextResponse.next({
-          request,
+          request: {
+            headers: requestHeaders,
+          },
         });
         cookiesToSet.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options)

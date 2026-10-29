@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { requireRole } from "@/lib/auth/server";
 import { AdminShell } from "@/components/features/admin/AdminShell";
 
@@ -20,7 +21,9 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const account = await requireRole(["admin", "core"], "/admin");
+  const headerList = await headers();
+  const pathname = headerList.get("x-pathname") || "/admin";
+  const account = await requireRole(["admin", "core"], pathname);
 
   return (
     <div className="relative z-10 min-h-screen">

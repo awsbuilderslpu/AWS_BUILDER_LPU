@@ -5,6 +5,7 @@ import { AdminSidebar } from "@/components/features/admin/AdminSidebar";
 import { AdminTopBar } from "@/components/features/admin/AdminTopBar";
 import { CommandMenu } from "@/components/features/admin/CommandMenu";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Toaster } from "@/components/ui/sonner";
 import { adminCopy } from "@/data/admin";
 import type { AccountSummary } from "@/lib/auth/account";
 
@@ -86,6 +87,9 @@ export function AdminShell({ account, children }: AdminShellProps) {
         onOpenChange={setCommandOpen}
         role={account.role}
       />
+
+      {/* Global Admin Notifications */}
+      <Toaster />
     </div>
   );
 }

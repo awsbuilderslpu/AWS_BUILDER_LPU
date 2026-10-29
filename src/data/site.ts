@@ -10,6 +10,7 @@ export interface SiteConfig {
   signInUrl: string;
   description: string;
   tagline: string;
+  timezone: string;
 }
 
 export interface NavLink {
@@ -46,6 +47,8 @@ export const siteConfig: SiteConfig = {
   description:
     "Official student-led community for AWS Student Builder Group LPU. Building, learning, and scaling cloud-native systems.",
   tagline: "A stronger cloud community together.",
+  // The club's time zone; all event and publish times are entered and shown in it.
+  timezone: "Asia/Kolkata",
 };
 
 export const navLinks: NavLink[] = [
