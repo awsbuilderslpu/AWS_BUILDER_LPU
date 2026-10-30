@@ -34,11 +34,11 @@ export interface Project {
 }
 
 export const projectsCopy = {
-  eyebrow: "AWS BUILDER GROUP / LPU",
+  eyebrow: "AWS CLOUD CLUB / LPU",
   titlePrefix: "OUR",
   titleHighlight: "PROJECTS",
   subtitle:
-    "Explore production-grade cloud architectures, generative AI tools, and serverless applications built by our student developers at AWS Builder Group LPU. Designed for resilience, scalability, and real impact.",
+    "Explore production-grade cloud architectures, generative AI tools, and serverless applications built by our student developers at AWS Student Builders Group LPU. Designed for resilience, scalability, and real impact.",
   searchPlaceholder: "Search projects by title, member, technology...",
   allProjectsTab: "All Projects",
   featuredTab: "Featured",

@@ -10,52 +10,62 @@ import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
 
 export function MembersSection() {
   return (
-    <section
-      className="members-page-section relative overflow-hidden pb-12"
-      style={{ zoom: 0.8 }}
-    >
+    <section className="relative w-full overflow-hidden pb-16">
       <MembersDecor />
 
-      {/* Header */}
-      <div className="relative z-10 w-full px-6 pt-7 xl:pl-[12.3%]">
-        <SectionEyebrow lines="both">Our Members</SectionEyebrow>
-        <PageHeading
-          as="h1"
-          size="md"
-          lines={membersHeading}
-          className="mt-3"
-        />
-        <p className="mt-2 text-base leading-6 text-muted-foreground max-w-[clamp(300px,26.6vw,445px)]">
-          {membersIntro}
-        </p>
-      </div>
+      {/* Main Container */}
+      <div className="relative z-10 mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 xl:px-10 pt-6 sm:pt-8">
+        {/* Hero Section: Two-Column Desktop Layout */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 lg:gap-8">
+          {/* Left Column: Eyebrow + Heading + Subtitle + StatsRow */}
+          <div className="flex flex-col items-start w-full lg:max-w-[680px] xl:max-w-[740px] shrink-0">
+            <SectionEyebrow lines="both">Our Members</SectionEyebrow>
+            <PageHeading
+              as="h1"
+              size="md"
+              lines={membersHeading}
+              className="mt-3 text-3xl sm:text-4xl lg:text-[42px] xl:text-[46px] leading-[1.08]"
+            />
+            <p className="mt-2.5 text-sm sm:text-base leading-relaxed text-muted-foreground max-w-[580px]">
+              {membersIntro}
+            </p>
 
-      {/* Mobile/Tablet Artwork banner */}
-      <div className="relative mx-auto mt-4 mb-2 aspect-[3/2] w-full max-w-[420px] px-6 xl:hidden">
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 scale-105 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-2xl"
-        />
-        <ArtworkSlot
-          name="Members: AWS cloud + builders"
-          src="/images/artwork/Neon Cloud Network Team.png"
-          alt="Neon Cloud Network Team"
-          priority
-          objectFit="contain"
-          className="h-full w-full aspect-auto overflow-visible"
-          imageClassName="drop-shadow-[0_0_25px_rgba(255,153,0,0.3)]"
-        />
-      </div>
+            {/* Stats Row embedded in hero left column */}
+            <div className="mt-5 sm:mt-6 w-full">
+              <StatsRow
+                variant="boxed"
+                size="sm"
+                stats={memberStats}
+                className="w-full px-5 py-4 sm:px-6 sm:py-4.5"
+              />
+            </div>
+          </div>
 
-      {/* Main wrapper */}
-      <div className="relative z-10 mt-3 w-full px-6 xl:pl-[10.2%] xl:pr-[7.7%]">
-        <StatsRow
-          variant="boxed"
-          size="sm"
-          stats={memberStats}
-          className="px-8 py-5 xl:w-[clamp(620px,48.6vw,812px)]"
-        />
-        <MembersExplorer />
+          {/* Right Column: Hero Artwork scaling proportionally */}
+          <div className="relative flex w-full flex-1 items-center justify-center lg:justify-end">
+            <div className="relative aspect-[3/2] w-full max-w-[420px] sm:max-w-[480px] lg:max-w-[520px] xl:max-w-[580px]">
+              {/* Ambient Radial Background Glow */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 -z-10 scale-110 rounded-full bg-gradient-to-tr from-primary/25 via-accent/20 to-transparent blur-3xl"
+              />
+              <ArtworkSlot
+                name="Members: AWS cloud + builders"
+                src="/images/artwork/Neon Cloud Network Team.png"
+                alt="Neon Cloud Network Team"
+                priority
+                objectFit="contain"
+                className="h-full w-full aspect-auto overflow-visible"
+                imageClassName="drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Members Explorer Section */}
+        <div className="mt-8 sm:mt-10">
+          <MembersExplorer />
+        </div>
       </div>
     </section>
   );

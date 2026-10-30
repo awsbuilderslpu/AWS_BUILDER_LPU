@@ -30,29 +30,29 @@ export function StatsRow({
       <div
         className={cn(
           "w-full rounded-xl border border-border bg-card/60 backdrop-blur-sm",
-          isSm ? "p-5" : "p-5 sm:p-6",
-          "flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-8",
+          isSm ? "p-3.5 sm:p-4 lg:p-5" : "p-5 sm:p-6",
+          "flex flex-col gap-4 sm:gap-6 lg:flex-row lg:items-center lg:justify-between",
           className
         )}
         {...props}
       >
-        <div className="grid grid-cols-2 gap-6 sm:gap-8 lg:flex lg:flex-1 lg:items-center lg:justify-between lg:gap-6">
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:flex lg:flex-1 lg:items-center lg:justify-between lg:gap-4 xl:gap-6">
           {stats.map((stat, idx) => {
             const Icon = stat.icon;
             return (
               <React.Fragment key={`${stat.label}-${idx}`}>
-                <div className="flex items-center gap-3.5 sm:gap-4">
+                <div className="flex items-center gap-3 sm:gap-3.5">
                   {Icon && (
                     <div
                       className={cn(
                         "flex shrink-0 items-center justify-center text-primary",
-                        isSm ? "size-[34px]" : "size-10"
+                        isSm ? "size-7 sm:size-8" : "size-10"
                       )}
                     >
                       <Icon
                         className={cn(
                           "stroke-[1.5]",
-                          isSm ? "size-[34px]" : "size-8"
+                          isSm ? "size-6 sm:size-7" : "size-8"
                         )}
                       />
                     </div>
@@ -62,7 +62,7 @@ export function StatsRow({
                       className={cn(
                         "text-foreground leading-tight",
                         isSm
-                          ? "text-[24px] font-semibold"
+                          ? "text-lg sm:text-xl lg:text-[22px] font-bold"
                           : "text-xl font-bold sm:text-2xl lg:text-[28px]"
                       )}
                     >
@@ -70,7 +70,7 @@ export function StatsRow({
                         <InfinityIcon
                           className={cn(
                             "text-primary",
-                            isSm ? "size-6" : "size-7"
+                            isSm ? "size-5 sm:size-6" : "size-7"
                           )}
                         />
                       ) : (
@@ -80,7 +80,7 @@ export function StatsRow({
                     <span
                       className={cn(
                         "text-muted-foreground mt-0.5 whitespace-nowrap",
-                        isSm ? "text-[13px]" : "text-xs sm:text-sm"
+                        isSm ? "text-[11px] sm:text-xs" : "text-xs sm:text-sm"
                       )}
                     >
                       {stat.label}
@@ -92,7 +92,7 @@ export function StatsRow({
                     aria-hidden="true"
                     className={cn(
                       "hidden w-px bg-border lg:block",
-                      isSm ? "h-10" : "h-12"
+                      isSm ? "h-8" : "h-12"
                     )}
                   />
                 )}

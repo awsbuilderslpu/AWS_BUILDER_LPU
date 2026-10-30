@@ -16,14 +16,14 @@ export function JoinCard({ data, className }: JoinCardProps) {
   const content = (
     <div className="flex gap-3">
       <Icon
-        className="size-[38px] text-primary shrink-0 stroke-[1.25]"
+        className="size-8 text-primary shrink-0 stroke-[1.25]"
         aria-hidden="true"
       />
       <div className="min-w-0 flex-1">
-        <h2 className="font-mono text-[12.5px] font-bold uppercase tracking-[0.02em] leading-5 text-primary">
+        <h2 className="font-mono text-xs sm:text-[13px] font-bold uppercase tracking-wider leading-snug text-primary">
           {data.title}
         </h2>
-        <p className="mt-2.5 text-[12.5px] leading-[1.55] text-muted-foreground">
+        <p className="mt-2 text-xs sm:text-[13px] leading-relaxed text-muted-foreground">
           {data.text}
         </p>
         <Button
@@ -31,7 +31,7 @@ export function JoinCard({ data, className }: JoinCardProps) {
           variant={data.cta.variant}
           withArrow
           className={cn(
-            "mt-5 w-full h-[43px] text-[14.5px] font-medium",
+            "mt-4 w-full h-10 text-xs sm:text-sm font-medium",
             data.cta.variant === "outline" &&
               "border-primary/70 hover:border-primary text-foreground"
           )}
@@ -50,7 +50,7 @@ export function JoinCard({ data, className }: JoinCardProps) {
   if (data.framed) {
     return (
       <section className={className}>
-        <CornerFrame className="rounded-lg bg-card/60 py-5 pl-4 pr-5 md:py-5 md:pl-4 md:pr-5 lg:py-5 lg:pl-4 lg:pr-5">
+        <CornerFrame className="rounded-lg bg-card/60 p-4 sm:p-5">
           {content}
         </CornerFrame>
       </section>
@@ -60,7 +60,7 @@ export function JoinCard({ data, className }: JoinCardProps) {
   return (
     <section
       className={cn(
-        "rounded-lg border border-border bg-card/60 py-5 pl-4 pr-5",
+        "rounded-lg border border-border bg-card/60 p-4 sm:p-5",
         className
       )}
     >

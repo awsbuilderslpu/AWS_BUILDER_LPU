@@ -80,7 +80,7 @@ export const blogPosts: BlogPost[] = [
   },
   {
     slug: "highlights-cloud-club-hackathon-2025",
-    title: "Highlights from AWS Builder Group Hackathon 2025",
+    title: "Highlights from AWS Cloud Club Hackathon 2025",
     category: "Community",
     topics: ["Community"],
     authorName: "Sneha Sharma",

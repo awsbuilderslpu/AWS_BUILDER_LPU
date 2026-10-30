@@ -48,25 +48,8 @@ export function MembersDecor() {
         line={false}
         className="absolute right-7 top-[767px]"
       />
-      {/* Artwork: Neon Cloud Network Team */}
-      <div className="absolute left-[52%] xl:left-[55%] top-2 h-[340px] xl:h-[370px] w-[34%] xl:w-[36%] max-w-[560px]">
-        {/* Ambient atmospheric glow behind members scene */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 scale-110 rounded-full bg-gradient-to-tr from-primary/25 via-accent/20 to-transparent blur-3xl"
-        />
-        <ArtworkSlot
-          name="Members: AWS cloud + builders"
-          src="/images/artwork/Neon Cloud Network Team.png"
-          alt="Neon Cloud Network Team"
-          priority
-          objectFit="contain"
-          className="h-full w-full aspect-auto overflow-visible"
-          imageClassName="drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]"
-        />
-      </div>
       {/* Artwork: Neon Orbital Network Overlay on the left side */}
-      <div className="absolute left-0 top-[140px] h-[640px] xl:h-[720px] 2xl:h-[780px] w-[200px] xl:w-[240px] 2xl:w-[260px]">
+      <div className="absolute left-0 top-[140px] h-[640px] xl:h-[720px] 2xl:h-[780px] w-[200px] xl:w-[240px] 2xl:w-[260px] pointer-events-none -z-10">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -left-12 top-1/4 -z-10 h-80 w-80 rounded-full bg-gradient-to-tr from-cyan-500/15 via-primary/10 to-transparent blur-3xl"
@@ -78,7 +61,7 @@ export function MembersDecor() {
           priority
           objectFit="contain"
           objectPosition="object-left"
-          className="h-full w-full aspect-auto overflow-visible"
+          className="h-full w-full aspect-auto overflow-visible opacity-60 xl:opacity-80"
           imageClassName="object-left drop-shadow-[0_0_25px_rgba(0,180,255,0.2)]"
         />
       </div>

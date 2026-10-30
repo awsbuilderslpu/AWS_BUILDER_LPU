@@ -2,7 +2,7 @@ import { type LucideIcon, Users, GraduationCap } from "lucide-react";
 import { siteConfig } from "@/data/site";
 import type { HeadingLine } from "@/components/ui/PageHeading";
 
-export type MemberGroup = "core" | "lead" | "mentor" | "community" | "alumni";
+export type MemberGroup = "core" | "lead" | "mentor" | "community" | "alumni" | "speaker";
 
 export interface MemberSocials {
   linkedin?: string;
@@ -53,6 +53,7 @@ export const memberTabs: MemberTab[] = [
   { label: "Mentors", group: "mentor" },
   { label: "Community Members", group: "community" },
   { label: "Alumni", group: "alumni" },
+  { label: "Speakers", group: "speaker" },
 ];
 
 export const memberSearchPlaceholder = "Search members by name, role, skills...";
@@ -206,7 +207,7 @@ export const members: Member[] = [
   {
     slug: "rahul-bansal",
     name: "Rahul Bansal",
-    role: "Alumni",
+    role: "Alumni • SDE at Amazon",
     group: "alumni",
     skills: ["AWS", "DevOps"],
     socials: defaultSocials,
@@ -214,9 +215,58 @@ export const members: Member[] = [
   {
     slug: "pooja-arora",
     name: "Pooja Arora",
-    role: "Alumni",
+    role: "Alumni • Cloud Engineer",
     group: "alumni",
     skills: ["Cloud", "Docker"],
+    socials: defaultSocials,
+  },
+  {
+    slug: "siddharth-patel",
+    name: "Siddharth Patel",
+    role: "Alumni • Solutions Architect",
+    group: "alumni",
+    skills: ["AWS", "Serverless", "IaC"],
+    socials: defaultSocials,
+  },
+  {
+    slug: "kavita-sharma",
+    name: "Kavita Sharma",
+    role: "Alumni • DevOps Consultant",
+    group: "alumni",
+    skills: ["DevOps", "Terraform", "Cloud"],
+    socials: defaultSocials,
+  },
+  // Speakers
+  {
+    slug: "dr-rajesh-gupta",
+    name: "Dr. Rajesh Gupta",
+    role: "Keynote Speaker • AWS Principal Architect",
+    group: "speaker",
+    skills: ["AWS", "Cloud", "GenAI"],
+    socials: defaultSocials,
+  },
+  {
+    slug: "aisha-verma",
+    name: "Aisha Verma",
+    role: "Tech Speaker • Staff DevOps Engineer",
+    group: "speaker",
+    skills: ["DevOps", "Kubernetes", "Docker"],
+    socials: defaultSocials,
+  },
+  {
+    slug: "sameer-sen",
+    name: "Sameer Sen",
+    role: "Guest Speaker • AWS Community Hero",
+    group: "speaker",
+    skills: ["Serverless", "AWS", "Python"],
+    socials: defaultSocials,
+  },
+  {
+    slug: "tanvi-nair",
+    name: "Tanvi Nair",
+    role: "Tech Speaker • Lead AI Researcher",
+    group: "speaker",
+    skills: ["AI/ML", "Cloud", "Security"],
     socials: defaultSocials,
   },
 ];

@@ -15,7 +15,7 @@ export function MemberCoreCard({ member, className }: MemberCoreCardProps) {
   return (
     <article
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-card/70 transition-colors duration-200 hover:border-primary/40",
+        "group flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card/70 transition-colors duration-200 hover:border-primary/40",
         className
       )}
     >
@@ -34,36 +34,36 @@ export function MemberCoreCard({ member, className }: MemberCoreCardProps) {
             aria-hidden="true"
             className="pointer-events-none select-none absolute inset-0 flex items-center justify-center bg-gradient-to-t from-primary/25 via-card to-background"
           >
-            <Avatar name={member.name} size={72} />
+            <Avatar name={member.name} size={64} />
           </div>
         )}
 
         {/* Role badge */}
-        <div className="pointer-events-none select-none absolute left-3.5 top-2.5 inline-flex h-5 items-center gap-1.5 rounded border border-primary/60 bg-background/70 px-2 backdrop-blur-sm">
-          <Crown className="size-[13px] text-primary" aria-hidden="true" />
-          <span className="text-[11.5px] font-medium text-foreground leading-none">
+        <div className="pointer-events-none select-none absolute left-2.5 top-2 inline-flex h-5 items-center gap-1.5 rounded border border-primary/60 bg-background/70 px-2 backdrop-blur-sm">
+          <Crown className="size-3 text-primary" aria-hidden="true" />
+          <span className="text-[11px] font-medium text-foreground leading-none">
             {member.badge ?? member.role}
           </span>
         </div>
       </div>
 
       {/* Body */}
-      <div className="flex flex-1 flex-col px-3.5 pb-3 pt-1.5">
-        <h3 className="text-base font-semibold leading-5 text-foreground">
+      <div className="flex min-w-0 flex-1 flex-col px-3 pb-3 pt-2">
+        <h3 className="truncate text-sm sm:text-[15px] font-semibold leading-snug text-foreground">
           {member.name}
         </h3>
-        <p className="mt-0.5 text-[13px] leading-[18px] text-muted-foreground">
+        <p className="mt-0.5 truncate text-xs sm:text-[13px] leading-tight text-muted-foreground">
           {member.role}
         </p>
         {member.focus && (
-          <p className="text-[12.5px] leading-[17px] text-muted-foreground">
+          <p className="truncate text-[11px] sm:text-xs text-muted-foreground">
             {member.focus}
           </p>
         )}
         <MemberSocials
           name={member.name}
           socials={member.socials}
-          className="mt-auto pt-2.5"
+          className="mt-auto pt-2"
         />
       </div>
     </article>

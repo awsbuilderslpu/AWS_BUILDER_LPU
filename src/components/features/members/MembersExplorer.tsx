@@ -30,13 +30,19 @@ export function MembersExplorer() {
     memberTabs.find((t) => t.label === activeTab) ?? memberTabs[0];
   const matched = filterMembers(members, tab.group, query, skills);
   const core = matched.filter((m) => m.group === "core");
-  const others = matched.filter((m) => m.group !== "core");
   const isDefaultView =
     tab.group === null && query.trim() === "" && skills.length === 0;
-  const visibleOthers =
+
+  const communityMembers = matched.filter(
+    (m) => m.group === "community" || m.group === "lead" || m.group === "mentor"
+  );
+  const alumniMembers = matched.filter((m) => m.group === "alumni");
+  const speakerMembers = matched.filter((m) => m.group === "speaker");
+
+  const visibleCommunity =
     isDefaultView && !showAll
-      ? others.slice(0, allMembersPreviewCount)
-      : others;
+      ? communityMembers.slice(0, allMembersPreviewCount)
+      : communityMembers;
 
   const handleClear = () => {
     setActiveTab("All Members");
@@ -48,25 +54,28 @@ export function MembersExplorer() {
   const options = React.useMemo(() => memberTabs.map((t) => t.label), []);
 
   return (
-    <div className="mt-6">
+    <div className="mt-4">
       {/* Controls row */}
-      <div className="flex flex-col gap-4 2xl:flex-row 2xl:items-center 2xl:justify-between">
-        <FilterChips
-          variant="solid"
-          ariaLabel="Filter members by group"
-          options={options}
-          value={activeTab}
-          onChange={setActiveTab}
-        />
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="min-w-0 flex-1">
+          <FilterChips
+            variant="solid"
+            size="sm"
+            ariaLabel="Filter members by group"
+            options={options}
+            value={activeTab}
+            onChange={setActiveTab}
+          />
+        </div>
 
         {/* Right group */}
-        <div className="flex w-full items-center gap-[15px] 2xl:w-auto 2xl:mr-[clamp(0px,2.6vw,43px)]">
+        <div className="flex w-full sm:w-auto items-center gap-3 shrink-0">
           <SearchInput
             value={query}
             onChange={setQuery}
             ariaLabel="Search members"
             placeholder={memberSearchPlaceholder}
-            className="h-[42px] min-w-0 flex-1 2xl:w-[clamp(300px,26.2vw,438px)] 2xl:flex-none"
+            className="h-10 min-w-0 flex-1 sm:w-[240px] lg:w-[270px] xl:w-[320px] sm:flex-none"
           />
 
           <button
@@ -74,7 +83,7 @@ export function MembersExplorer() {
             aria-expanded={filtersOpen}
             aria-controls="member-skill-filters"
             onClick={() => setFiltersOpen((prev) => !prev)}
-            className="inline-flex h-[42px] shrink-0 items-center gap-2.5 rounded-md border border-border bg-card/40 px-5 text-sm text-foreground transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background cursor-pointer"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg border border-border bg-card/40 px-4 text-xs sm:text-sm font-medium text-foreground transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background cursor-pointer"
           >
             <SlidersHorizontal
               className="size-4 text-muted-foreground"
@@ -82,7 +91,7 @@ export function MembersExplorer() {
             />
             <span>Filters</span>
             {skills.length > 0 && (
-              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[11px] font-semibold text-primary-foreground leading-none">
+              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-semibold text-primary-foreground leading-none">
                 {skills.length}
               </span>
             )}
@@ -164,76 +173,175 @@ export function MembersExplorer() {
       )}
 
       {/* Main grid */}
-      <div className="mt-5 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_clamp(260px,17.2vw,288px)] xl:gap-[23px]">
+      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_300px] 2xl:grid-cols-[minmax(0,1fr)_320px] lg:gap-6 xl:gap-8">
         {/* Left column */}
-        <div className="flex flex-col gap-5">
-          {/* Core section */}
-          {core.length > 0 && (
-            <section aria-labelledby="core-team-heading">
-              <div className="mb-2.5 flex items-center justify-between">
-                <SectionEyebrow
-                  id="core-team-heading"
-                  size="sm"
-                  role="heading"
-                  aria-level={2}
-                >
-                  Core Team
-                </SectionEyebrow>
-                {tab.group === null && (
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("Core Team")}
-                    className="inline-flex items-center gap-1 text-[13.5px] font-medium text-primary transition-colors hover:text-primary-hover cursor-pointer focus-visible:outline-none focus-visible:underline"
-                  >
-                    <span>View All</span>
-                    <ArrowRight className="size-3.5" aria-hidden="true" />
-                  </button>
-                )}
-              </div>
-              <ul className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 2xl:grid-cols-6">
-                {core.map((member) => (
-                  <li key={member.slug} className="flex">
-                    <MemberCoreCard member={member} className="w-full" />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {/* Others section */}
-          {visibleOthers.length > 0 && (
-            <section aria-labelledby="others-members-heading">
-              <div className="mb-2.5 flex items-center justify-between">
-                <SectionEyebrow
-                  id="others-members-heading"
-                  size="sm"
-                  role="heading"
-                  aria-level={2}
-                >
-                  {tab.group === null ? "All Members" : tab.label}
-                </SectionEyebrow>
-                {isDefaultView && others.length > allMembersPreviewCount && (
-                  <button
-                    type="button"
-                    aria-expanded={showAll}
-                    onClick={() => setShowAll((prev) => !prev)}
-                    className="inline-flex items-center gap-1 text-[13.5px] font-medium text-primary transition-colors hover:text-primary-hover cursor-pointer focus-visible:outline-none focus-visible:underline"
-                  >
-                    <span>{showAll ? "Show Less" : "View All"}</span>
-                    {!showAll && (
+        <div className="min-w-0 flex flex-col gap-8">
+          {/* Default view: Core Team + All Members + Alumni + Speakers */}
+          {isDefaultView ? (
+            <>
+              {/* Core Team section */}
+              {core.length > 0 && (
+                <section aria-labelledby="core-team-heading">
+                  <div className="mb-3 flex items-center justify-between">
+                    <SectionEyebrow
+                      id="core-team-heading"
+                      size="sm"
+                      role="heading"
+                      aria-level={2}
+                    >
+                      Core Team
+                    </SectionEyebrow>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("Core Team")}
+                      className="inline-flex items-center gap-1 text-xs sm:text-[13px] font-medium text-primary transition-colors hover:text-primary-hover cursor-pointer focus-visible:outline-none focus-visible:underline"
+                    >
+                      <span>View All</span>
                       <ArrowRight className="size-3.5" aria-hidden="true" />
+                    </button>
+                  </div>
+                  <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6">
+                    {core.map((member) => (
+                      <li key={member.slug} className="flex">
+                        <MemberCoreCard member={member} className="w-full" />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {/* All Members section */}
+              {visibleCommunity.length > 0 && (
+                <section aria-labelledby="all-members-heading">
+                  <div className="mb-3 flex items-center justify-between">
+                    <SectionEyebrow
+                      id="all-members-heading"
+                      size="sm"
+                      role="heading"
+                      aria-level={2}
+                    >
+                      All Members
+                    </SectionEyebrow>
+                    {communityMembers.length > allMembersPreviewCount && (
+                      <button
+                        type="button"
+                        aria-expanded={showAll}
+                        onClick={() => setShowAll((prev) => !prev)}
+                        className="inline-flex items-center gap-1 text-xs sm:text-[13px] font-medium text-primary transition-colors hover:text-primary-hover cursor-pointer focus-visible:outline-none focus-visible:underline"
+                      >
+                        <span>{showAll ? "Show Less" : "View All"}</span>
+                        {!showAll && (
+                          <ArrowRight className="size-3.5" aria-hidden="true" />
+                        )}
+                      </button>
                     )}
-                  </button>
-                )}
-              </div>
-              <ul className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 2xl:grid-cols-4">
-                {visibleOthers.map((member) => (
-                  <li key={member.slug} className="flex">
-                    <MemberRowCard member={member} className="w-full" />
-                  </li>
-                ))}
-              </ul>
-            </section>
+                  </div>
+                  <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+                    {visibleCommunity.map((member) => (
+                      <li key={member.slug} className="flex">
+                        <MemberRowCard member={member} className="w-full" />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {/* Alumni section */}
+              {alumniMembers.length > 0 && (
+                <section aria-labelledby="alumni-members-heading">
+                  <div className="mb-3 flex items-center justify-between">
+                    <SectionEyebrow
+                      id="alumni-members-heading"
+                      size="sm"
+                      role="heading"
+                      aria-level={2}
+                    >
+                      Alumni
+                    </SectionEyebrow>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("Alumni")}
+                      className="inline-flex items-center gap-1 text-xs sm:text-[13px] font-medium text-primary transition-colors hover:text-primary-hover cursor-pointer focus-visible:outline-none focus-visible:underline"
+                    >
+                      <span>View All</span>
+                      <ArrowRight className="size-3.5" aria-hidden="true" />
+                    </button>
+                  </div>
+                  <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+                    {alumniMembers.slice(0, 4).map((member) => (
+                      <li key={member.slug} className="flex">
+                        <MemberRowCard member={member} className="w-full" />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+
+              {/* Speakers section */}
+              {speakerMembers.length > 0 && (
+                <section aria-labelledby="speakers-members-heading">
+                  <div className="mb-3 flex items-center justify-between">
+                    <SectionEyebrow
+                      id="speakers-members-heading"
+                      size="sm"
+                      role="heading"
+                      aria-level={2}
+                    >
+                      Speakers
+                    </SectionEyebrow>
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("Speakers")}
+                      className="inline-flex items-center gap-1 text-xs sm:text-[13px] font-medium text-primary transition-colors hover:text-primary-hover cursor-pointer focus-visible:outline-none focus-visible:underline"
+                    >
+                      <span>View All</span>
+                      <ArrowRight className="size-3.5" aria-hidden="true" />
+                    </button>
+                  </div>
+                  <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+                    {speakerMembers.slice(0, 4).map((member) => (
+                      <li key={member.slug} className="flex">
+                        <MemberRowCard member={member} className="w-full" />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+            </>
+          ) : (
+            /* Filtered or Searched view */
+            matched.length > 0 && (
+              <section aria-labelledby="filtered-members-heading">
+                <div className="mb-3 flex items-center justify-between">
+                  <SectionEyebrow
+                    id="filtered-members-heading"
+                    size="sm"
+                    role="heading"
+                    aria-level={2}
+                  >
+                    {tab.label}
+                  </SectionEyebrow>
+                </div>
+                <ul
+                  className={cn(
+                    "grid gap-3",
+                    tab.group === "core"
+                      ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6"
+                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4"
+                  )}
+                >
+                  {matched.map((member) => (
+                    <li key={member.slug} className="flex">
+                      {tab.group === "core" ? (
+                        <MemberCoreCard member={member} className="w-full" />
+                      ) : (
+                        <MemberRowCard member={member} className="w-full" />
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )
           )}
 
           {/* Empty state */}
@@ -247,10 +355,10 @@ export function MembersExplorer() {
         {/* Right column */}
         <aside
           aria-label="Join the community"
-          className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:flex xl:flex-col xl:justify-between xl:gap-[21px] xl:pt-1"
+          className="flex flex-col gap-4 sm:flex-row lg:flex-col lg:gap-5 shrink-0"
         >
           {joinCards.map((card, idx) => (
-            <JoinCard key={idx} data={card} />
+            <JoinCard key={idx} data={card} className="w-full" />
           ))}
         </aside>
       </div>

@@ -8,6 +8,7 @@ export interface FilterChipsProps {
   value: string;
   onChange: (v: string) => void;
   variant?: "outline" | "solid";
+  size?: "md" | "sm";
   ariaLabel?: string;
   className?: string;
 }
@@ -17,14 +18,16 @@ export function FilterChips({
   value,
   onChange,
   variant = "solid",
+  size = "md",
   ariaLabel = "Filter options",
   className,
 }: FilterChipsProps) {
+  const isSm = size === "sm";
   return (
     <div
       role="group"
       aria-label={ariaLabel}
-      className={cn("flex flex-wrap items-center gap-2.5 sm:gap-3", className)}
+      className={cn("flex flex-wrap items-center", isSm ? "gap-2 sm:gap-2.5" : "gap-2.5 sm:gap-3", className)}
     >
       {options.map((option) => {
         const isActive = option.toLowerCase() === value.toLowerCase();
@@ -36,7 +39,9 @@ export function FilterChips({
             aria-pressed={isActive}
             onClick={() => onChange(option)}
             className={cn(
-              "h-10 px-5 text-sm rounded-lg border transition-all duration-200 cursor-pointer select-none",
+              isSm
+                ? "h-9 px-3.5 sm:px-4 text-xs sm:text-sm rounded-lg border transition-all duration-200 cursor-pointer select-none whitespace-nowrap"
+                : "h-10 px-5 text-sm rounded-lg border transition-all duration-200 cursor-pointer select-none whitespace-nowrap",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background",
               isActive
                 ? variant === "outline"
