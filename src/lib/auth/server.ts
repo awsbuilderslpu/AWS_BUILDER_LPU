@@ -1,3 +1,5 @@
+import "server-only";
+
 // Server-only code. Do not import in client components.
 
 import { cache } from "react";
@@ -92,6 +94,19 @@ export const getCurrentAccount = cache(async (): Promise<AccountSummary | null> 
   } catch {
     return null;
   }
+});
+
+/**
+ * Returns the currently signed-in user's account summary only if they hold the "admin" role and are active.
+ * Never redirects (used by server actions).
+ * Wrapped in React's cache() to deduplicate requests within a single server cycle.
+ */
+export const getAdminAccount = cache(async (): Promise<AccountSummary | null> => {
+  const account = await getCurrentAccount();
+  if (!account || account.role !== "admin" || !account.isActive) {
+    return null;
+  }
+  return account;
 });
 
 /**

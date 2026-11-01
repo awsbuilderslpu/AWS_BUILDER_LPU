@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 export interface DataColumn<T> {
   key: string;
   header: string;
-  cell: (row: T) => React.ReactNode;
+  cell: (row: T, index: number) => React.ReactNode;
   sortKey?: string;
   align?: "left" | "center" | "right";
   className?: string;
@@ -25,6 +25,8 @@ export interface DataTableProps<T> {
   sort?: { column: string; dir: "asc" | "desc" };
   onSortChange?: (sort: { column: string; dir: "asc" | "desc" }) => void;
   selectable?: boolean;
+  isRowSelectable?: (row: T) => boolean;
+  getSelectDisabledReason?: (row: T) => string | undefined;
   selectedIds?: Set<string>;
   onSelectionChange?: (ids: Set<string>) => void;
   onRowClick?: (row: T) => void;
@@ -43,6 +45,8 @@ export function DataTable<T>({
   sort,
   onSortChange,
   selectable = false,
+  isRowSelectable,
+  getSelectDisabledReason,
   selectedIds,
   onSelectionChange,
   onRowClick,
@@ -56,14 +60,19 @@ export function DataTable<T>({
 
   const totalCols = (selectable ? 1 : 0) + columns.length;
 
+  const selectableRows = React.useMemo(() => {
+    return isRowSelectable ? rows.filter(isRowSelectable) : rows;
+  }, [rows, isRowSelectable]);
+
   // Compute selection state for current page rows
-  const selectedOnPageCount = rows.reduce(
+  const selectedOnPageCount = selectableRows.reduce(
     (count, row) => (selectedIds?.has(getRowId(row)) ? count + 1 : count),
     0
   );
-  const isAllSelected = rows.length > 0 && selectedOnPageCount === rows.length;
+  const isAllSelected =
+    selectableRows.length > 0 && selectedOnPageCount === selectableRows.length;
   const isSomeSelected =
-    selectedOnPageCount > 0 && selectedOnPageCount < rows.length;
+    selectedOnPageCount > 0 && selectedOnPageCount < selectableRows.length;
 
   React.useEffect(() => {
     if (headerCheckboxRef.current) {
@@ -75,9 +84,9 @@ export function DataTable<T>({
     if (!onSelectionChange) return;
     const next = new Set(selectedIds);
     if (e.target.checked) {
-      rows.forEach((r) => next.add(getRowId(r)));
+      selectableRows.forEach((r) => next.add(getRowId(r)));
     } else {
-      rows.forEach((r) => next.delete(getRowId(r)));
+      selectableRows.forEach((r) => next.delete(getRowId(r)));
     }
     onSelectionChange(next);
   };
@@ -233,9 +242,14 @@ export function DataTable<T>({
               </td>
             </tr>
           ) : (
-            rows.map((row) => {
+            rows.map((row, rowIndex) => {
               const id = getRowId(row);
               const isSelected = selectedIds?.has(id) ?? false;
+              const isSelectable = isRowSelectable ? isRowSelectable(row) : true;
+              const disabledReason =
+                !isSelectable && getSelectDisabledReason
+                  ? getSelectDisabledReason(row)
+                  : undefined;
 
               return (
                 <tr
@@ -268,9 +282,18 @@ export function DataTable<T>({
                       <input
                         type="checkbox"
                         checked={isSelected}
+                        disabled={!isSelectable}
+                        title={disabledReason}
                         onChange={(e) => handleRowCheckboxChange(id, e)}
-                        aria-label={adminCopy.kit.selectRow(getRowLabel(row))}
-                        className="size-5 rounded border border-border bg-card/40 accent-primary cursor-pointer hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ring-offset-background"
+                        aria-label={
+                          disabledReason
+                            ? `${adminCopy.kit.selectRow(getRowLabel(row))} (${disabledReason})`
+                            : adminCopy.kit.selectRow(getRowLabel(row))
+                        }
+                        className={cn(
+                          "size-5 rounded border border-border bg-card/40 accent-primary cursor-pointer hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ring-offset-background",
+                          !isSelectable && "opacity-40 cursor-not-allowed"
+                        )}
                       />
                     </td>
                   )}
@@ -284,7 +307,7 @@ export function DataTable<T>({
                         : "text-left";
 
                     const isRowHeader = col.isRowHeader;
-                    const cellContent = col.cell(row);
+                    const cellContent = col.cell(row, rowIndex);
 
                     return isRowHeader ? (
                       <th

@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Supabase Row Level Security & Database Foundation Audit Queries
--- Run these queries in the Supabase SQL Editor after applying migrations 001-006.
+-- Run these queries in the Supabase SQL Editor after applying migrations 001-009.
 -- ============================================================================
 
 -- 1 tables in schema public with row level security off (expect: no rows)
@@ -19,7 +19,8 @@ where schemaname = 'public'
     'event_registrations',
     'posts',
     'contact_messages',
-    'newsletter_subscribers'
+    'newsletter_subscribers',
+    'admin_audit_log'
   )
   and rowsecurity = false;
 
@@ -30,7 +31,7 @@ select
   policyname,
   roles,
   cmd
-from pg_policies
+  from pg_policies
 where schemaname in ('public', 'storage')
 order by schemaname, tablename, policyname;
 
@@ -72,7 +73,7 @@ from storage.buckets
 where id in ('avatars', 'covers', 'event-images', 'blog-images')
 order by id;
 
--- 6 privileges held by the anon role on all tables (expect: SELECT on events & posts; INSERT on contact_messages & newsletter_subscribers; NO access to profiles, user_roles, registrations, registration_notes, event_registrations)
+-- 6 privileges held by the anon role on all tables and views (expect: SELECT on events & posts; INSERT on contact_messages & newsletter_subscribers; NO access to profiles, user_roles, registrations, registration_notes, event_registrations, admin_registrations, admin_members, admin_audit_log)
 select
   grantee,
   table_schema,
@@ -89,7 +90,10 @@ where table_schema = 'public'
     'event_registrations',
     'posts',
     'contact_messages',
-    'newsletter_subscribers'
+    'newsletter_subscribers',
+    'admin_registrations',
+    'admin_members',
+    'admin_audit_log'
   )
   and grantee = 'anon'
 order by table_name, privilege_type;
@@ -100,3 +104,46 @@ select
 from public.user_roles
 where role in ('administrator', 'admin')
   and is_active = true;
+
+-- 8 views in schema public that are not security_invoker (expect: no rows)
+select
+  c.relname as view_name,
+  c.reloptions
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public'
+  and c.relkind = 'v'
+  and (
+    c.reloptions is null
+    or not ('security_invoker=true' = any(c.reloptions))
+  );
+
+-- 9 functions in schema public with their security type (expect: review_registration, set_member_role, set_member_active and remove_member, none security definer)
+select
+  p.proname as function_name,
+  p.prosecdef as is_security_definer
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public'
+order by p.proname;
+
+-- 10 columns named admin_note in any table of schema public (expect: no rows)
+select
+  table_schema,
+  table_name,
+  column_name
+from information_schema.columns
+where table_schema = 'public'
+  and column_name = 'admin_note';
+
+-- 11 policies on registration_notes (expect 4, all to authenticated) and on admin_audit_log (expect 1, select only)
+select
+  schemaname,
+  tablename,
+  policyname,
+  roles,
+  cmd
+from pg_policies
+where schemaname = 'public'
+  and tablename in ('registration_notes', 'admin_audit_log')
+order by tablename, policyname;

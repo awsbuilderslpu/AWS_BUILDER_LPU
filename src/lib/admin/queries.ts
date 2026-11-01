@@ -1,3 +1,5 @@
+import "server-only";
+
 // Server-only code. Do not import in client components.
 import { createClient } from "@/lib/supabase/server";
 

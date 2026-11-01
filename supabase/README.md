@@ -46,17 +46,22 @@ Follow this guide step by step to initialize and verify the Supabase backend fou
      4. **`004_security_policies.sql`** (Role evaluation helpers, RLS enabled on all 9 tables, table grants, and RLS policies)
      5. **`005_storage.sql`** (Buckets `avatars`, `covers`, `event-images`, `blog-images`, MIME restrictions, and storage RLS)
      6. **`006_owner_completion.sql`** (Lets people finish their own registration, sets column grants on terms_accepted_at and requested_role, and guards identity fields)
+     7. **`007_registration_review.sql`** (Creates the `admin_registrations` view with `security_invoker = true` and the `review_registration` state machine function)
+     8. **`008_private_notes.sql`** (Moves notes to admin-only `registration_notes` table, updates view and functions, drops `registrations.admin_note`)
+     9. **`009_member_admin.sql`** (Creates `admin_members` view, member management functions `set_member_role`, `set_member_active`, `remove_member`, and append-only `admin_audit_log`)
    - If any file fails, stop immediately, inspect the error, and resolve it before proceeding.
 
 7. **Run Database Audit**
    - Open [`supabase/audit/rls-audit.sql`](file:///F:/AWS/AWS_BUILDER_LPU/supabase/audit/rls-audit.sql) in the SQL Editor.
-   - Run all 7 audit queries and compare each output against the expected results:
+   - Run all 11 audit queries and compare each output against the expected results:
      - Query 1: 0 tables in public with RLS off.
      - Query 2: All expected policies present on public tables and `storage.objects`.
      - Query 3 & 4: 0 security definer functions missing `search_path = ''` or living in `public`.
      - Query 5: Buckets `avatars` and `covers` are private; `event-images` and `blog-images` are public; allowed MIME types are `image/jpeg`, `image/png`, `image/webp` (no SVG).
-     - Query 6: Anon holds only `SELECT` on `events` and `posts`, and `INSERT` on `contact_messages` and `newsletter_subscribers`. No access to `profiles`, `user_roles`, `registrations`, `registration_notes`, or `event_registrations`.
+     - Query 6: Anon holds only `SELECT` on `events` and `posts`, and `INSERT` on `contact_messages` and `newsletter_subscribers`. No access to `profiles`, `user_roles`, `registrations`, `registration_notes`, `event_registrations`, or `admin_registrations`.
      - Query 7: Active admin count is 0 initially (1 after bootstrap).
+     - Query 8: 0 views in schema public that are not `security_invoker`.
+     - Query 9: Only `review_registration` in schema public, and it is NOT security definer.
 
 8. **Run Verification Script**
    - In your local project terminal, run:
@@ -86,6 +91,58 @@ Follow this guide step by step to initialize and verify the Supabase backend fou
 10. **First Administrator Promotion**
    - **Do NOT run `supabase/manual/first-admin.example.sql` yet.**
    - Once the administrator signs up and confirms their email via the application (Step 15), execute [`supabase/manual/first-admin.example.sql`](file:///F:/AWS/AWS_BUILDER_LPU/supabase/manual/first-admin.example.sql) with their verified email address in the SQL Editor to grant root Administrator privileges.
+
+---
+
+### Registrations and Email
+
+- **Run Migration 007**: Apply `supabase/migrations/007_registration_review.sql` after `006_owner_completion.sql`. This adds:
+  - `public.admin_registrations`: A `security_invoker = true` view that joins `registrations` with `profiles`. Under RLS, administrators see all submissions while regular members only see their own.
+  - `public.review_registration`: An invoker-rights, transactional SQL state machine function enforcing role hierarchy and atomic status updates.
+- **State Machine**:
+  - `pending` -> `approve` (becomes `approved`), `reject` (`rejected`), or `archive` (`archived`)
+  - `rejected` -> `reopen` (`pending`) or `archive` (`archived`)
+  - `approved` -> `archive` only (revoking membership or altering roles happens on the Members page, not here)
+  - `archived` -> `restore` (restores to `approved` if the account already holds a role above `participant`, otherwise reverts to `pending`)
+- **Role Grants on Approval**:
+  - Approval grants exactly one of: `student`, `participant`, `member`, or `core`.
+  - The `admin` role is **NEVER** granted from the registrations page or review function; administrative elevation is performed exclusively on the Members page or via direct SQL.
+- **SMTP Mailer Configuration**:
+  - The five SMTP settings (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and `MAIL_FROM`) are server-only secrets.
+  - Store them locally in `.env.local` and in the production hosting provider's environment variables dashboard. They must never be prefixed with `NEXT_PUBLIC_` and never committed to git.
+  - Run `npm run mail:test -- you@example.com` to verify SMTP connectivity and transport health.
+  - If mail is not configured, the registrations system continues to function normally and simply skips email dispatch.
+- **Re-run Audit & Simulation**: Always re-run `supabase/audit/rls-audit.sql` and `supabase/audit/rls-simulation.sql` after applying migration 007 to verify the new view and review function.
+
+---
+
+### Members and the audit log
+
+- **Run Migrations 008 and 009**: Apply `supabase/migrations/008_private_notes.sql` and `supabase/migrations/009_member_admin.sql` in numerical order after `007_registration_review.sql`.
+- **What Migration 008 Fixes**:
+  - `admin_note` was previously stored directly on `public.registrations`. Since applicants can select their own registration row via the API, private notes could potentially be read by the applicant.
+  - Migration 008 moves notes into an admin-only table (`public.registration_notes`) with strict RLS policies (authenticated admins only).
+  - Existing non-empty notes were safely copied into `registration_notes` before dropping `registrations.admin_note`.
+  - Both `admin_registrations` view and `review_registration` function were updated to read and write notes via `registration_notes`.
+- **What Migration 009 Adds**:
+  - `public.admin_members`: A `security_invoker = true` view joining `user_roles`, `profiles`, `registrations`, and `registration_notes`.
+  - Three member management functions: `set_member_role`, `set_member_active`, and `remove_member`. All are invoker security, admin-only, cannot target the caller's own account, and enforce rules in SQL.
+  - `public.admin_audit_log`: An append-only audit trail capturing role changes, active flag toggles, and registration status updates.
+- **Who Counts as a Member**:
+  - A member is anyone who holds access: an approved registration, or any role above `participant`. Archiving a registration can never hide someone who still holds elevated access.
+- **Admin Role Grants**:
+  - `admin` is granted exclusively from the Members page or the SQL Editor, one person at a time, and only to someone who is active and approved.
+  - The last active admin can never be demoted, deactivated, or removed.
+- **Remove Member Semantics**:
+  - "Remove member" deletes nothing: the person's role becomes `participant` and their registration is set to `archived` (it can be restored from the Registrations page).
+  - "Inactive" is a separate, reversible flag that keeps the person listed while disabling access.
+- **Audit Trail**:
+  - Every change of a role, active flag, or registration status is written to `public.admin_audit_log` by database triggers (`private.audit_user_roles` and `private.audit_registrations`), so even changes made directly in the SQL Editor leave a trace.
+  - No insert, update, or delete policy exists on `admin_audit_log`, making it append-only and immutable through the API.
+  - The audit log can be inspected directly in the Supabase Table Editor (`admin_audit_log`).
+- **Re-run Audit & Simulation**:
+  - Re-run `supabase/audit/rls-audit.sql` and `supabase/audit/rls-simulation.sql` after applying 008 and 009.
+  - Note: Member-dependent simulation tests require the test account (`v_user`) to be an approved member on the Registrations page; otherwise those tests are skipped.
 
 ---
 

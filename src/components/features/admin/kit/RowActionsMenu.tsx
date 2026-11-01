@@ -16,6 +16,7 @@ export interface RowActionItem {
   onSelect: () => void;
   tone?: "danger";
   disabled?: boolean;
+  title?: string;
 }
 
 export interface RowActionsMenuProps {
@@ -56,6 +57,7 @@ export function RowActionsMenu({
             <DropdownMenuItem
               key={item.label}
               disabled={item.disabled}
+              title={item.title}
               onSelect={() => item.onSelect()}
               className={cn(
                 "flex items-center gap-2.5 px-3 py-2 text-[14px] cursor-pointer rounded-md transition-colors",

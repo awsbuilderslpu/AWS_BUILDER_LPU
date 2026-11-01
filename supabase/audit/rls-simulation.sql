@@ -2,7 +2,9 @@
 -- Supabase Row Level Security & Role Guard Security Simulation
 -- File: supabase/audit/rls-simulation.sql
 -- Description: Proves database-side security policies, role guard triggers,
---              and storage permissions under simulated 'authenticated' sessions.
+--              storage permissions, registration review state machine security,
+--              private notes, member functions, and append-only audit trail
+--              under simulated authenticated and anonymous sessions (migrations 001-009).
 --
 -- Safety: Every individual test executes within an isolated subtransaction
 --         that ends in an immediate rollback ('SIM_ROLLBACK'). NO DATA IS MODIFIED.
@@ -11,11 +13,12 @@
 -- INSTRUCTIONS:
 -- 1. Find your Admin user ID and a regular member user ID by running:
 --      select id, email, created_at from auth.users order by created_at;
--- 2. Replace the two UUID placeholders below:
+-- 2. Note: Approve your test account on the Registrations page first, otherwise these tests are skipped.
+-- 3. Replace the two UUID placeholders below:
 --      v_admin: The UUID of your active Administrator account.
 --      v_user:  The UUID of a regular, non-admin registered account.
--- 3. Click 'Run' in the Supabase SQL Editor.
--- 4. Verify the single result table shows 'ALL PASS' on the SUMMARY row.
+-- 4. Click 'Run' in the Supabase SQL Editor.
+-- 5. Verify the single result table shows 'ALL PASS' on the SUMMARY row.
 -- ============================================================================
 
 create temp table if not exists _sim (
@@ -53,7 +56,18 @@ declare
   v_user_has_reg boolean := false;
   v_user_reg_status public.registration_status;
   v_user_reg_no text;
+  v_user_reg_id uuid;
+  v_assigned_role public.app_role;
   v_admin_is_active boolean := false;
+  v_user_role public.app_role;
+  v_user_is_active boolean := false;
+  v_user_is_member boolean := false;
+  v_note_check text;
+  v_audit_exists boolean := false;
+  v_target_role public.app_role;
+  v_expect_admin_grant boolean := false;
+  v_check_role public.app_role;
+  v_check_status public.registration_status;
 begin
   -- --------------------------------------------------------------------------
   -- PRE-CHECKS (Run as Owner)
@@ -80,7 +94,11 @@ begin
   ) into v_admin_is_active;
 
   select status into v_user_reg_status from public.registrations where user_id = v_user;
+  select id into v_user_reg_id from public.registrations where user_id = v_user;
+  select count(*) into v_reg_count from public.registrations;
   select registration_number into v_user_reg_no from public.profiles where id = v_user;
+  select role, is_active into v_user_role, v_user_is_active from public.user_roles where user_id = v_user;
+  v_user_is_member := (v_user_reg_status = 'approved' or (v_user_role is not null and v_user_role <> 'participant'));
 
   -- Validate test accounts setup
   if not (v_user_has_profile and v_user_has_role and v_user_has_reg and not v_user_is_admin and v_admin_is_active) then
@@ -283,27 +301,6 @@ begin
 
   insert into _sim (who, test, expected, outcome, pass)
   values ('v_user', 'N4: Update own registrations.status = approved', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
-
-  -- N5: Update own registrations.admin_note
-  v_rows := 0;
-  begin
-    perform set_config('request.jwt.claim.sub', v_user::text, true);
-    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
-    set local role authenticated;
-
-    update public.registrations set admin_note = 'simulated note' where user_id = v_user;
-    get diagnostics v_rows = row_count;
-    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
-  exception
-    when sqlstate 'P0000' then v_state := 'OK';
-    when others then get stacked diagnostics v_state = returned_sqlstate;
-  end;
-  reset role;
-  perform set_config('request.jwt.claim.sub', '', true);
-  perform set_config('request.jwt.claims', '', true);
-
-  insert into _sim (who, test, expected, outcome, pass)
-  values ('v_user', 'N5: Update own registrations.admin_note', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
 
   -- N6: Update own registrations.requested_role (allowed if status is pending)
   if v_user_reg_status = 'pending' then
@@ -786,6 +783,768 @@ begin
 
   insert into _sim (who, test, expected, outcome, pass)
   values ('v_admin', 'A8: Alter registrations.user_id FK', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows' end, v_state <> 'OK' or v_rows = 0);
+
+  -- --------------------------------------------------------------------------
+  -- REGISTRATION REVIEW FUNCTION & VIEW SECURITY (007)
+  -- --------------------------------------------------------------------------
+
+  -- R1: v_user calls review_registration on their own registration with 'archive' -> blocked
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.review_registration(v_user_reg_id, 'archive');
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'R1: review_registration on own registration', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- R2: v_user visible rows in admin_registrations is 1
+  v_cnt := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select count(*) into v_cnt from public.admin_registrations;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'R2: Visible rows in admin_registrations', '1 row', v_cnt || ' rows', v_state = 'OK' and v_cnt = 1);
+
+  -- R3: v_admin visible rows in admin_registrations equals total registrations owner sees
+  v_cnt := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select count(*) into v_cnt from public.admin_registrations;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'R3: Visible rows in admin_registrations matches total', v_reg_count || ' rows', v_cnt || ' rows', v_state = 'OK' and v_cnt = v_reg_count);
+
+  -- R4: v_admin 'approve' on v_user's registration with role 'student' -> allowed (SKIP if not pending)
+  -- Inside the same block after the call, v_user's user_roles.role must equal 'student'
+  v_assigned_role := null;
+  if v_user_reg_status = 'pending' then
+    begin
+      perform set_config('request.jwt.claim.sub', v_admin::text, true);
+      perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+      set local role authenticated;
+
+      perform public.review_registration(v_user_reg_id, 'approve', null, 'student'::public.app_role);
+      select role into v_assigned_role from public.user_roles where user_id = v_user;
+      raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+    exception
+      when sqlstate 'P0000' then v_state := 'OK';
+      when others then get stacked diagnostics v_state = returned_sqlstate;
+    end;
+    reset role;
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'R4a: Approve pending registration with role student', 'allowed', case when v_state = 'OK' then 'allowed' else 'sqlstate ' || v_state end, v_state = 'OK');
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'R4b: Role updated to student upon approval', 'student', coalesce(v_assigned_role::text, 'null'), v_state = 'OK' and v_assigned_role = 'student');
+  else
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'R4a: Approve pending registration with role student', 'allowed', 'SKIPPED (v_user not pending)', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'R4b: Role updated to student upon approval', 'student', 'SKIPPED (v_user not pending)', true);
+  end if;
+
+  -- R5: v_admin 'approve' with role 'admin' -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.review_registration(v_user_reg_id, 'approve', null, 'admin'::public.app_role);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'R5: Approve with role admin', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- R6: v_admin 'approve' with role null -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.review_registration(v_user_reg_id, 'approve', null, null);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'R6: Approve with null role', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- R7: v_admin 'reopen' on a pending registration -> blocked (SKIP if not pending)
+  if v_user_reg_status = 'pending' then
+    begin
+      perform set_config('request.jwt.claim.sub', v_admin::text, true);
+      perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+      set local role authenticated;
+
+      perform public.review_registration(v_user_reg_id, 'reopen');
+      raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+    exception
+      when sqlstate 'P0000' then v_state := 'OK';
+      when others then get stacked diagnostics v_state = returned_sqlstate;
+    end;
+    reset role;
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'R7: Reopen pending registration', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+  else
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'R7: Reopen pending registration', 'blocked', 'SKIPPED (v_user not pending)', true);
+  end if;
+
+  -- R8: anon role select from admin_registrations -> blocked
+  v_cnt := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    select count(*) into v_cnt from public.admin_registrations;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'R8: Anon select from admin_registrations', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state <> 'OK');
+
+  -- R9: anon role call review_registration -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    perform public.review_registration(v_user_reg_id, 'approve', null, 'student'::public.app_role);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'R9: Anon call review_registration', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- ==========================================================================
+  -- MEMBER & NOTES SECURITY TESTS (Migrations 008 - 009)
+  -- ==========================================================================
+
+  -- --------------------------------------------------------------------------
+  -- AS V_USER (Regular non-admin user)
+  -- --------------------------------------------------------------------------
+
+  -- X1: Seed note for v_user as owner, rows visible in registration_notes as v_user is 0
+  v_cnt := -1;
+  begin
+    insert into public.registration_notes (registration_id, note)
+    values (v_user_reg_id, 'audit simulation note')
+    on conflict (registration_id) do update set note = excluded.note;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select count(*) into v_cnt from public.registration_notes;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'X1: Visible rows in registration_notes is 0', '0 rows', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state = 'OK' and v_cnt = 0);
+
+  -- X2: After same seed, admin_note read from admin_registrations for v_user is null
+  v_note_check := 'NOT_CHECKED';
+  begin
+    insert into public.registration_notes (registration_id, note)
+    values (v_user_reg_id, 'audit simulation note')
+    on conflict (registration_id) do update set note = excluded.note;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select admin_note into v_note_check from public.admin_registrations where id = v_user_reg_id;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'X2: admin_note in admin_registrations is null', 'null', case when v_state <> 'OK' then 'sqlstate ' || v_state when v_note_check is null then 'null' else 'visible' end, v_state = 'OK' and v_note_check is null);
+
+  -- X3: Rows in admin_members whose user_id is not v_user is 0
+  v_cnt := -1;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select count(*) into v_cnt from public.admin_members where user_id <> v_user;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'X3: Rows in admin_members with user_id <> v_user is 0', '0 rows', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state = 'OK' and v_cnt = 0);
+
+  -- X4: set_member_role on admin with participant -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.set_member_role(v_admin, 'participant'::public.app_role);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'X4: set_member_role on admin with participant', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- X5: set_member_role on v_user with admin -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.set_member_role(v_user, 'admin'::public.app_role);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'X5: set_member_role on v_user with admin', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- X6: set_member_active(v_user, false) -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.set_member_active(v_user, false);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'X6: set_member_active(v_user, false)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- X7: remove_member(v_user) -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.remove_member(v_user);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'X7: remove_member(v_user)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- X8: Rows visible in admin_audit_log is 0 (seed row as owner first)
+  v_cnt := -1;
+  begin
+    insert into public.admin_audit_log (actor_id, target_user_id, action, old_value, new_value)
+    values (v_admin, v_user, 'role_changed', 'participant', 'member');
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select count(*) into v_cnt from public.admin_audit_log;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'X8: Rows visible in admin_audit_log is 0', '0 rows', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state = 'OK' and v_cnt = 0);
+
+  -- X9: insert into registration_notes -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    insert into public.registration_notes (registration_id, note)
+    values (v_user_reg_id, 'unauthorized note');
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'X9: Insert into registration_notes', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- X10: insert into admin_audit_log -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    insert into public.admin_audit_log (actor_id, target_user_id, action, old_value, new_value)
+    values (v_user, v_user, 'hack', null, null);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'X10: Insert into admin_audit_log', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- --------------------------------------------------------------------------
+  -- AS V_ADMIN (Active administrator)
+  -- --------------------------------------------------------------------------
+
+  -- Y1: After same seed, rows visible in registration_notes is >= 1
+  v_cnt := 0;
+  begin
+    insert into public.registration_notes (registration_id, note)
+    values (v_user_reg_id, 'audit simulation note')
+    on conflict (registration_id) do update set note = excluded.note;
+
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select count(*) into v_cnt from public.registration_notes;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'Y1: Visible rows in registration_notes >= 1', '>= 1', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state = 'OK' and v_cnt >= 1);
+
+  -- Y2: set_member_role(v_admin, 'core') -> blocked (cannot_change_self)
+  begin
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.set_member_role(v_admin, 'core'::public.app_role);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'Y2: set_member_role on self (v_admin)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- Y3: set_member_active(v_admin, false) -> blocked (cannot_change_self)
+  begin
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.set_member_active(v_admin, false);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'Y3: set_member_active on self (v_admin)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- Y4: remove_member(v_admin) -> blocked (cannot_change_self)
+  begin
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.remove_member(v_admin);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'Y4: remove_member on self (v_admin)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- Y5: set_member_role on v_user to different role -> allowed, and role_changed audit row exists
+  if not v_user_is_member then
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y5: set_member_role on v_user to different role', 'allowed', 'SKIPPED (v_user not a member)', true);
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y5b: Audit row role_changed exists for v_user', 'true', 'SKIPPED (v_user not a member)', true);
+  else
+    v_target_role := case when v_user_role = 'core' then 'member'::public.app_role else 'core'::public.app_role end;
+    v_audit_exists := false;
+    begin
+      perform set_config('request.jwt.claim.sub', v_admin::text, true);
+      perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+      set local role authenticated;
+
+      perform public.set_member_role(v_user, v_target_role);
+      select exists (
+        select 1 from public.admin_audit_log
+        where target_user_id = v_user and action = 'role_changed' and new_value = v_target_role::text
+      ) into v_audit_exists;
+
+      raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+    exception
+      when sqlstate 'P0000' then v_state := 'OK';
+      when others then get stacked diagnostics v_state = returned_sqlstate;
+    end;
+    reset role;
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y5: set_member_role on v_user to different role', 'allowed', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state = 'OK');
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y5b: Audit row role_changed exists for v_user', 'true', case when v_audit_exists then 'true' else 'false' end, v_state = 'OK' and v_audit_exists);
+  end if;
+
+  -- Y6: set_member_role(v_user, 'admin') -> allowed when approved & active, else blocked
+  if not v_user_is_member then
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y6: set_member_role on v_user to admin', 'conditional', 'SKIPPED (v_user not a member)', true);
+  else
+    v_expect_admin_grant := (v_user_reg_status = 'approved' and v_user_is_active);
+    begin
+      perform set_config('request.jwt.claim.sub', v_admin::text, true);
+      perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+      set local role authenticated;
+
+      perform public.set_member_role(v_user, 'admin'::public.app_role);
+      raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+    exception
+      when sqlstate 'P0000' then v_state := 'OK';
+      when others then get stacked diagnostics v_state = returned_sqlstate;
+    end;
+    reset role;
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values (
+      'v_admin',
+      'Y6: set_member_role on v_user to admin',
+      case when v_expect_admin_grant then 'allowed' else 'blocked' end,
+      case when v_state = 'OK' then 'allowed' else 'sqlstate ' || v_state end,
+      (v_expect_admin_grant and v_state = 'OK') or (not v_expect_admin_grant and v_state <> 'OK')
+    );
+  end if;
+
+  -- Y7: set_member_role(v_user, current role) -> blocked (no_change)
+  if not v_user_is_member then
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y7: set_member_role on v_user to same role', 'blocked', 'SKIPPED (v_user not a member)', true);
+  else
+    begin
+      perform set_config('request.jwt.claim.sub', v_admin::text, true);
+      perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+      set local role authenticated;
+
+      perform public.set_member_role(v_user, v_user_role);
+      raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+    exception
+      when sqlstate 'P0000' then v_state := 'OK';
+      when others then get stacked diagnostics v_state = returned_sqlstate;
+    end;
+    reset role;
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y7: set_member_role on v_user to same role', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+  end if;
+
+  -- Y8: set_member_active(v_user, opposite of current) -> allowed, with active_changed audit row
+  if not v_user_is_member then
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y8: set_member_active on v_user to opposite value', 'allowed', 'SKIPPED (v_user not a member)', true);
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y8b: Audit row active_changed exists for v_user', 'true', 'SKIPPED (v_user not a member)', true);
+  else
+    v_audit_exists := false;
+    begin
+      perform set_config('request.jwt.claim.sub', v_admin::text, true);
+      perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+      set local role authenticated;
+
+      perform public.set_member_active(v_user, not v_user_is_active);
+      select exists (
+        select 1 from public.admin_audit_log
+        where target_user_id = v_user and action = 'active_changed'
+      ) into v_audit_exists;
+
+      raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+    exception
+      when sqlstate 'P0000' then v_state := 'OK';
+      when others then get stacked diagnostics v_state = returned_sqlstate;
+    end;
+    reset role;
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y8: set_member_active on v_user to opposite value', 'allowed', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state = 'OK');
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y8b: Audit row active_changed exists for v_user', 'true', case when v_audit_exists then 'true' else 'false' end, v_state = 'OK' and v_audit_exists);
+  end if;
+
+  -- Y9: remove_member(v_user) -> allowed when non-admin member, role='participant' and status='archived'
+  if not v_user_is_member or v_user_role = 'admin' then
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y9: remove_member on v_user', 'allowed', 'SKIPPED (v_user not a non-admin member)', true);
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y9b: v_user role is participant and status is archived', 'true', 'SKIPPED (v_user not a non-admin member)', true);
+  else
+    v_check_role := null;
+    v_check_status := null;
+    begin
+      perform set_config('request.jwt.claim.sub', v_admin::text, true);
+      perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+      set local role authenticated;
+
+      perform public.remove_member(v_user);
+
+      select role into v_check_role from public.user_roles where user_id = v_user;
+      select status into v_check_status from public.registrations where user_id = v_user;
+
+      raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+    exception
+      when sqlstate 'P0000' then v_state := 'OK';
+      when others then get stacked diagnostics v_state = returned_sqlstate;
+    end;
+    reset role;
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y9: remove_member on v_user', 'allowed', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state = 'OK');
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'Y9b: v_user role is participant and status is archived', 'true', case when v_check_role = 'participant' and v_check_status = 'archived' then 'true' else 'role=' || coalesce(v_check_role::text, 'null') || ' status=' || coalesce(v_check_status::text, 'null') end, v_state = 'OK' and v_check_role = 'participant' and v_check_status = 'archived');
+  end if;
+
+  -- Y10: insert, update and delete on admin_audit_log -> blocked (3 tests)
+  begin
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    insert into public.admin_audit_log (actor_id, target_user_id, action, old_value, new_value)
+    values (v_admin, v_user, 'manual_insert', null, null);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'Y10a: Insert into admin_audit_log', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    update public.admin_audit_log set action = 'modified' where target_user_id = v_user;
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'Y10b: Update on admin_audit_log', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
+
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    delete from public.admin_audit_log where target_user_id = v_user;
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'Y10c: Delete on admin_audit_log', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
+
+  -- --------------------------------------------------------------------------
+  -- AS ANON ROLE (Unauthenticated caller)
+  -- --------------------------------------------------------------------------
+
+  -- Z1: select from admin_members -> blocked
+  v_cnt := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    select count(*) into v_cnt from public.admin_members;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'Z1: Anon select from admin_members', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state <> 'OK');
+
+  -- Z2: call set_member_role -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    perform public.set_member_role(v_user, 'participant'::public.app_role);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'Z2: Anon call set_member_role', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
 
 end;
 $$;

@@ -16,7 +16,13 @@ export default async function AdminDashboardPage() {
   const counts = isAdmin ? await getAdminCounts() : null;
 
   const regNavItem = adminNav.find((item) => item.key === "registrations");
-  const regHref = regNavItem?.ready ? "/admin/registrations" : undefined;
+  const pendingHref = regNavItem?.ready
+    ? "/admin/registrations?tab=pending"
+    : undefined;
+  const approvedHref = regNavItem?.ready
+    ? "/admin/registrations?tab=approved"
+    : undefined;
+  const totalHref = regNavItem?.ready ? "/admin/registrations" : undefined;
 
   return (
     <div className="space-y-6">
@@ -39,21 +45,21 @@ export default async function AdminDashboardPage() {
               value={counts ? counts.pending : null}
               icon={ClipboardList}
               tone="orange"
-              href={regHref}
+              href={pendingHref}
             />
             <StatCard
               label={adminCopy.dashboard.cards.approved}
               value={counts ? counts.approved : null}
               icon={UserCheck}
               tone="green"
-              href={regHref}
+              href={approvedHref}
             />
             <StatCard
               label={adminCopy.dashboard.cards.total}
               value={counts ? counts.total : null}
               icon={Users}
               tone="blue"
-              href={regHref}
+              href={totalHref}
             />
           </StatCardRow>
           {counts === null && (
