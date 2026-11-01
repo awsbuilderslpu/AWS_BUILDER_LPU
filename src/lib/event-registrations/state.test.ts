@@ -144,3 +144,4 @@ test("publicRegistrationState returns open for member with null status or after 
   });
   assert.equal(resultCancelled, "open");
 });
+

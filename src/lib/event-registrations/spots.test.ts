@@ -21,3 +21,4 @@ test("spotsState returns some for 6 or more", () => {
   assert.equal(spotsState(6), "some");
   assert.equal(spotsState(100), "some");
 });
+

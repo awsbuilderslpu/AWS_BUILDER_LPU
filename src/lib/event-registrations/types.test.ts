@@ -67,3 +67,4 @@ test("toAttendeeRow never throws on null, undefined or empty input", () => {
   assert.equal(rowEmpty.fullName, "");
   assert.equal(rowEmpty.email, "");
 });
+

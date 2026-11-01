@@ -295,3 +295,4 @@ revoke all on function public.staff_event_meeting_url(uuid) from public, anon;
 grant execute on function public.staff_event_meeting_url(uuid) to authenticated;
 revoke all on function public.event_spots_left(uuid) from public;
 grant execute on function public.event_spots_left(uuid) to anon, authenticated;
+

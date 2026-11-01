@@ -13,3 +13,4 @@ test("canSetAttendance disallows identical status transitions and cancelled tran
   assert.equal(canSetAttendance("cancelled", "attended"), false);
   assert.equal(canSetAttendance("cancelled", "registered"), false);
 });
+

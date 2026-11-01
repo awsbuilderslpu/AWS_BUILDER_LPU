@@ -76,3 +76,4 @@ test("buildAttendeeCsvColumns handles row with nulls safely", () => {
   assert.equal(columns[6].value(nullRow), "");
   assert.equal(columns[7].value(nullRow), "");
 });
+

@@ -105,3 +105,4 @@ export async function listEventAttendees(
     throw new Error("attendees_query_failed");
   }
 }
+

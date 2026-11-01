@@ -75,3 +75,4 @@ export function toAttendeeRow(raw: unknown): AttendeeRow {
     cancelledAt: typeof rawCancelledAt === "string" ? rawCancelledAt : null,
   };
 }
+

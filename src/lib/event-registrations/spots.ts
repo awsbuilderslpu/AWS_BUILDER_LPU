@@ -12,3 +12,4 @@ export function spotsState(spotsLeft: number | null): SpotsState {
   }
   return "some";
 }
+
