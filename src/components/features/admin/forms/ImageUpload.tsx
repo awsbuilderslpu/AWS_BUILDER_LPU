@@ -28,6 +28,7 @@ export interface ImageUploadProps {
   bucket: BucketKey;
   value: string | null; // the stored object path
   onChange: (path: string | null) => void;
+  onUploaded?: (path: string) => void;
   required?: boolean;
   error?: string;
   hint?: string;
@@ -71,6 +72,7 @@ export function ImageUpload({
   bucket,
   value,
   onChange,
+  onUploaded,
   required = false,
   error,
   hint,
@@ -205,6 +207,7 @@ export function ImageUpload({
 
       sessionUploadsRef.current.add(path);
       onChange(path);
+      onUploaded?.(path);
       setAnnouncement(copy.uploaded);
     } catch (err) {
       setUploadError(getErrorMessage(err, bucket));

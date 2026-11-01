@@ -17,6 +17,7 @@ export interface DetailDrawerProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
   className?: string;
+  widthClass?: string;
 }
 
 export function DetailDrawer({
@@ -27,13 +28,15 @@ export function DetailDrawer({
   children,
   footer,
   className,
+  widthClass = "sm:max-w-[430px]",
 }: DetailDrawerProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
         className={cn(
-          "flex h-full w-full flex-col border-l border-border bg-background p-0 sm:max-w-[430px] gap-0",
+          "flex h-full w-full flex-col border-l border-border bg-background p-0 gap-0",
+          widthClass,
           className
         )}
       >

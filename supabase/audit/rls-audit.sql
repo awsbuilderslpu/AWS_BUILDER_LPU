@@ -73,7 +73,7 @@ from storage.buckets
 where id in ('avatars', 'covers', 'event-images', 'blog-images')
 order by id;
 
--- 6 privileges held by the anon role on all tables and views (expect: SELECT on events & posts; INSERT on contact_messages & newsletter_subscribers; NO access to profiles, user_roles, registrations, registration_notes, event_registrations, admin_registrations, admin_members, admin_audit_log)
+-- 6 privileges held by the anon role on table-level grants (expect: SELECT on posts; INSERT on contact_messages & newsletter_subscribers; NO table-level access to events, profiles, user_roles, registrations, registration_notes, event_registrations, admin_registrations, admin_members, admin_audit_log)
 select
   grantee,
   table_schema,
@@ -86,7 +86,6 @@ where table_schema = 'public'
     'user_roles',
     'registrations',
     'registration_notes',
-    'events',
     'event_registrations',
     'posts',
     'contact_messages',
@@ -147,3 +146,28 @@ from pg_policies
 where schemaname = 'public'
   and tablename in ('registration_notes', 'admin_audit_log')
 order by tablename, policyname;
+
+-- 12 privileges held by anon on events (expect: only select, and only the 16 listed columns; no insert, update or delete, and no created_by, updated_by or meeting_url)
+select
+  grantee,
+  table_schema,
+  table_name,
+  column_name,
+  privilege_type
+from information_schema.column_privileges
+where table_schema = 'public'
+  and table_name = 'events'
+  and grantee = 'anon'
+order by column_name, privilege_type;
+
+-- 13 policies on public.events (expect 4: events_select_public, events_select_staff, events_insert_staff, events_update_staff; no delete policy)
+select
+  schemaname,
+  tablename,
+  policyname,
+  roles,
+  cmd
+from pg_policies
+where schemaname = 'public'
+  and tablename = 'events'
+order by policyname;

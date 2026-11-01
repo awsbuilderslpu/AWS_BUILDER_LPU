@@ -110,6 +110,24 @@ export const getAdminAccount = cache(async (): Promise<AccountSummary | null> =>
 });
 
 /**
+ * Returns the currently signed-in user's account summary only if they hold "admin" or "core" role and are active.
+ * Never redirects (used by server actions).
+ * Wrapped in React's cache() to deduplicate requests within a single server cycle.
+ */
+export const getStaffAccount = cache(async (): Promise<AccountSummary | null> => {
+  const account = await getCurrentAccount();
+  if (
+    !account ||
+    !account.role ||
+    !["admin", "core"].includes(account.role) ||
+    !account.isActive
+  ) {
+    return null;
+  }
+  return account;
+});
+
+/**
  * Ensures the user is authenticated on server-rendered routes.
  * Redirects unauthenticated visitors to the sign-in modal with a sanitized ?next= destination.
  */
@@ -139,5 +157,13 @@ export async function requireRole(
   }
 
   return account;
+}
+
+/**
+ * Ensures the authenticated user is an active staff member (admin or core).
+ * Redirects unauthorized users to `/account`.
+ */
+export async function requireStaff(next?: string): Promise<AccountSummary> {
+  return requireRole(["admin", "core"], next);
 }
 

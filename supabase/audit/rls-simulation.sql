@@ -3,8 +3,8 @@
 -- File: supabase/audit/rls-simulation.sql
 -- Description: Proves database-side security policies, role guard triggers,
 --              storage permissions, registration review state machine security,
---              private notes, member functions, and append-only audit trail
---              under simulated authenticated and anonymous sessions (migrations 001-009).
+--              private notes, member functions, events security policies, and append-only audit trail
+--              under simulated authenticated and anonymous sessions (migrations 001-010).
 --
 -- Safety: Every individual test executes within an isolated subtransaction
 --         that ends in an immediate rollback ('SIM_ROLLBACK'). NO DATA IS MODIFIED.
@@ -1545,6 +1545,316 @@ begin
 
   insert into _sim (who, test, expected, outcome, pass)
   values ('anon', 'Z2: Anon call set_member_role', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- ==========================================================================
+  -- EVENTS SECURITY TESTS (Migration 010)
+  -- ==========================================================================
+
+  -- --------------------------------------------------------------------------
+  -- AS V_USER (Plain registered account)
+  -- --------------------------------------------------------------------------
+
+  -- E1: select an unpublished event seeded by the owner -> blocked (0 rows)
+  v_cnt := 0;
+  begin
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-e1-unpub', 'Sim E1 Unpub', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', false);
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select count(*) into v_cnt from public.events where slug = 'sim-e1-unpub';
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'E1: Select unpublished event', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state <> 'OK' or v_cnt = 0);
+
+  -- E2: insert a valid event -> blocked
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-e2-insert', 'Sim E2 Insert', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', false);
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'E2: Insert event as plain user', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows' end, v_state <> 'OK' or v_rows = 0);
+
+  -- E3: update a seeded event's title -> blocked
+  v_rows := 0;
+  begin
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-e3-update', 'Sim E3 Update', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', true);
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    update public.events set title = 'Sim E3 Hacked' where slug = 'sim-e3-update';
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'E3: Update event title as plain user', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
+
+  -- E4: delete a seeded event -> blocked
+  v_rows := 0;
+  begin
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-e4-delete', 'Sim E4 Delete', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', true);
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    delete from public.events where slug = 'sim-e4-delete';
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'E4: Delete event as plain user', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
+
+  -- --------------------------------------------------------------------------
+  -- AS V_USER MADE CORE (Temporary Core staff elevation)
+  -- --------------------------------------------------------------------------
+
+  -- E5: insert a valid event -> allowed
+  v_rows := 0;
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-e5-core-insert', 'Sim E5 Core Insert', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', false);
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'E5: Core insert valid event', 'allowed', case when v_state = 'OK' then v_rows || ' rows' else 'sqlstate ' || v_state end, v_state = 'OK' and v_rows > 0);
+
+  -- E6: update the event's title -> allowed
+  v_rows := 0;
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-e6-core-update', 'Sim E6 Core Update', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', false);
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    update public.events set title = 'Sim E6 Updated by Core' where slug = 'sim-e6-core-update';
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'E6: Core update event title', 'allowed', case when v_state = 'OK' then v_rows || ' rows affected' else 'sqlstate ' || v_state end, v_state = 'OK' and v_rows > 0);
+
+  -- E7: delete it -> blocked
+  v_rows := 0;
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-e7-core-delete', 'Sim E7 Core Delete', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', false);
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    delete from public.events where slug = 'sim-e7-core-delete';
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'E7: Core delete event', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
+
+  -- E8: insert with ends_at before starts_at -> blocked
+  v_rows := 0;
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-e8-inverted', 'Sim E8 Inverted', 'workshop', 'on_campus', 'Room 1', now() + interval '2 days', now() + interval '1 day', false);
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'E8: Core insert with ends_at before starts_at', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows' end, v_state <> 'OK' or v_rows = 0);
+
+  -- --------------------------------------------------------------------------
+  -- AS THE ANON ROLE (Unauthenticated caller)
+  -- --------------------------------------------------------------------------
+
+  -- A1: select id, title, starts_at from a published event -> allowed
+  v_cnt := 0;
+  begin
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-a1-pub', 'Sim A1 Pub', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', true);
+
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    select count(*) into v_cnt from public.events where slug = 'sim-a1-pub';
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'A1: Anon select from published event', 'allowed', case when v_state = 'OK' then v_cnt || ' rows' else 'sqlstate ' || v_state end, v_state = 'OK' and v_cnt > 0);
+
+  -- A2: select created_by from events -> blocked
+  v_cnt := 0;
+  begin
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-a2-pub', 'Sim A2 Pub', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', true);
+
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    select count(created_by) into v_cnt from public.events where slug = 'sim-a2-pub';
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'A2: Anon select created_by column', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- A3: select an unpublished event -> blocked (0 rows)
+  v_cnt := 0;
+  begin
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-a3-unpub', 'Sim A3 Unpub', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', false);
+
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    select count(*) into v_cnt from public.events where slug = 'sim-a3-unpub';
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'A3: Anon select unpublished event', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state <> 'OK' or v_cnt = 0);
+
+  -- A4: insert -> blocked
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    insert into public.events (slug, title, category, location_mode, venue, starts_at, ends_at, is_published)
+    values ('sim-a4-insert', 'Sim A4 Insert', 'workshop', 'on_campus', 'Room 1', now() + interval '1 day', now() + interval '2 days', true);
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'A4: Anon insert event', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows' end, v_state <> 'OK' or v_rows = 0);
 
 end;
 $$;
