@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Supabase Row Level Security & Database Foundation Audit Queries
--- Run these queries in the Supabase SQL Editor after applying migrations 001-009.
+-- Run these queries in the Supabase SQL Editor after applying migrations 001-011.
 -- ============================================================================
 
 -- 1 tables in schema public with row level security off (expect: no rows)
@@ -18,6 +18,7 @@ where schemaname = 'public'
     'events',
     'event_registrations',
     'posts',
+    'blogs',
     'contact_messages',
     'newsletter_subscribers',
     'admin_audit_log'
@@ -73,7 +74,7 @@ from storage.buckets
 where id in ('avatars', 'covers', 'event-images', 'blog-images')
 order by id;
 
--- 6 privileges held by the anon role on table-level grants (expect: SELECT on posts; INSERT on contact_messages & newsletter_subscribers; NO table-level access to events, profiles, user_roles, registrations, registration_notes, event_registrations, admin_registrations, admin_members, admin_audit_log)
+-- 6 privileges held by the anon role on table-level grants (expect: SELECT on posts; INSERT on contact_messages & newsletter_subscribers; NO table-level access to events, profiles, user_roles, registrations, registration_notes, event_registrations, admin_registrations, admin_members, admin_audit_log, blogs)
 select
   grantee,
   table_schema,
@@ -88,6 +89,7 @@ where table_schema = 'public'
     'registration_notes',
     'event_registrations',
     'posts',
+    'blogs',
     'contact_messages',
     'newsletter_subscribers',
     'admin_registrations',
@@ -117,7 +119,7 @@ where n.nspname = 'public'
     or not ('security_invoker=true' = any(c.reloptions))
   );
 
--- 9 functions in schema public with their security type (expect: review_registration, set_member_role, set_member_active and remove_member, none security definer)
+-- 9 functions in schema public with their security type (expect: review_registration, set_member_role, set_member_active, remove_member and set_featured_blog, none security definer)
 select
   p.proname as function_name,
   p.prosecdef as is_security_definer
@@ -171,3 +173,37 @@ from pg_policies
 where schemaname = 'public'
   and tablename = 'events'
 order by policyname;
+
+-- 14 policies on public.blogs (expect 4: blogs_select_public, blogs_select_staff, blogs_insert_staff, blogs_update_staff; no delete policy)
+select
+  schemaname,
+  tablename,
+  policyname,
+  roles,
+  cmd
+from pg_policies
+where schemaname = 'public'
+  and tablename = 'blogs'
+order by policyname;
+
+-- 15 columns granted to anon or authenticated on public.blogs (expect exactly the 17 columns in the select grant; no author_id, created_by or updated_by)
+select
+  grantee,
+  table_schema,
+  table_name,
+  column_name,
+  privilege_type
+from information_schema.column_privileges
+where table_schema = 'public'
+  and table_name = 'blogs'
+  and grantee in ('anon', 'authenticated')
+order by grantee, column_name, privilege_type;
+
+-- 16 the unique index blogs_one_featured_idx exists (expect: 1 row with indisunique = true)
+select
+  indexname,
+  indexdef
+from pg_indexes
+where schemaname = 'public'
+  and tablename = 'blogs'
+  and indexname = 'blogs_one_featured_idx';

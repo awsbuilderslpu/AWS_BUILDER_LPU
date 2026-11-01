@@ -28,6 +28,7 @@ export interface BlogPost {
 
 export interface PopularTopic {
   label: string;
+  topic: BlogTopic;
   count: number;
   icon: LucideIcon;
   href: string;
@@ -143,33 +144,38 @@ export const blogPosts: BlogPost[] = [
 export const popularTopics: PopularTopic[] = [
   {
     label: "AWS Services",
+    topic: "AWS",
     count: 12,
     icon: Cloud,
-    href: "#", // TODO: link to topic filter
+    href: "/blogs?topic=AWS",
   },
   {
     label: "Cloud Projects",
+    topic: "Projects",
     count: 8,
     icon: Box,
-    href: "#", // TODO: link to topic filter
+    href: "/blogs?topic=Projects",
   },
   {
     label: "Tutorials",
+    topic: "Tutorials",
     count: 15,
     icon: BookOpen,
-    href: "#", // TODO: link to topic filter
+    href: "/blogs?topic=Tutorials",
   },
   {
     label: "Career Guidance",
+    topic: "Career",
     count: 6,
     icon: Briefcase,
-    href: "#", // TODO: link to topic filter
+    href: "/blogs?topic=Career",
   },
   {
     label: "Community Stories",
+    topic: "Community",
     count: 9,
     icon: Users,
-    href: "#", // TODO: link to topic filter
+    href: "/blogs?topic=Community",
   },
 ];
 
@@ -179,4 +185,4 @@ export const newsletterCopy = {
   placeholder: "Enter your email address",
 };
 
-export const allPostsHref = "#"; // TODO: the full posts listing
+export const allPostsHref = "/blogs";

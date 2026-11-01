@@ -3,11 +3,15 @@
 -- File: supabase/audit/rls-simulation.sql
 -- Description: Proves database-side security policies, role guard triggers,
 --              storage permissions, registration review state machine security,
---              private notes, member functions, events security policies, and append-only audit trail
---              under simulated authenticated and anonymous sessions (migrations 001-010).
+--              private notes, member functions, events security policies,
+--              blogs security policies and the set_featured_blog function, and
+--              the append-only audit trail under simulated authenticated and
+--              anonymous sessions (migrations 001-011).
 --
 -- Safety: Every individual test executes within an isolated subtransaction
 --         that ends in an immediate rollback ('SIM_ROLLBACK'). NO DATA IS MODIFIED.
+--         The blog pre-seeds (draft, due-published, scheduled) exist only inside the
+--         outermost rollback block and are automatically removed when that block ends.
 --         Safe to execute repeatedly in the Supabase SQL Editor.
 --
 -- INSTRUCTIONS:
@@ -68,6 +72,10 @@ declare
   v_expect_admin_grant boolean := false;
   v_check_role public.app_role;
   v_check_status public.registration_status;
+  -- Blog simulation variables
+  v_blog_draft_id   uuid;
+  v_blog_pub_id     uuid;
+  v_blog_sched_id   uuid;
 begin
   -- --------------------------------------------------------------------------
   -- PRE-CHECKS (Run as Owner)
@@ -1856,12 +1864,450 @@ begin
   insert into _sim (who, test, expected, outcome, pass)
   values ('anon', 'A4: Anon insert event', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows' end, v_state <> 'OK' or v_rows = 0);
 
+  -- ==========================================================================
+  -- BLOGS SECURITY TESTS (Migration 011)
+  -- Pre-seeds (draft, due-published, scheduled) exist only inside this block.
+  -- The rollback at the end of each subtransaction undoes each seed automatically.
+  -- ==========================================================================
+
+  -- Pre-seed the three blog posts as owner (inside the outer block; rollback removes them)
+  insert into public.blogs (slug, title, category, author_name, status, publish_at)
+  values (
+    'sim-blog-draft', 'Sim Blog Draft', 'AWS', 'Demo Author', 'draft', null
+  ) returning id into v_blog_draft_id;
+
+  insert into public.blogs (slug, title, category, author_name, status, publish_at)
+  values (
+    'sim-blog-pub', 'Sim Blog Published', 'AWS', 'Demo Author', 'published', now() - interval '1 hour'
+  ) returning id into v_blog_pub_id;
+
+  insert into public.blogs (slug, title, category, author_name, status, publish_at)
+  values (
+    'sim-blog-sched', 'Sim Blog Scheduled', 'AWS', 'Demo Author', 'published', now() + interval '2 days'
+  ) returning id into v_blog_sched_id;
+
+  -- --------------------------------------------------------------------------
+  -- AS V_USER (Plain signed-in account, not staff)
+  -- --------------------------------------------------------------------------
+
+  -- K0: select the due published post -> allowed (1 row)
+  v_cnt := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select count(*) into v_cnt from public.blogs where id = v_blog_pub_id;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'K0: Select due published blog post', 'allowed', case when v_state = 'OK' then v_cnt || ' rows' else 'sqlstate ' || v_state end, v_state = 'OK' and v_cnt = 1);
+
+  -- K1: select the draft -> blocked (0 rows)
+  v_cnt := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select count(*) into v_cnt from public.blogs where id = v_blog_draft_id;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'K1: Select draft blog (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state = 'OK' and v_cnt = 0);
+
+  -- K2: select author_id from blogs -> blocked (column not readable)
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform (select author_id from public.blogs where id = v_blog_pub_id);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'K2: Select author_id column (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- K3: insert a post with author_id = v_user -> blocked
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    insert into public.blogs (slug, title, category, author_id, author_name, status)
+    values ('sim-k3-insert', 'Sim K3 Insert', 'AWS', v_user, 'Demo Author', 'draft');
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'K3: Insert blog post (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows' end, v_state <> 'OK' or v_rows = 0);
+
+  -- K4: update the seeded draft's title -> blocked
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    update public.blogs set title = 'Hacked' where id = v_blog_draft_id;
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'K4: Update draft blog title (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
+
+  -- K5: delete the seeded draft -> blocked
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    delete from public.blogs where id = v_blog_draft_id;
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'K5: Delete draft blog (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
+
+  -- K6: call set_featured_blog on the due published post -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.set_featured_blog(v_blog_pub_id, true);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'K6: set_featured_blog as plain user (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- --------------------------------------------------------------------------
+  -- AS V_USER ELEVATED TO CORE (temporary; rollback undoes role change)
+  -- --------------------------------------------------------------------------
+
+  -- L1: insert a post with author_id = v_user and a valid category -> allowed
+  v_rows := 0;
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    insert into public.blogs (slug, title, category, author_id, author_name, status)
+    values ('sim-l1-insert', 'Sim L1 Insert', 'AWS', v_user, 'Demo Author', 'draft');
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'L1: Core insert blog with own author_id', 'allowed', case when v_state = 'OK' then v_rows || ' rows' else 'sqlstate ' || v_state end, v_state = 'OK' and v_rows > 0);
+
+  -- L2: insert a post with author_id = v_admin -> blocked
+  v_rows := 0;
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    insert into public.blogs (slug, title, category, author_id, author_name, status)
+    values ('sim-l2-insert', 'Sim L2 Insert', 'AWS', v_admin, 'Demo Author', 'draft');
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'L2: Core insert blog with admin author_id (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows' end, v_state <> 'OK' or v_rows = 0);
+
+  -- L3: insert a post with category 'Not a category' -> blocked
+  v_rows := 0;
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    insert into public.blogs (slug, title, category, author_id, author_name, status)
+    values ('sim-l3-insert', 'Sim L3 Insert', 'Not a category', v_user, 'Demo Author', 'draft');
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'L3: Core insert blog with bad category (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows' end, v_state <> 'OK' or v_rows = 0);
+
+  -- L4: update the seeded draft's title -> allowed
+  v_rows := 0;
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    update public.blogs set title = 'Sim Draft Updated' where id = v_blog_draft_id;
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'L4: Core update draft blog title', 'allowed', case when v_state = 'OK' then v_rows || ' rows affected' else 'sqlstate ' || v_state end, v_state = 'OK' and v_rows > 0);
+
+  -- L5: set_featured_blog on the due published post -> allowed
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.set_featured_blog(v_blog_pub_id, true);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'L5: Core set_featured_blog on published post', 'allowed', case when v_state = 'OK' then 'allowed' else 'sqlstate ' || v_state end, v_state = 'OK');
+
+  -- L6: set_featured_blog on the seeded draft -> blocked (not_published)
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    perform public.set_featured_blog(v_blog_draft_id, true);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'L6: Core set_featured_blog on draft (blocked: not_published)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- L7: delete the seeded draft -> blocked
+  v_rows := 0;
+  begin
+    update public.user_roles set role = 'core' where user_id = v_user;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    delete from public.blogs where id = v_blog_draft_id;
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'L7: Core delete blog (blocked, no delete policy)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
+
+  -- --------------------------------------------------------------------------
+  -- AS ANON ROLE (no sub claim)
+  -- --------------------------------------------------------------------------
+
+  -- M1: select id, title, slug, status from the due published post -> allowed
+  v_cnt := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    select count(*) into v_cnt from public.blogs where id = v_blog_pub_id;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'M1: Anon select due published blog', 'allowed', case when v_state = 'OK' then v_cnt || ' rows' else 'sqlstate ' || v_state end, v_state = 'OK' and v_cnt > 0);
+
+  -- M2: select author_id from blogs -> blocked
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    perform (select author_id from public.blogs where id = v_blog_pub_id);
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'M2: Anon select author_id column (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- M3: select the draft -> blocked (0 rows)
+  v_cnt := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    select count(*) into v_cnt from public.blogs where id = v_blog_draft_id;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'M3: Anon select draft blog (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state = 'OK' and v_cnt = 0);
+
+  -- M4: select the scheduled post -> blocked (0 rows - publish_at in the future)
+  v_cnt := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    select count(*) into v_cnt from public.blogs where id = v_blog_sched_id;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'M4: Anon select scheduled blog (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state = 'OK' and v_cnt = 0);
+
+  -- M5: insert a post -> blocked
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    set local role anon;
+
+    insert into public.blogs (slug, title, category, author_name, status)
+    values ('sim-m5-insert', 'Sim M5 Insert', 'AWS', 'Demo Author', 'draft');
+    get diagnostics v_rows = row_count;
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'M5: Anon insert blog (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows' end, v_state <> 'OK' or v_rows = 0);
+
 end;
 $$;
 
 -- ============================================================================
 -- FINAL SUMMARY QUERY
 -- Displays SUMMARY row first, followed by each individual test in order.
+-- SUMMARY: migrations 001-011 blog tests (K0-K6: plain user = 7, L1-L7: core = 7, M1-M5: anon = 5) = 19 new tests.
 -- ============================================================================
 select
   s.who,

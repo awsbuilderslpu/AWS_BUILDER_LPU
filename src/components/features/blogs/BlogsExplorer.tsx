@@ -13,29 +13,58 @@ import { RecentArticleCard } from "@/components/features/blogs/RecentArticleCard
 import { PopularTopics } from "@/components/features/blogs/PopularTopics";
 import { BlogNewsletter } from "@/components/features/blogs/BlogNewsletter";
 import {
-  blogPosts,
   blogFilters,
   popularTopics,
   searchPlaceholder,
   allPostsHref,
+  type BlogPost,
+  type BlogTopic,
 } from "@/data/blogs";
-import { splitPosts, filterPosts } from "@/lib/blogs";
+import { publicCopy } from "@/data/public";
+import { splitPosts, filterPosts } from "@/lib/blogs/layout";
 
-export function BlogsExplorer() {
-  const [activeFilter, setActiveFilter] = React.useState<string>("All");
+export interface BlogsExplorerProps {
+  posts: BlogPost[];
+  topicCounts: Record<BlogTopic, number>;
+  initialTopic?: string;
+}
+
+export function BlogsExplorer({
+  posts,
+  topicCounts,
+  initialTopic,
+}: BlogsExplorerProps) {
+  const [activeFilter, setActiveFilter] = React.useState<string>(
+    initialTopic ?? "All"
+  );
   const [query, setQuery] = React.useState<string>("");
+
+  // Adjust activeFilter during render if initialTopic prop changed
+  const [prevInitialTopic, setPrevInitialTopic] = React.useState(initialTopic);
+  if (initialTopic !== prevInitialTopic) {
+    setPrevInitialTopic(initialTopic);
+    setActiveFilter(initialTopic ?? "All");
+  }
 
   const isFiltering = activeFilter !== "All" || query.trim() !== "";
 
   const { featured, latest, recent } = React.useMemo(
-    () => splitPosts(blogPosts),
-    []
+    () => splitPosts(posts),
+    [posts]
   );
 
   const results = React.useMemo(() => {
     if (!isFiltering) return [];
-    return filterPosts(blogPosts, activeFilter, query);
-  }, [isFiltering, activeFilter, query]);
+    return filterPosts(posts, activeFilter, query);
+  }, [isFiltering, posts, activeFilter, query]);
+
+  const computedPopularTopics = React.useMemo(() => {
+    return popularTopics.map((pt) => ({
+      ...pt,
+      count: topicCounts[pt.topic] ?? 0,
+      href: `/blogs?topic=${encodeURIComponent(pt.topic)}`,
+    }));
+  }, [topicCounts]);
 
   return (
     <div className="relative z-10 w-full px-6 pt-7 xl:pl-[9.7%] xl:pr-[2.6%]">
@@ -60,7 +89,13 @@ export function BlogsExplorer() {
       {/* Main grid (mt-7) */}
       <div className="mt-7 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_clamp(280px,19.3vw,323px)]">
         {/* Left column */}
-        {!isFiltering ? (
+        {posts.length === 0 ? (
+          <div className="flex min-h-[300px] items-center justify-center rounded-lg border border-dashed border-border bg-card/30 p-12 text-center">
+            <p className="text-base text-muted-foreground">
+              {publicCopy.blogs.empty}
+            </p>
+          </div>
+        ) : !isFiltering ? (
           /* Normal view */
           <div className="flex flex-col gap-7">
             {/* Row A: grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)] */}
@@ -180,7 +215,7 @@ export function BlogsExplorer() {
         {/* Right column */}
         <div className="flex flex-col gap-7 xl:justify-between">
           <PopularTopics
-            topics={popularTopics}
+            topics={computedPopularTopics}
             className="xl:mx-[clamp(0px,0.65vw,11px)]"
           />
           <BlogNewsletter />

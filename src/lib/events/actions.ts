@@ -115,7 +115,7 @@ export async function createEventAction(
 
     if (!error && data) {
       revalidatePath("/admin/events");
-      revalidatePath("/events");
+      revalidatePath("/events", "layout");
       return { ok: true, id: data.id };
     }
 
@@ -203,7 +203,7 @@ export async function updateEventAction(
   }
 
   revalidatePath("/admin/events");
-  revalidatePath("/events");
+  revalidatePath("/events", "layout");
   return { ok: true, id: eventId };
 }
 
@@ -246,7 +246,7 @@ export async function setEventsStateAction(
   }
 
   revalidatePath("/admin/events");
-  revalidatePath("/events");
+  revalidatePath("/events", "layout");
   return { ok: true, count: data?.length ?? 0 };
 }
 

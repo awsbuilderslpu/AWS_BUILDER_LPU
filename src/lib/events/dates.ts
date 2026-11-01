@@ -54,7 +54,11 @@ export function getBadgeParts(start: string): { month: string; day: string } {
   };
 }
 
-export function getDefaultMonth(eventsList: EventItem[]): Date {
+export function getDefaultMonth(eventsList?: EventItem[] | null): Date {
+  if (!eventsList || !Array.isArray(eventsList) || eventsList.length === 0) {
+    return new Date(2026, 0, 1);
+  }
+
   const activeEvent =
     eventsList.find((e) => e.status !== "past") || eventsList[0];
 

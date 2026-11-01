@@ -2,16 +2,56 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { PageHeading } from "@/components/ui/PageHeading";
-import { blogsHeading, blogsIntro } from "@/data/blogs";
+import {
+  blogsHeading,
+  blogsIntro,
+  type BlogPost,
+  type BlogTopic,
+} from "@/data/blogs";
+import { listPublicBlogs } from "@/lib/public/blogs.server";
+import { toBlogPost, popularTopicCounts } from "@/lib/public/blog-cards";
+import { publicObjectUrl } from "@/lib/storage/urls";
 import { BlogsDecor } from "@/components/features/blogs/BlogsDecor";
 import { BlogsExplorer } from "@/components/features/blogs/BlogsExplorer";
 import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
 
 export interface BlogsSectionProps extends React.HTMLAttributes<HTMLElement> {
+  posts?: BlogPost[];
+  topicCounts?: Record<BlogTopic, number>;
+  initialTopic?: string;
   className?: string;
 }
 
-export function BlogsSection({ className, ...props }: BlogsSectionProps) {
+export async function BlogsSection({
+  posts,
+  topicCounts,
+  initialTopic = "All",
+  className,
+  ...props
+}: BlogsSectionProps) {
+  let resolvedPosts = posts;
+  let resolvedTopicCounts = topicCounts;
+
+  if (!resolvedPosts) {
+    const nowIso = new Date().toISOString();
+    const rows = await listPublicBlogs(nowIso);
+    resolvedPosts = rows
+      .map((row) =>
+        toBlogPost(
+          row,
+          Date.parse(nowIso),
+          row.featured_image_path
+            ? publicObjectUrl("blog-images", row.featured_image_path)
+            : null
+        )
+      )
+      .filter((p): p is BlogPost => p !== null);
+  }
+
+  if (!resolvedTopicCounts) {
+    resolvedTopicCounts = popularTopicCounts(resolvedPosts);
+  }
+
   return (
     <section
       className={cn("relative overflow-hidden pb-12", className)}
@@ -55,7 +95,11 @@ export function BlogsSection({ className, ...props }: BlogsSectionProps) {
       </div>
 
       {/* Direct child 3: BlogsExplorer */}
-      <BlogsExplorer />
+      <BlogsExplorer
+        posts={resolvedPosts}
+        topicCounts={resolvedTopicCounts}
+        initialTopic={initialTopic}
+      />
     </section>
   );
 }

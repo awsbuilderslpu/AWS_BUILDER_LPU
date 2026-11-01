@@ -17,13 +17,14 @@ export interface RichTextEditorProps {
   id?: string;
   label?: string;
   required?: boolean;
-  variant?: "basic" | "full";
+  variant?: "basic" | "full" | "article";
   value?: unknown;
   onChange: (doc: RichTextDoc | null) => void;
   hint?: string;
   error?: string;
   disabled?: boolean;
   className?: string;
+  onImageUploaded?: (path: string) => void;
 }
 
 /**

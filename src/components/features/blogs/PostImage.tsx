@@ -31,14 +31,13 @@ export function PostImage({
   return (
     <div
       className={cn(
-        "absolute inset-0 flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 via-card/50 to-accent/10 select-none overflow-hidden",
+        "absolute inset-0 flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 via-card to-accent/10 select-none overflow-hidden",
         className
       )}
       {...props}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--primary)_8%,transparent)_0%,transparent_70%)]" />
-      <span className="relative z-10 font-mono text-xs font-medium tracking-widest text-muted-foreground uppercase opacity-70">
-        [{label}]
+      <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+        {label}
       </span>
     </div>
   );

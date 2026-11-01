@@ -8,11 +8,14 @@ import { Button } from "@/components/ui/button";
 import { StatsRow } from "@/components/ui/StatsRow";
 import { eventStats } from "@/data/stats";
 import {
-  events,
   eventsHeading,
   eventsIntro,
   viewAllHref,
 } from "@/data/events";
+import { publicCopy } from "@/data/public";
+import { listPublicEvents } from "@/lib/public/events.server";
+import { toEventItem } from "@/lib/public/event-cards";
+import { publicObjectUrl } from "@/lib/storage/urls";
 import { EventsDecor } from "@/components/features/events/EventsDecor";
 import { EventsExplorer } from "@/components/features/events/EventsExplorer";
 import { EventsCalendar } from "@/components/features/events/EventsCalendar";
@@ -21,7 +24,19 @@ export interface EventsSectionProps extends React.HTMLAttributes<HTMLElement> {
   className?: string;
 }
 
-export function EventsSection({ className, ...props }: EventsSectionProps) {
+export async function EventsSection({ className, ...props }: EventsSectionProps) {
+  const nowIso = new Date().toISOString();
+  const rows = await listPublicEvents(nowIso);
+  const events = rows.map((row) =>
+    toEventItem(
+      row,
+      Date.parse(nowIso),
+      row.banner_path
+        ? publicObjectUrl("event-banners", row.banner_path)
+        : null
+    )
+  );
+
   return (
     <section
       className={cn(
@@ -51,14 +66,22 @@ export function EventsSection({ className, ...props }: EventsSectionProps) {
           </p>
         </div>
 
-        {/* Main grid, mt-8 */}
-        <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_clamp(280px,19.3vw,323px)] xl:gap-[21px]">
-          <EventsExplorer events={events} />
+        {/* Main content or empty state, mt-8 */}
+        {events.length > 0 ? (
+          <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_clamp(280px,19.3vw,323px)] xl:gap-[21px]">
+            <EventsExplorer events={events} />
 
-          <div className="flex flex-col max-w-[420px] xl:max-w-none xl:pt-[45px]">
-            <EventsCalendar events={events} className="flex-1" />
+            <div className="flex flex-col max-w-[420px] xl:max-w-none xl:pt-[45px]">
+              <EventsCalendar events={events} className="flex-1" />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mt-8 flex items-center justify-center rounded-lg border border-border bg-card/40 p-12 text-center">
+            <p className="text-base text-muted-foreground">
+              {publicCopy.events.empty}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Direct child 3: Stats wrapper */}

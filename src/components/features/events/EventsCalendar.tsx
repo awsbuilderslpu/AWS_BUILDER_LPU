@@ -6,7 +6,7 @@ import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { legendGroups } from "@/components/features/events/categoryStyles";
-import { expandEventDays, getDefaultMonth, MONTH_NAMES } from "@/lib/events";
+import { expandEventDays, getDefaultMonth, MONTH_NAMES } from "@/lib/events/dates";
 import type { EventItem } from "@/data/events";
 
 export interface EventsCalendarProps {

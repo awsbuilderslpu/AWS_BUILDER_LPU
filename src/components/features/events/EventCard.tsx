@@ -4,9 +4,8 @@ import Link from "next/link";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
 import { categoryStyles } from "@/components/features/events/categoryStyles";
-import { formatEventDate, getBadgeParts } from "@/lib/events";
+import { formatEventDate, getBadgeParts } from "@/lib/events/dates";
 import type { EventItem, EventStatus } from "@/data/events";
 
 export interface EventCardProps extends React.HTMLAttributes<HTMLElement> {
@@ -43,10 +42,11 @@ export function EventCard({ event, className, ...props }: EventCardProps) {
             className="object-cover"
           />
         ) : (
-          <ArtworkSlot
-            name="Event image"
-            className="absolute inset-0 h-full w-full aspect-auto rounded-none border-0"
-          />
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/10 via-card to-accent/10 select-none">
+            <span className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+              {event.category}
+            </span>
+          </div>
         )}
 
         {/* Overlay at left-4 top-4: status badge, then date box */}

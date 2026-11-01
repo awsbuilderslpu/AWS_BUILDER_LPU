@@ -49,19 +49,21 @@ Follow this guide step by step to initialize and verify the Supabase backend fou
      7. **`007_registration_review.sql`** (Creates the `admin_registrations` view with `security_invoker = true` and the `review_registration` state machine function)
      8. **`008_private_notes.sql`** (Moves notes to admin-only `registration_notes` table, updates view and functions, drops `registrations.admin_note`)
      9. **`009_member_admin.sql`** (Creates `admin_members` view, member management functions `set_member_role`, `set_member_active`, `remove_member`, and append-only `admin_audit_log`)
+     10. **`010_events.sql`** (Events table, column-level security grants, fine-grained public and staff RLS policies, and lifecycle triggers)
+     11. **`011_blogs.sql`** (Blogs table, column-level least-privilege grants, featured post function, and lifecycle triggers)
    - If any file fails, stop immediately, inspect the error, and resolve it before proceeding.
 
 7. **Run Database Audit**
    - Open [`supabase/audit/rls-audit.sql`](file:///F:/AWS/AWS_BUILDER_LPU/supabase/audit/rls-audit.sql) in the SQL Editor.
-   - Run all 11 audit queries and compare each output against the expected results:
+   - Run all 16 audit queries and compare each output against the expected results:
      - Query 1: 0 tables in public with RLS off.
      - Query 2: All expected policies present on public tables and `storage.objects`.
      - Query 3 & 4: 0 security definer functions missing `search_path = ''` or living in `public`.
      - Query 5: Buckets `avatars` and `covers` are private; `event-images` and `blog-images` are public; allowed MIME types are `image/jpeg`, `image/png`, `image/webp` (no SVG).
-     - Query 6: Anon holds only `SELECT` on `events` and `posts`, and `INSERT` on `contact_messages` and `newsletter_subscribers`. No access to `profiles`, `user_roles`, `registrations`, `registration_notes`, `event_registrations`, or `admin_registrations`.
+     - Query 6: Anon holds only `SELECT` on `events`, `blogs`, and `posts`, and `INSERT` on `contact_messages` and `newsletter_subscribers`. No access to `profiles`, `user_roles`, `registrations`, `registration_notes`, `event_registrations`, or `admin_registrations`.
      - Query 7: Active admin count is 0 initially (1 after bootstrap).
      - Query 8: 0 views in schema public that are not `security_invoker`.
-     - Query 9: Only `review_registration` in schema public, and it is NOT security definer.
+     - Query 9: Only `review_registration`, `set_member_role`, `set_member_active`, `remove_member`, and `set_featured_blog` in schema public, and none are security definer.
 
 8. **Run Verification Script**
    - In your local project terminal, run:
@@ -143,6 +145,34 @@ Follow this guide step by step to initialize and verify the Supabase backend fou
 - **Re-run Audit & Simulation**:
   - Re-run `supabase/audit/rls-audit.sql` and `supabase/audit/rls-simulation.sql` after applying 008 and 009.
   - Note: Member-dependent simulation tests require the test account (`v_user`) to be an approved member on the Registrations page; otherwise those tests are skipped.
+
+---
+
+### Blogs
+
+- **Run Migration 011**: Apply `supabase/migrations/011_blogs.sql` in numerical order after `010_events.sql`.
+- **What Migration 011 Adds**:
+  - `public.blogs`: Production blogs table with lifecycle timestamps, strict column length and regex constraints, and jsonb size limits.
+  - Column-level least-privilege grants: anon and authenticated receive select on safe public columns only; `author_id`, `created_by`, and `updated_by` are never granted for reading.
+  - Row Level Security: public and staff select paths are separated into independent policies. Public visitors (anonymous and signed-in non-staff) only see published posts whose publish date has passed (`status = 'published' and publish_at <= now()`).
+  - No delete policy: posts are archived and can be restored; nobody deletes through the API.
+  - Triggers: `private.stamp_blog()` sets `created_by` on insert, updates `updated_by`, and automatically sets `publish_at = now()` when a post is published without a date. `private.guard_blog_featured()` un-features any post that transitions away from published status.
+  - `public.set_featured_blog`: An invoker-rights function that clears the previous featured post and sets the new one, enforcing that only published posts can be featured.
+- **Statuses and Scheduling**:
+  - Stored statuses are `draft`, `published`, and `archived`.
+  - "Scheduled" is computed dynamically: a post with status `published` whose `publish_at` timestamp is in the future.
+- **Authoring and Permissions**:
+  - Staff (admins and core) create, edit, publish, archive, and feature posts.
+  - Both admins and core can edit any post regardless of author.
+  - On insert, `author_id` is enforced by policy to match the caller's authenticated user ID (`auth.uid()`).
+  - `author_name` serves as the public byline (2 to 80 characters).
+- **Featured Post Invariant**:
+  - At most one post is featured at any time across the entire site.
+  - Enforced at the database level by the unique partial index `blogs_one_featured_idx` (`where is_featured`).
+- **Public Page Decoupling**:
+  - The sample posts in `src/data/blogs.ts` continue powering the public Blogs page until Step 22.
+- **Re-run Audit & Simulation**:
+  - Re-run `supabase/audit/rls-audit.sql` and `supabase/audit/rls-simulation.sql` after applying migration 011 to verify table security policies, column grants, the unique index, and function permissions.
 
 ---
 

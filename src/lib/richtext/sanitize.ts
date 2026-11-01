@@ -33,6 +33,9 @@ export const richLimits = {
   full: {
     maxChars: 50000,
   },
+  article: {
+    maxChars: 120000,
+  },
 } as const;
 
 const BASIC_ALLOWED_NODES = new Set([
@@ -46,12 +49,36 @@ const BASIC_ALLOWED_NODES = new Set([
   "hardBreak",
 ]);
 
+const ARTICLE_ALLOWED_NODES = new Set([
+  "doc",
+  "paragraph",
+  "text",
+  "bulletList",
+  "orderedList",
+  "listItem",
+  "heading",
+  "hardBreak",
+  "blockquote",
+  "codeBlock",
+  "horizontalRule",
+  "image",
+]);
+
 const BASIC_ALLOWED_MARKS = new Set([
   "bold",
   "italic",
   "strike",
   "code",
   "link",
+]);
+
+const ARTICLE_ALLOWED_MARKS = new Set([
+  "bold",
+  "italic",
+  "strike",
+  "code",
+  "link",
+  "underline",
 ]);
 
 /**
@@ -106,6 +133,18 @@ function sanitizeNode(
 
     if (type === "heading" && typeof rawAttrs.level === "number") {
       cleanAttrs.level = Math.min(Math.max(Math.floor(rawAttrs.level), 1), 6);
+    }
+
+    if (type === "image") {
+      if (typeof rawAttrs.src === "string") {
+        cleanAttrs.src = rawAttrs.src;
+      }
+      if (typeof rawAttrs.alt === "string") {
+        cleanAttrs.alt = rawAttrs.alt;
+      }
+      if (typeof rawAttrs.path === "string") {
+        cleanAttrs.path = rawAttrs.path;
+      }
     }
 
     if (Object.keys(cleanAttrs).length > 0) {
@@ -163,7 +202,7 @@ function sanitizeNode(
  */
 export function sanitizeDoc(
   value: unknown,
-  variant: "basic" | "full" = "basic"
+  variant: "basic" | "full" | "article" = "basic"
 ): RichTextDoc {
   if (!value || typeof value !== "object") {
     return emptyDoc;
@@ -174,8 +213,10 @@ export function sanitizeDoc(
     return emptyDoc;
   }
 
-  const allowedNodes = variant === "full" ? BASIC_ALLOWED_NODES : BASIC_ALLOWED_NODES;
-  const allowedMarks = variant === "full" ? BASIC_ALLOWED_MARKS : BASIC_ALLOWED_MARKS;
+  const allowedNodes =
+    variant === "article" ? ARTICLE_ALLOWED_NODES : BASIC_ALLOWED_NODES;
+  const allowedMarks =
+    variant === "article" ? ARTICLE_ALLOWED_MARKS : BASIC_ALLOWED_MARKS;
 
   const sanitized = sanitizeNode(raw, allowedNodes, allowedMarks);
   if (!sanitized || sanitized.type !== "doc") {

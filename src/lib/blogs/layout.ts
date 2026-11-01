@@ -1,5 +1,5 @@
 import type { BlogPost } from "@/data/blogs";
-import { formatEventDate } from "@/lib/events";
+import { formatEventDate } from "@/lib/events/dates";
 
 export { formatEventDate };
 
