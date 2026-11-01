@@ -94,6 +94,32 @@ export const eventFormSchema = z
         message: adminCopy.events.errors.banner,
       }),
     isPublished: z.boolean(),
+    capacity: z
+      .union([z.number(), z.string(), z.null(), z.undefined()])
+      .optional()
+      .default(null)
+      .transform((val) => {
+        if (val === null || val === undefined) return null;
+        if (typeof val === "string") {
+          const trimmed = val.trim();
+          if (trimmed === "") return null;
+          const num = Number(trimmed);
+          return Number.isNaN(num) ? NaN : num;
+        }
+        return val;
+      })
+      .refine(
+        (val) => {
+          if (val === null) return true;
+          return (
+            typeof val === "number" &&
+            Number.isInteger(val) &&
+            val >= 1 &&
+            val <= 100000
+          );
+        },
+        { message: adminCopy.events.errors.capacity }
+      ),
     description: z.unknown(),
   })
   .superRefine((data, ctx) => {

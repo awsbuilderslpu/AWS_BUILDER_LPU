@@ -156,5 +156,66 @@ describe("events validate helper", () => {
       assert.equal(issue.message, adminCopy.events.errors.banner);
     }
   });
+
+  it("capacity validation behaves according to specifications", () => {
+    // null or undefined or empty string becomes null
+    const resNull = eventFormSchema.safeParse({ ...validBase, capacity: null });
+    assert.equal(resNull.success, true);
+    if (resNull.success) {
+      assert.equal(resNull.data.capacity, null);
+    }
+
+    const resEmpty = eventFormSchema.safeParse({ ...validBase, capacity: "" });
+    assert.equal(resEmpty.success, true);
+    if (resEmpty.success) {
+      assert.equal(resEmpty.data.capacity, null);
+    }
+
+    const resWhitespace = eventFormSchema.safeParse({ ...validBase, capacity: "   " });
+    assert.equal(resWhitespace.success, true);
+    if (resWhitespace.success) {
+      assert.equal(resWhitespace.data.capacity, null);
+    }
+
+    // valid integer from 1 to 100000
+    const resValid = eventFormSchema.safeParse({ ...validBase, capacity: 50 });
+    assert.equal(resValid.success, true);
+    if (resValid.success) {
+      assert.equal(resValid.data.capacity, 50);
+    }
+
+    const resValidStr = eventFormSchema.safeParse({ ...validBase, capacity: "100" });
+    assert.equal(resValidStr.success, true);
+    if (resValidStr.success) {
+      assert.equal(resValidStr.data.capacity, 100);
+    }
+
+    // 0 fails
+    const resZero = eventFormSchema.safeParse({ ...validBase, capacity: 0 });
+    assert.equal(resZero.success, false);
+    if (!resZero.success) {
+      const issue = resZero.error.issues.find((i) => i.path.includes("capacity"));
+      assert.ok(issue);
+      assert.equal(issue.message, adminCopy.events.errors.capacity);
+    }
+
+    // 100001 fails
+    const resOver = eventFormSchema.safeParse({ ...validBase, capacity: 100001 });
+    assert.equal(resOver.success, false);
+    if (!resOver.success) {
+      const issue = resOver.error.issues.find((i) => i.path.includes("capacity"));
+      assert.ok(issue);
+      assert.equal(issue.message, adminCopy.events.errors.capacity);
+    }
+
+    // 12.5 fails
+    const resFloat = eventFormSchema.safeParse({ ...validBase, capacity: 12.5 });
+    assert.equal(resFloat.success, false);
+    if (!resFloat.success) {
+      const issue = resFloat.error.issues.find((i) => i.path.includes("capacity"));
+      assert.ok(issue);
+      assert.equal(issue.message, adminCopy.events.errors.capacity);
+    }
+  });
 });
 

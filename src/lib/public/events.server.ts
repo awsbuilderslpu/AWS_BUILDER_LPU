@@ -116,17 +116,26 @@ export async function getMeetingLinkForSignedInUser(
     const supabase = await createServerClient();
     const { data, error } = await supabase
       .from("events")
-      .select("meeting_url")
+      .select("id")
       .eq("slug", slug)
       .eq("is_published", true)
       .is("archived_at", null)
       .maybeSingle();
 
-    if (error || !data || typeof data.meeting_url !== "string") {
+    if (error || !data || typeof data.id !== "string") {
       return null;
     }
 
-    return data.meeting_url;
+    const { data: linkData, error: linkError } = await supabase.rpc(
+      "event_meeting_link",
+      { p_event_id: data.id }
+    );
+
+    if (linkError || typeof linkData !== "string") {
+      return null;
+    }
+
+    return linkData;
   } catch {
     return null;
   }

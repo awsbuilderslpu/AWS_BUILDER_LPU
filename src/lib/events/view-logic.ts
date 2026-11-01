@@ -84,6 +84,7 @@ export function formFromDetails(details: EventDetails): EventFormValues {
     registrationDeadline: details.registrationDeadline ?? null,
     bannerPath: details.bannerPath ?? null,
     isPublished: Boolean(details.isPublished),
+    capacity: details.capacity ?? null,
     description: details.description ?? emptyDoc,
   };
 }
@@ -105,6 +106,7 @@ export function emptyEventForm(): EventFormValues {
     registrationDeadline: null,
     bannerPath: null,
     isPublished: false,
+    capacity: null,
     description: emptyDoc,
   };
 }

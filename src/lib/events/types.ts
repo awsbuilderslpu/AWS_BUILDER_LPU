@@ -29,6 +29,7 @@ export interface EventAdminRow {
 export interface EventDetails extends EventAdminRow {
   description: unknown;
   meetingUrl: string | null;
+  capacity?: number | null;
 }
 
 export function toEventAdminRow(raw: unknown): EventAdminRow {
@@ -87,6 +88,7 @@ export function toEventDetails(raw: unknown): EventDetails {
     ...adminRow,
     description: r.description ?? null,
     meetingUrl: typeof r.meeting_url === "string" ? r.meeting_url : null,
+    capacity: typeof r.capacity === "number" ? r.capacity : null,
   };
 }
 

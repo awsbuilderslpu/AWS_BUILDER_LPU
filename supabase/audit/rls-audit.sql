@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Supabase Row Level Security & Database Foundation Audit Queries
--- Run these queries in the Supabase SQL Editor after applying migrations 001-011.
+-- Run these queries in the Supabase SQL Editor after applying migrations 001-012.
 -- ============================================================================
 
 -- 1 tables in schema public with row level security off (expect: no rows)
@@ -55,14 +55,15 @@ where n.nspname in ('public', 'private')
     )
   );
 
--- 4 security definer functions in schema public (expect: no rows)
+-- 4 security definer functions in schema public (expect: exactly the 7 event sign-up definer functions: cancel_event_registration, event_meeting_link, event_spots_left, my_event_registration, register_for_event, staff_event_counts, staff_event_meeting_url)
 select
   n.nspname as schema_name,
   p.proname as function_name
 from pg_proc p
 join pg_namespace n on n.oid = p.pronamespace
 where n.nspname = 'public'
-  and p.prosecdef = true;
+  and p.prosecdef = true
+order by p.proname;
 
 -- 5 storage.buckets: id, public, file_size_limit, allowed_mime_types (expect: avatars and covers private, event-images and blog-images public, image types only)
 select
@@ -119,7 +120,7 @@ where n.nspname = 'public'
     or not ('security_invoker=true' = any(c.reloptions))
   );
 
--- 9 functions in schema public with their security type (expect: review_registration, set_member_role, set_member_active, remove_member and set_featured_blog, none security definer)
+-- 9 functions in schema public with their security type (the definer functions in public are exactly register_for_event, cancel_event_registration, event_meeting_link, event_spots_left, my_event_registration, staff_event_counts and staff_event_meeting_url, each with search_path set (query 3 checks this). All other functions in public are security invoker)
 select
   p.proname as function_name,
   p.prosecdef as is_security_definer
@@ -207,3 +208,56 @@ from pg_indexes
 where schemaname = 'public'
   and tablename = 'blogs'
   and indexname = 'blogs_one_featured_idx';
+
+-- 17 functions executable by anon (expect only event_spots_left)
+select
+  p.proname as function_name
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public'
+  and has_function_privilege('anon', p.oid, 'execute')
+order by p.proname;
+
+-- 18 columns granted to authenticated on public.events (expect the 17 names in the grant; no meeting_url, created_by or updated_by)
+select
+  column_name,
+  privilege_type
+from information_schema.column_privileges
+where table_schema = 'public'
+  and table_name = 'events'
+  and grantee = 'authenticated'
+order by column_name, privilege_type;
+
+-- 19 admin_event_attendees is security invoker (expect one row, true)
+select
+  c.relname as view_name,
+  'security_invoker=true' = any(c.reloptions) as is_security_invoker
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public'
+  and c.relname = 'admin_event_attendees';
+
+-- 20 row level security is on for event_registrations, and anon has no privileges on it (expect no rows)
+select
+  'rls_off' as issue,
+  tablename
+from pg_tables
+where schemaname = 'public'
+  and tablename = 'event_registrations'
+  and rowsecurity = false
+union all
+select
+  'anon_table_privilege' as issue,
+  table_name as tablename
+from information_schema.role_table_grants
+where table_schema = 'public'
+  and table_name = 'event_registrations'
+  and grantee = 'anon'
+union all
+select
+  'anon_column_privilege' as issue,
+  table_name as tablename
+from information_schema.column_privileges
+where table_schema = 'public'
+  and table_name = 'event_registrations'
+  and grantee = 'anon';

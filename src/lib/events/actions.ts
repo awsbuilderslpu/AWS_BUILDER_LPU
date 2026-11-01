@@ -109,6 +109,7 @@ export async function createEventAction(
         registration_deadline: values.registrationDeadline,
         banner_path: values.bannerPath,
         is_published: values.isPublished,
+        capacity: values.capacity,
       })
       .select("id")
       .maybeSingle();
@@ -190,6 +191,7 @@ export async function updateEventAction(
       registration_deadline: values.registrationDeadline,
       banner_path: values.bannerPath,
       is_published: values.isPublished,
+      capacity: values.capacity,
     })
     .eq("id", eventId)
     .select("id");
@@ -268,7 +270,7 @@ export async function getEventDetailsAction(
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, slug, title, category, description, location_mode, venue, meeting_url, starts_at, ends_at, registration_enabled, registration_deadline, banner_path, is_published, archived_at, created_at, updated_at"
+      "id, slug, title, category, description, location_mode, venue, starts_at, ends_at, registration_enabled, registration_deadline, banner_path, is_published, archived_at, capacity, created_at, updated_at"
     )
     .eq("id", parsed.data)
     .maybeSingle();
@@ -277,7 +279,22 @@ export async function getEventDetailsAction(
     return null;
   }
 
-  return toEventDetails(data);
+  let meetingUrl: string | null = null;
+  try {
+    const { data: urlData, error: rpcError } = await supabase.rpc(
+      "staff_event_meeting_url",
+      { p_event_id: parsed.data }
+    );
+    if (!rpcError && typeof urlData === "string") {
+      meetingUrl = urlData;
+    }
+  } catch {
+    meetingUrl = null;
+  }
+
+  const details = toEventDetails(data);
+  details.meetingUrl = meetingUrl;
+  return details;
 }
 
 export async function exportEventsAction(

@@ -802,6 +802,18 @@ export const adminCopy = {
       endsAt: "Choose an end date and time after the start.",
       deadline: "The registration deadline must be on or before the start.",
       banner: "Please upload a valid banner image.",
+      capacity:
+        "Capacity must be a whole number from 1 to 100,000, or left empty.",
+    },
+    attendees: {
+      registered: "Registered",
+      attended: "Attended",
+      cancelled: "Cancelled",
+      statusLabels: {
+        registered: "Registered",
+        attended: "Attended",
+        cancelled: "Cancelled",
+      },
     },
   },
   blogs: {

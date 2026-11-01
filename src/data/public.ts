@@ -17,6 +17,14 @@ export interface PublicEventsCopy {
   back: string;
   joinOnline: string;
   signInForLink: string;
+  signUp?: {
+    errors: {
+      sign_in: string;
+      not_member: string;
+      not_found: string;
+      failed: string;
+    };
+  };
 }
 
 export interface PublicBlogsCopy {
@@ -52,6 +60,14 @@ export const publicCopy: PublicCopy = {
     back: "All events",
     joinOnline: "Join online",
     signInForLink: "Sign in to see the meeting link.",
+    signUp: {
+      errors: {
+        sign_in: "Sign in to register.",
+        not_member: "Only approved members can register for events.",
+        not_found: "This event is no longer open for registration.",
+        failed: "We couldn't complete that. Please try again.",
+      },
+    },
   },
   blogs: {
     empty: "No articles are published yet. Check back soon.",
