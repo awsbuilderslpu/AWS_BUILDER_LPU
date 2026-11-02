@@ -158,8 +158,19 @@ export interface AccountPageCopy {
   signOut: string;
 }
 
+export interface MenuAccountCopy {
+  trigger: string;
+  dashboard: string;
+  profile: string;
+  viewSite: string;
+  logout: string;
+  finish: string;
+  footer: (label: string) => string;
+}
+
 export interface MenuCopy {
   finish: string;
+  account: MenuAccountCopy;
 }
 
 const { name, org, website } = siteConfig;
@@ -345,6 +356,15 @@ export const authCopy: {
   },
   menu: {
     finish: "Finish registration",
+    account: {
+      trigger: "Account menu",
+      dashboard: "Dashboard",
+      profile: "Profile",
+      viewSite: "View site",
+      logout: "Log out",
+      finish: "Finish registration",
+      footer: (label: string) => `${label} account`,
+    },
   },
 };
 
