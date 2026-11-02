@@ -23,7 +23,6 @@ where user_id = (
 update public.registrations
 set
   status = 'approved',
-  admin_note = 'Initial administrator bootstrap promotion',
   reviewed_at = now(),
   updated_at = now()
 where user_id = (
