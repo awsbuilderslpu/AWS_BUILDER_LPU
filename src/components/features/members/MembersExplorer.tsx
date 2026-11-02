@@ -9,25 +9,33 @@ import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { MemberCoreCard } from "@/components/features/members/MemberCoreCard";
 import { MemberRowCard } from "@/components/features/members/MemberRowCard";
 import { JoinCard } from "@/components/features/members/JoinCard";
+import { Reveal } from "@/components/motion/Reveal";
+import { staggerDelay } from "@/lib/motion/tokens";
+import type { Member } from "@/data/members";
 import {
-  members,
-  memberTabs,
-  memberSkills,
   memberSearchPlaceholder,
   allMembersPreviewCount,
   joinCards,
 } from "@/data/members";
-import { filterMembers } from "@/lib/members";
+import { publicMemberTabs, profileCopy } from "@/data/profile";
+import { filterMembers } from "@/lib/members/public-filter";
+import { skillsOf } from "@/lib/members/public-card";
 
-export function MembersExplorer() {
+export interface MembersExplorerProps {
+  members: Member[];
+}
+
+export function MembersExplorer({ members }: MembersExplorerProps) {
   const [activeTab, setActiveTab] = React.useState<string>("All Members");
   const [query, setQuery] = React.useState<string>("");
   const [skills, setSkills] = React.useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = React.useState<boolean>(false);
   const [showAll, setShowAll] = React.useState<boolean>(false);
 
+  const memberSkills = React.useMemo(() => skillsOf(members), [members]);
+
   const tab =
-    memberTabs.find((t) => t.label === activeTab) ?? memberTabs[0];
+    publicMemberTabs.find((t) => t.label === activeTab) ?? publicMemberTabs[0];
   const matched = filterMembers(members, tab.group, query, skills);
   const core = matched.filter((m) => m.group === "core");
   const isDefaultView =
@@ -51,7 +59,25 @@ export function MembersExplorer() {
     setShowAll(false);
   };
 
-  const options = React.useMemo(() => memberTabs.map((t) => t.label), []);
+  const options = React.useMemo(() => publicMemberTabs.map((t) => t.label), []);
+
+  if (members.length === 0) {
+    return (
+      <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_360px] items-start">
+        <div className="rounded-2xl border border-border bg-card/60 p-8 sm:p-12 text-center text-muted-foreground backdrop-blur-sm">
+          {profileCopy.members.empty}
+        </div>
+        <aside
+          aria-label="Join the community"
+          className="flex flex-col gap-4 sm:flex-row lg:flex-col lg:gap-5 shrink-0"
+        >
+          {joinCards.map((card, idx) => (
+            <JoinCard key={idx} data={card} className="w-full" />
+          ))}
+        </aside>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-4">
@@ -201,10 +227,15 @@ export function MembersExplorer() {
                     </button>
                   </div>
                   <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6">
-                    {core.map((member) => (
-                      <li key={member.slug} className="flex">
+                    {core.map((member, index) => (
+                      <Reveal
+                        as="li"
+                        key={member.slug}
+                        delay={staggerDelay(index, 0.06, 0.4)}
+                        className="flex"
+                      >
                         <MemberCoreCard member={member} className="w-full" />
-                      </li>
+                      </Reveal>
                     ))}
                   </ul>
                 </section>
@@ -237,10 +268,15 @@ export function MembersExplorer() {
                     )}
                   </div>
                   <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-                    {visibleCommunity.map((member) => (
-                      <li key={member.slug} className="flex">
+                    {visibleCommunity.map((member, index) => (
+                      <Reveal
+                        as="li"
+                        key={member.slug}
+                        delay={staggerDelay(index, 0.06, 0.4)}
+                        className="flex"
+                      >
                         <MemberRowCard member={member} className="w-full" />
-                      </li>
+                      </Reveal>
                     ))}
                   </ul>
                 </section>
@@ -268,10 +304,15 @@ export function MembersExplorer() {
                     </button>
                   </div>
                   <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-                    {alumniMembers.slice(0, 4).map((member) => (
-                      <li key={member.slug} className="flex">
+                    {alumniMembers.slice(0, 4).map((member, index) => (
+                      <Reveal
+                        as="li"
+                        key={member.slug}
+                        delay={staggerDelay(index, 0.06, 0.4)}
+                        className="flex"
+                      >
                         <MemberRowCard member={member} className="w-full" />
-                      </li>
+                      </Reveal>
                     ))}
                   </ul>
                 </section>
@@ -299,10 +340,15 @@ export function MembersExplorer() {
                     </button>
                   </div>
                   <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-                    {speakerMembers.slice(0, 4).map((member) => (
-                      <li key={member.slug} className="flex">
+                    {speakerMembers.slice(0, 4).map((member, index) => (
+                      <Reveal
+                        as="li"
+                        key={member.slug}
+                        delay={staggerDelay(index, 0.06, 0.4)}
+                        className="flex"
+                      >
                         <MemberRowCard member={member} className="w-full" />
-                      </li>
+                      </Reveal>
                     ))}
                   </ul>
                 </section>
@@ -330,14 +376,19 @@ export function MembersExplorer() {
                       : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4"
                   )}
                 >
-                  {matched.map((member) => (
-                    <li key={member.slug} className="flex">
+                  {matched.map((member, index) => (
+                    <Reveal
+                      as="li"
+                      key={member.slug}
+                      delay={staggerDelay(index, 0.06, 0.4)}
+                      className="flex"
+                    >
                       {tab.group === "core" ? (
                         <MemberCoreCard member={member} className="w-full" />
                       ) : (
                         <MemberRowCard member={member} className="w-full" />
                       )}
-                    </li>
+                    </Reveal>
                   ))}
                 </ul>
               </section>

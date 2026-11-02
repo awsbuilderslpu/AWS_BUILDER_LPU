@@ -24,6 +24,7 @@ import {
 } from "@/components/features/admin/kit/StatusBadge";
 import { ConfirmDialog } from "@/components/features/admin/kit/ConfirmDialog";
 import { Button } from "@/components/ui/button";
+import { TextField } from "@/components/ui/TextField";
 import { SelectField, type SelectOption } from "@/components/ui/SelectField";
 import { CheckboxField } from "@/components/ui/CheckboxField";
 import { fieldClass } from "@/components/ui/formStyles";
@@ -45,6 +46,10 @@ import {
 } from "@/lib/members/view-logic";
 import type { MemberTarget } from "@/lib/members/rules";
 import type { AppRole, MemberDetails } from "@/lib/members/types";
+import {
+  getAdminPublicTitle,
+  setMemberPublicTitleAction,
+} from "@/lib/profile/actions";
 import { saveNoteAction } from "@/lib/registrations/actions";
 import { programmeLabel } from "@/lib/registrations/labels";
 import { cn } from "@/lib/utils";
@@ -81,11 +86,23 @@ export function MemberDrawer({
   const [confirmActive, setConfirmActive] = React.useState<boolean | null>(null);
   const [confirmRemoveOpen, setConfirmRemoveOpen] = React.useState(false);
 
+  // Public title state
+  const [publicTitleInfo, setPublicTitleInfo] = React.useState<{
+    publicTitle: string | null;
+    isPublicProfile: boolean;
+  } | null>(null);
+  const [publicTitleInput, setPublicTitleInput] = React.useState("");
+  const [savingPublicTitle, setSavingPublicTitle] = React.useState(false);
+  const [publicTitleError, setPublicTitleError] = React.useState<string | null>(null);
+
   const fetchDetails = React.useCallback(async (id: string) => {
     setLoading(true);
     setLoadError(false);
     try {
-      const data = await getMemberDetailsAction(id);
+      const [data, titleInfo] = await Promise.all([
+        getMemberDetailsAction(id),
+        getAdminPublicTitle(id),
+      ]);
       if (!data) {
         setLoadError(true);
       } else {
@@ -93,6 +110,9 @@ export function MemberDrawer({
         setNote(data.adminNote || "");
         setSelectedRole(data.role);
         setConfirmAdmin(false);
+        setPublicTitleInfo(titleInfo);
+        setPublicTitleInput(titleInfo?.publicTitle || "");
+        setPublicTitleError(null);
       }
     } catch {
       setLoadError(true);
@@ -108,6 +128,9 @@ export function MemberDrawer({
       setDetails(null);
       setLoadError(false);
       setNote("");
+      setPublicTitleInfo(null);
+      setPublicTitleInput("");
+      setPublicTitleError(null);
     }
   }
 
@@ -118,8 +141,11 @@ export function MemberDrawer({
     setLoading(true);
     setLoadError(false);
 
-    getMemberDetailsAction(userId)
-      .then((data) => {
+    Promise.all([
+      getMemberDetailsAction(userId),
+      getAdminPublicTitle(userId),
+    ])
+      .then(([data, titleInfo]) => {
         if (!active) return;
         if (!data) {
           setLoadError(true);
@@ -128,6 +154,9 @@ export function MemberDrawer({
           setNote(data.adminNote || "");
           setSelectedRole(data.role);
           setConfirmAdmin(false);
+          setPublicTitleInfo(titleInfo);
+          setPublicTitleInput(titleInfo?.publicTitle || "");
+          setPublicTitleError(null);
         }
       })
       .catch(() => {
@@ -138,7 +167,7 @@ export function MemberDrawer({
         if (active) setLoading(false);
       });
 
-  return () => {
+    return () => {
       active = false;
     };
   }, [userId]);
@@ -281,6 +310,36 @@ export function MemberDrawer({
       notify.error(copy.errors.failed);
     } finally {
       setConfirmRemoveOpen(false);
+    }
+  };
+
+  const handleSavePublicTitle = async () => {
+    if (!details) return;
+    setSavingPublicTitle(true);
+    setPublicTitleError(null);
+    try {
+      const res = await setMemberPublicTitleAction({
+        userId: details.userId,
+        title: publicTitleInput.trim() || null,
+      });
+      if (!res.ok) {
+        const errKey = res.error as keyof typeof copy.errors;
+        const msg = (errKey && copy.errors[errKey]) || copy.errors.failed;
+        notify.error(msg);
+        setPublicTitleError(msg);
+      } else {
+        notify.success(copy.drawer.titleSaved);
+        setPublicTitleInfo((prev) =>
+          prev ? { ...prev, publicTitle: res.title ?? null } : null
+        );
+        setPublicTitleInput(res.title ?? "");
+        onChanged();
+      }
+    } catch {
+      notify.error(copy.errors.failed);
+      setPublicTitleError(copy.errors.failed);
+    } finally {
+      setSavingPublicTitle(false);
     }
   };
 
@@ -680,6 +739,79 @@ export function MemberDrawer({
                       </div>
                     )}
                   </>
+                )}
+              </div>
+            </DrawerSection>
+
+            {/* Public profile */}
+            <DrawerSection
+              icon={Globe}
+              title={copy.drawer.sections.publicProfile}
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between text-[13px]">
+                  <span className="text-muted-foreground">
+                    {copy.drawer.publicStatus}:
+                  </span>
+                  <span
+                    className={cn(
+                      "font-medium",
+                      publicTitleInfo?.isPublicProfile
+                        ? "text-emerald-400"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    {publicTitleInfo?.isPublicProfile
+                      ? copy.drawer.publicYes
+                      : copy.drawer.publicNo}
+                  </span>
+                </div>
+
+                {details.registrationStatus === "approved" ? (
+                  <div className="space-y-2 pt-2 border-t border-border">
+                    <TextField
+                      label={copy.drawer.publicTitle}
+                      maxLength={80}
+                      value={publicTitleInput}
+                      onChange={(e) => {
+                        setPublicTitleInput(e.target.value);
+                        setPublicTitleError(null);
+                      }}
+                      placeholder={copy.drawer.publicTitle}
+                      hint={copy.drawer.publicTitleHint}
+                      error={publicTitleError ?? undefined}
+                      disabled={savingPublicTitle}
+                    />
+                    <div className="flex justify-end pt-1">
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleSavePublicTitle}
+                        disabled={
+                          savingPublicTitle ||
+                          (publicTitleInput.trim() || null) ===
+                            (publicTitleInfo?.publicTitle ?? null)
+                        }
+                        className="h-8 px-3 text-[12.5px] bg-primary text-background hover:bg-primary-hover font-semibold cursor-pointer"
+                      >
+                        {savingPublicTitle ? (
+                          <>
+                            <LoaderCircle className="size-3.5 animate-spin mr-1.5 shrink-0" />
+                            <span>{copy.drawer.savingTitle}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save className="size-3.5 mr-1.5 shrink-0" />
+                            <span>{copy.drawer.saveTitle}</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-[12.5px] text-muted-foreground pt-2 border-t border-border">
+                    {copy.drawer.notApproved}
+                  </p>
                 )}
               </div>
             </DrawerSection>

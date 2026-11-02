@@ -4,10 +4,13 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, Search } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 
 import { siteConfig, navLinks } from "@/data/site";
 import { authCopy } from "@/data/auth";
+import { profileCopy } from "@/data/profile";
 import { cn } from "@/lib/utils";
+import { durations, easing } from "@/lib/motion/tokens";
 import { Logo } from "@/components/layout/Logo";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { UserMenu } from "@/components/layout/UserMenu";
@@ -26,6 +29,7 @@ export function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
   const { account, signOut } = useAuth();
+  const shouldReduceMotion = useReducedMotion();
 
   const isLinkActive = (href: string) => {
     if (href === "/") {
@@ -61,7 +65,12 @@ export function Navbar() {
               >
                 {link.label}
                 {active && (
-                  <span
+                  <motion.span
+                    layoutId="nav-underline"
+                    transition={{
+                      duration: shouldReduceMotion ? 0 : durations.base,
+                      ease: easing,
+                    }}
                     className="absolute bottom-[12px] left-3.5 right-3.5 h-[2px] rounded-full bg-primary"
                     aria-hidden="true"
                   />
@@ -190,7 +199,7 @@ export function Navbar() {
                       className="w-full justify-center"
                       onClick={() => setIsOpen(false)}
                     >
-                      <Link href="/account">My Account</Link>
+                      <Link href="/profile">{profileCopy.myProfile}</Link>
                     </Button>
                     <Button
                       variant="ghost"

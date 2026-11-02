@@ -71,3 +71,4 @@ test("viewerKind returns signed-in-not-member for staff without approved registr
   };
   assert.equal(viewerKind(account), "signed-in-not-member");
 });
+

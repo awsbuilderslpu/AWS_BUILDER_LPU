@@ -12,6 +12,8 @@ import { LatestPostItem } from "@/components/features/blogs/LatestPostItem";
 import { RecentArticleCard } from "@/components/features/blogs/RecentArticleCard";
 import { PopularTopics } from "@/components/features/blogs/PopularTopics";
 import { BlogNewsletter } from "@/components/features/blogs/BlogNewsletter";
+import { Reveal } from "@/components/motion/Reveal";
+import { staggerDelay } from "@/lib/motion/tokens";
 import {
   blogFilters,
   popularTopics,
@@ -111,7 +113,11 @@ export function BlogsExplorer({
                 >
                   Featured Article
                 </SectionEyebrow>
-                {featured && <FeaturedArticle post={featured} />}
+                {featured && (
+                  <Reveal delay={staggerDelay(0)}>
+                    <FeaturedArticle post={featured} />
+                  </Reveal>
+                )}
               </section>
 
               {/* Latest section */}
@@ -134,10 +140,10 @@ export function BlogsExplorer({
                   </Link>
                 </div>
                 <ul className="flex flex-col gap-2.5">
-                  {latest.map((post) => (
-                    <li key={post.slug}>
+                  {latest.map((post, index) => (
+                    <Reveal as="li" key={post.slug} delay={staggerDelay(index)}>
                       <LatestPostItem post={post} />
-                    </li>
+                    </Reveal>
                   ))}
                 </ul>
               </section>
@@ -155,10 +161,15 @@ export function BlogsExplorer({
                 Recent Articles
               </SectionEyebrow>
               <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-4">
-                {recent.map((post) => (
-                  <li key={post.slug} className="flex">
+                {recent.map((post, index) => (
+                  <Reveal
+                    as="li"
+                    key={post.slug}
+                    delay={staggerDelay(index)}
+                    className="flex"
+                  >
                     <RecentArticleCard post={post} />
-                  </li>
+                  </Reveal>
                 ))}
               </ul>
             </section>
@@ -198,10 +209,15 @@ export function BlogsExplorer({
 
             {results.length > 0 ? (
               <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {results.map((post) => (
-                  <li key={post.slug} className="flex">
+                {results.map((post, index) => (
+                  <Reveal
+                    as="li"
+                    key={post.slug}
+                    delay={staggerDelay(index)}
+                    className="flex"
+                  >
                     <RecentArticleCard post={post} />
-                  </li>
+                  </Reveal>
                 ))}
               </ul>
             ) : (

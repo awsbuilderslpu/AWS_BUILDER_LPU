@@ -20,6 +20,7 @@ export interface EventAdminRow {
   endsAt: string;
   registrationEnabled: boolean;
   registrationDeadline: string | null;
+  capacity: number | null;
   bannerPath: string | null;
   isPublished: boolean;
   archivedAt: string | null;
@@ -29,7 +30,6 @@ export interface EventAdminRow {
 export interface EventDetails extends EventAdminRow {
   description: unknown;
   meetingUrl: string | null;
-  capacity?: number | null;
 }
 
 export function toEventAdminRow(raw: unknown): EventAdminRow {
@@ -70,6 +70,7 @@ export function toEventAdminRow(raw: unknown): EventAdminRow {
       typeof r.registration_deadline === "string"
         ? r.registration_deadline
         : null,
+    capacity: typeof r.capacity === "number" ? r.capacity : null,
     bannerPath: typeof r.banner_path === "string" ? r.banner_path : null,
     isPublished: Boolean(r.is_published),
     archivedAt: typeof r.archived_at === "string" ? r.archived_at : null,

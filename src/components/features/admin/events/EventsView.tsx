@@ -58,6 +58,8 @@ export interface EventsViewProps {
   params: ReturnType<typeof useListState>["params"];
   nowIso: string;
   loadError?: boolean;
+  eventCounts?: Record<string, { registered: number; attended: number }>;
+  isAdmin?: boolean;
 }
 
 type OpenState =
@@ -74,6 +76,8 @@ export function EventsView({
   params: _initialParams,
   nowIso,
   loadError = false,
+  eventCounts = {},
+  isAdmin = false,
 }: EventsViewProps) {
   void _initialParams;
   const router = useRouter();
@@ -234,8 +238,9 @@ export function EventsView({
         nowIso,
         onEdit: (id) => setOpenState({ kind: "form", id }),
         onAction: handleSingleAction,
+        eventCounts,
       }),
-    [nowIso, handleSingleAction]
+    [nowIso, handleSingleAction, eventCounts]
   );
 
   const csvColumns = React.useMemo(
@@ -446,6 +451,12 @@ export function EventsView({
         mode={openState?.kind === "form" && openState.id ? "edit" : "create"}
         eventId={openState?.kind === "form" ? openState.id : null}
         nowIso={nowIso}
+        isAdmin={isAdmin}
+        eventCounts={
+          openState?.kind === "form" && openState.id
+            ? eventCounts[openState.id] ?? null
+            : null
+        }
         onClose={() => setOpenState(null)}
         onSaved={handleActionSuccess}
       />

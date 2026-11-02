@@ -184,11 +184,16 @@ const requestedRoleField = z
   });
 
 // Validate phone according to country code
-const phoneRefinement = (data: { countryCode: string; phone: string }) => {
-  if (data.countryCode === "+91") {
-    return /^[6-9]\d{9}$/.test(data.phone);
+export function isValidPhoneNumber(countryCode: string, phone: string): boolean {
+  const clean = phone.replace(/[\s-]/g, "");
+  if (countryCode === "+91") {
+    return /^[6-9]\d{9}$/.test(clean);
   }
-  return /^\d{6,14}$/.test(data.phone);
+  return /^\d{6,14}$/.test(clean);
+}
+
+export const phoneRefinement = (data: { countryCode: string; phone: string }) => {
+  return isValidPhoneNumber(data.countryCode, data.phone);
 };
 
 // ============================================================================

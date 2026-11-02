@@ -16,6 +16,7 @@ export interface TagInputProps {
   hint?: string;
   required?: boolean;
   disabled?: boolean;
+  maxTags?: number;
   className?: string;
 }
 
@@ -30,6 +31,7 @@ export function TagInput({
   hint,
   required = false,
   disabled = false,
+  maxTags = 10,
   className,
 }: TagInputProps) {
   const [inputVal, setInputVal] = React.useState("");
@@ -37,16 +39,24 @@ export function TagInput({
 
   const handleAdd = React.useCallback(
     (raw: string) => {
-      const res = addTag(value, raw);
+      const res = addTag(value, raw, maxTags);
       if (res.ok) {
         onChange(res.tags);
         setInputVal("");
         setTagError(null);
       } else {
-        setTagError(copy.tagErrors[res.error] ?? copy.tagErrors.empty);
+        if (res.error === "limit") {
+          const limitMsg =
+            typeof copy.tagErrors.limitFor === "function"
+              ? copy.tagErrors.limitFor(maxTags)
+              : copy.tagErrors.limit;
+          setTagError(limitMsg);
+        } else {
+          setTagError(copy.tagErrors[res.error] ?? copy.tagErrors.empty);
+        }
       }
     },
-    [value, onChange]
+    [value, onChange, maxTags]
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -126,8 +136,8 @@ export function TagInput({
           value={inputVal}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          disabled={disabled || value.length >= 10}
-          placeholder={value.length >= 10 ? "" : copy.hints.tags}
+          disabled={disabled || value.length >= maxTags}
+          placeholder={value.length >= maxTags ? "" : copy.hints.tags}
           className="flex-1 min-w-[120px] bg-transparent text-[13px] text-foreground placeholder:text-[12px] placeholder:text-muted-foreground/75 focus:outline-none px-1"
         />
       </div>

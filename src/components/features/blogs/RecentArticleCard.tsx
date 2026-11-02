@@ -20,7 +20,7 @@ export function RecentArticleCard({
   return (
     <article
       className={cn(
-        "relative group flex h-full w-full flex-col overflow-hidden rounded-lg border border-border bg-card/60 transition-colors hover:border-primary/40",
+        "relative group flex h-full w-full flex-col overflow-hidden rounded-lg border border-border bg-card/60 transition-colors hover:border-primary/40 motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:translate-y-[-2px]",
         className
       )}
       {...props}

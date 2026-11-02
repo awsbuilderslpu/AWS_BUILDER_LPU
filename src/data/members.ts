@@ -8,6 +8,8 @@ export interface MemberSocials {
   linkedin?: string;
   github?: string;
   website?: string;
+  instagram?: string;
+  youtube?: string;
 }
 
 export interface Member {

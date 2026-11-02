@@ -32,6 +32,20 @@ describe("blog tags helper", () => {
     assert.deepEqual(addTag(current, "tag11"), { ok: false, error: "limit" });
   });
 
+  it("max 20 accepts a 20th tag", () => {
+    const current = Array.from({ length: 19 }, (_, i) => `tag${i}`);
+    const res = addTag(current, "tag20", 20);
+    assert.equal(res.ok, true);
+    if (res.ok) {
+      assert.equal(res.tags.length, 20);
+      assert.equal(res.tags[19], "tag20");
+    }
+    assert.deepEqual(addTag(res.ok ? res.tags : [], "tag21", 20), {
+      ok: false,
+      error: "limit",
+    });
+  });
+
   it("adds a valid tag and trims whitespace", () => {
     const res = addTag(["cloud"], "  serverless  ");
     assert.equal(res.ok, true);

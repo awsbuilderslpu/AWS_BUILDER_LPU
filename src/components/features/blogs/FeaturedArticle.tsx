@@ -22,7 +22,7 @@ export function FeaturedArticle({
   return (
     <article
       className={cn(
-        "relative group overflow-hidden rounded-lg border border-border bg-card/70 transition-colors hover:border-primary/40",
+        "relative group overflow-hidden rounded-lg border border-border bg-card/70 transition-colors hover:border-primary/40 motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:translate-y-[-2px]",
         className
       )}
       {...props}

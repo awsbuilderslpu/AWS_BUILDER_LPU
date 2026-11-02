@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { User, LogOut, ShieldCheck, ChevronDown, AlertCircle } from "lucide-react";
+import { User, LogOut, ShieldCheck, AlertCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +16,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { useAuth } from "@/components/features/auth/AuthProvider";
 import { roleMeta, type Role } from "@/data/roles";
 import { authCopy } from "@/data/auth";
+import { profileCopy } from "@/data/profile";
 import { cn } from "@/lib/utils";
 import type { AccountSummary } from "@/lib/auth/account";
 
@@ -115,11 +116,11 @@ export function UserMenu({ account, className }: UserMenuProps) {
           )}
           <DropdownMenuItem asChild className="cursor-pointer rounded-lg text-sm">
             <Link
-              href="/account"
+              href="/profile"
               className="flex items-center gap-2 px-2.5 py-2 text-foreground/90 hover:text-white"
             >
               <User className="size-4 text-muted-foreground" />
-              <span>My Account</span>
+              <span>{profileCopy.myProfile}</span>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>

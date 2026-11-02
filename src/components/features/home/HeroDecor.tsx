@@ -4,6 +4,7 @@ import { StackedLabel } from "@/components/ui/decor/StackedLabel";
 import { DotGrid } from "@/components/ui/decor/DotGrid";
 import { PlusMark } from "@/components/ui/decor/PlusMark";
 import { InlineLabel } from "@/components/ui/decor/InlineLabel";
+import { Artwork } from "@/components/ui/Artwork";
 import { decorLabels } from "@/data/home";
 
 export interface HeroDecorProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -89,6 +90,13 @@ export function HeroDecor({ className, ...props }: HeroDecorProps) {
         gap={18}
         tone="orange"
         className="absolute left-[30.5%] top-[89%]"
+      />
+
+      {/* 13. Artwork Home: AWS cube */}
+      <Artwork
+        slot="homeCube"
+        sizes="24vw"
+        className="absolute left-0 top-[15%] h-[55%] w-[24%] aspect-auto motion-safe:animate-float motion-safe:[animation-delay:2s]"
       />
     </div>
   );

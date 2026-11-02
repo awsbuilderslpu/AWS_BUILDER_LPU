@@ -17,12 +17,14 @@ export interface EventColumnsOptions {
   nowIso: string;
   onEdit: (id: string) => void;
   onAction: (row: EventAdminRow, action: EventAction) => void;
+  eventCounts?: Record<string, { registered: number; attended: number }>;
 }
 
 export function getEventColumns({
   nowIso,
   onEdit,
   onAction,
+  eventCounts,
 }: EventColumnsOptions): DataColumn<EventAdminRow>[] {
   const copy = adminCopy.events;
   const nowMs = Date.parse(nowIso);
@@ -143,6 +145,30 @@ export function getEventColumns({
           <StatusBadge tone={isOpen ? "success" : "muted"}>
             {isOpen ? copy.table.registrationOpen : copy.table.registrationClosed}
           </StatusBadge>
+        );
+      },
+    },
+    {
+      key: "registered",
+      header: copy.table.registered,
+      cell: (row) => {
+        const counts = eventCounts?.[row.id];
+        if (!counts) {
+          return <span className="text-muted-foreground">—</span>;
+        }
+
+        const registeredLabel =
+          row.capacity !== null
+            ? `${counts.registered} / ${row.capacity}`
+            : `${counts.registered}`;
+
+        return (
+          <div className="flex flex-col text-[12.5px] whitespace-nowrap">
+            <span className="font-medium text-foreground">{registeredLabel}</span>
+            <span className="text-[11.5px] text-muted-foreground">
+              {counts.attended} attended
+            </span>
+          </div>
         );
       },
     },

@@ -5,6 +5,7 @@ import "./globals.css";
 import { PageBackground } from "@/components/layout/PageBackground";
 import { AuthModal } from "@/components/features/auth/AuthModal";
 import { AuthProvider } from "@/components/features/auth/AuthProvider";
+import { MotionProvider } from "@/components/motion/MotionProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -43,13 +44,19 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable} dark`}
     >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary">
-        <AuthProvider>
-          <PageBackground />
-          {children}
-          <Suspense fallback={null}>
-            <AuthModal />
-          </Suspense>
-        </AuthProvider>
+        {/* Visitors without JavaScript still see all content */}
+        <noscript>
+          <style>{`[data-reveal] { opacity: 1 !important; transform: none !important; }`}</style>
+        </noscript>
+        <MotionProvider>
+          <AuthProvider>
+            <PageBackground />
+            {children}
+            <Suspense fallback={null}>
+              <AuthModal />
+            </Suspense>
+          </AuthProvider>
+        </MotionProvider>
       </body>
     </html>
   );

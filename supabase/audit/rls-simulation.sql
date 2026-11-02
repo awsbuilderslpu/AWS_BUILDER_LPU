@@ -5,9 +5,10 @@
 --              storage permissions, registration review state machine security,
 --              private notes, member functions, events security policies,
 --              blogs security policies and the set_featured_blog function,
---              event sign-up, capacity, registrations, and meeting link policies, and
+--              event sign-up, capacity, registrations, and meeting link policies,
+--              member profiles, public opt-in, admin-only titles, public directory, and
 --              the append-only audit trail under simulated authenticated and
---              anonymous sessions (migrations 001-012).
+--              anonymous sessions (migrations 001-013).
 --
 -- Safety: Every individual test executes within an isolated subtransaction
 --         that ends in an immediate rollback ('SIM_ROLLBACK'). NO DATA IS MODIFIED.
@@ -83,6 +84,7 @@ declare
   v_ret_text        text;
   v_ret_int         integer;
   v_is_approved_member boolean := false;
+  v_public_title_check text;
 begin
   -- --------------------------------------------------------------------------
   -- PRE-CHECKS (Run as Owner)
@@ -2966,6 +2968,297 @@ begin
   insert into _sim (who, test, expected, outcome, pass)
   values ('v_user (core)', 'T3: Core select other rows in admin_event_attendees (blocked)', '0 rows', case when v_state = 'OK' then v_cnt || ' rows' else 'sqlstate ' || v_state end, v_state = 'OK' and v_cnt = 0);
 
+  -- ==========================================================================
+  -- MIGRATION 013: MEMBER PROFILES, PUBLIC OPT-IN, ADMIN TITLES, DIRECTORY
+  -- ==========================================================================
+
+  -- M1: update own is_public_profile to true -> allowed (1 row)
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    update public.profiles set is_public_profile = true where id = v_user;
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'M1: update own is_public_profile to true', 'allowed (1 row)', case when v_state = 'OK' then v_rows || ' rows affected' else 'sqlstate ' || v_state end, v_state = 'OK' and v_rows = 1);
+
+  -- M2: update own public_title -> blocked (no column privilege)
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    update public.profiles set public_title = 'Club Lead' where id = v_user;
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'M2: update own public_title (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK' or v_rows = 0);
+
+  -- M3: call set_member_public_title(v_user, 'Club Lead') -> blocked (forbidden)
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select public.set_member_public_title(v_user, 'Club Lead') into v_ret_text;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'M3: call set_member_public_title (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- M4: update own avatar_path to 'not-a-valid-path.png' -> blocked (format check)
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    update public.profiles set avatar_path = 'not-a-valid-path.png' where id = v_user;
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'M4: update own avatar_path invalid format (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_rows || ' rows affected' end, v_state <> 'OK');
+
+  -- M5: update own avatar_path to v_user || '/' || gen_random_uuid() || '.webp' -> allowed (1 row)
+  v_rows := 0;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    update public.profiles set avatar_path = v_user::text || '/' || gen_random_uuid()::text || '.webp' where id = v_user;
+    get diagnostics v_rows = row_count;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'M5: update own avatar_path valid format', 'allowed (1 row)', case when v_state = 'OK' then v_rows || ' rows affected' else 'sqlstate ' || v_state end, v_state = 'OK' and v_rows = 1);
+
+  -- M6: count visible profiles other than v_user -> 0 -> blocked
+  v_cnt := 1;
+  begin
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select count(*) into v_cnt from public.profiles where id <> v_user;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user', 'M6: count visible profiles other than v_user (blocked)', '0 rows', case when v_state = 'OK' then v_cnt || ' rows' else 'sqlstate ' || v_state end, v_state = 'OK' and v_cnt = 0);
+
+  -- N1: select email from profiles as anon -> blocked
+  v_cnt := 1;
+  begin
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', json_build_object('role', 'anon')::text, true);
+    set local role anon;
+
+    select count(*) into v_cnt from public.profiles;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('anon', 'N1: select email from profiles (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else v_cnt || ' rows' end, v_state <> 'OK' or v_cnt = 0);
+
+  -- N2 [member]: call public_member_directory() -> allowed when v_user is an approved member who has opted in
+  if not v_is_approved_member then
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('anon', 'N2: [member] call public_member_directory()', 'allowed', 'SKIPPED: v_user is not an approved member', true);
+  else
+    v_cnt := 0;
+    begin
+      -- Owner sets is_public_profile = true for v_user inside block
+      update public.profiles set is_public_profile = true where id = v_user;
+
+      perform set_config('request.jwt.claim.sub', '', true);
+      perform set_config('request.jwt.claims', json_build_object('role', 'anon')::text, true);
+      set local role anon;
+
+      select count(*) into v_cnt from public.public_member_directory() where user_id = v_user;
+
+      raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+    exception
+      when sqlstate 'P0000' then v_state := 'OK';
+      when others then get stacked diagnostics v_state = returned_sqlstate;
+    end;
+    reset role;
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('anon', 'N2: [member] call public_member_directory()', 'allowed (>= 1 row)', case when v_state = 'OK' then v_cnt || ' rows' else 'sqlstate ' || v_state end, v_state = 'OK' and v_cnt >= 1);
+  end if;
+
+  -- O1 [member]: call set_member_public_title(v_user, 'Club Lead') as admin -> allowed
+  if not v_is_approved_member then
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'O1: [member] set_member_public_title(v_user, ''Club Lead'')', 'Club Lead', 'SKIPPED: v_user is not an approved member', true);
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'O1: [member] read-back public_title as owner equals Club Lead', 'Club Lead', 'SKIPPED: v_user is not an approved member', true);
+  else
+    v_ret_text := null;
+    v_public_title_check := null;
+    begin
+      perform set_config('request.jwt.claim.sub', v_admin::text, true);
+      perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+      set local role authenticated;
+
+      select public.set_member_public_title(v_user, 'Club Lead') into v_ret_text;
+
+      -- Read v_user's public_title as the owner (inside block before rollback)
+      reset role;
+      select public_title into v_public_title_check from public.profiles where id = v_user;
+
+      raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+    exception
+      when sqlstate 'P0000' then v_state := 'OK';
+      when others then get stacked diagnostics v_state = returned_sqlstate;
+    end;
+    reset role;
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'O1: [member] set_member_public_title(v_user, ''Club Lead'')', 'Club Lead', case when v_state = 'OK' then coalesce(v_ret_text, 'null') else 'sqlstate ' || v_state end, v_state = 'OK' and v_ret_text = 'Club Lead');
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'O1: [member] read-back public_title as owner equals Club Lead', 'Club Lead', case when v_state = 'OK' then coalesce(v_public_title_check, 'null') else 'sqlstate ' || v_state end, v_state = 'OK' and v_public_title_check = 'Club Lead');
+  end if;
+
+  -- O2: call set_member_public_title(v_user, 'x') as admin -> blocked (invalid_input)
+  begin
+    perform set_config('request.jwt.claim.sub', v_admin::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select public.set_member_public_title(v_user, 'x') into v_ret_text;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_admin', 'O2: set_member_public_title(v_user, ''x'') (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
+  -- O3 [member]: call set_member_public_title(v_user, null) as admin -> allowed [member] (clears the title)
+  if not v_is_approved_member then
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'O3: [member] set_member_public_title(v_user, null) to clear title', 'allowed (null)', 'SKIPPED: v_user is not an approved member', true);
+  else
+    v_ret_text := 'not-null';
+    begin
+      -- Owner first sets a title
+      update public.profiles set public_title = 'Existing Title' where id = v_user;
+
+      perform set_config('request.jwt.claim.sub', v_admin::text, true);
+      perform set_config('request.jwt.claims', json_build_object('sub', v_admin, 'role', 'authenticated')::text, true);
+      set local role authenticated;
+
+      select public.set_member_public_title(v_user, null) into v_ret_text;
+
+      raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+    exception
+      when sqlstate 'P0000' then v_state := 'OK';
+      when others then get stacked diagnostics v_state = returned_sqlstate;
+    end;
+    reset role;
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+
+    insert into _sim (who, test, expected, outcome, pass)
+    values ('v_admin', 'O3: [member] set_member_public_title(v_user, null) to clear title', 'allowed (null)', case when v_state = 'OK' then coalesce(v_ret_text, 'null') else 'sqlstate ' || v_state end, v_state = 'OK' and v_ret_text is null);
+  end if;
+
+  -- P1: call set_member_public_title(v_user, 'Club Lead') as temporary core -> blocked (forbidden)
+  begin
+    -- Owner sets v_user role to 'core' inside block
+    update public.user_roles set role = 'core' where user_id = v_user;
+
+    perform set_config('request.jwt.claim.sub', v_user::text, true);
+    perform set_config('request.jwt.claims', json_build_object('sub', v_user, 'role', 'authenticated')::text, true);
+    set local role authenticated;
+
+    select public.set_member_public_title(v_user, 'Club Lead') into v_ret_text;
+
+    raise exception using errcode = 'P0000', message = 'SIM_ROLLBACK';
+  exception
+    when sqlstate 'P0000' then v_state := 'OK';
+    when others then get stacked diagnostics v_state = returned_sqlstate;
+  end;
+  reset role;
+  perform set_config('request.jwt.claim.sub', '', true);
+  perform set_config('request.jwt.claims', '', true);
+
+  insert into _sim (who, test, expected, outcome, pass)
+  values ('v_user (core)', 'P1: Core call set_member_public_title (blocked)', 'blocked', case when v_state <> 'OK' then 'sqlstate ' || v_state else 'allowed' end, v_state <> 'OK');
+
 end;
 $$;
 
@@ -2973,7 +3266,8 @@ $$;
 -- FINAL SUMMARY QUERY
 -- Displays SUMMARY row first, followed by each individual test in order.
 -- SUMMARY: migrations 001-011 blog tests (K0-K6: plain user = 7, L1-L7: core = 7, M1-M5: anon = 5) = 19 tests;
---          migration 012 event sign-up tests (Q1-Q12: plain user = 12, R1-R5: anon = 5, S1-S4: admin = 4, T1-T3: core = 3) = 24 new tests.
+--          migration 012 event sign-up tests (Q1-Q12: plain user = 12, R1-R5: anon = 5, S1-S4: admin = 4, T1-T3: core = 3) = 24 new tests;
+--          migration 013 member profile tests (M1-M6: plain user = 6, N1-N2: anon = 2, O1-O3: admin = 4 [including read-back], P1: core = 1) = 13 new tests.
 -- ============================================================================
 select
   s.who,

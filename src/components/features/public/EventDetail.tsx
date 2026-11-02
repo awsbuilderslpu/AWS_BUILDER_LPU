@@ -9,9 +9,12 @@ import { categoryStyles } from "@/components/features/events/categoryStyles";
 import { formatEventDate } from "@/lib/events/dates";
 import { isoToIst, formatIst } from "@/lib/datetime";
 import { RichTextRenderer } from "@/components/features/admin/forms/RichTextRenderer";
+import { EventRegistrationPanel } from "@/components/features/public/EventRegistrationPanel";
 import type { PublicEventRow } from "@/lib/public/events.server";
 import type { EventLifecycle } from "@/lib/events/types";
 import type { EventCategory } from "@/data/events";
+import type { MyStatus } from "@/lib/event-registrations/types";
+import type { ViewerKind } from "@/lib/event-registrations/viewer";
 
 export interface EventDetailProps extends React.HTMLAttributes<HTMLElement> {
   event: PublicEventRow;
@@ -19,6 +22,12 @@ export interface EventDetailProps extends React.HTMLAttributes<HTMLElement> {
   signedIn: boolean;
   meetingUrl: string | null;
   bannerUrl: string | null;
+  viewer: ViewerKind;
+  myStatus: MyStatus;
+  spotsLeft: number | null;
+  registrationOpen: boolean;
+  hasEnded: boolean;
+  isFull: boolean;
   className?: string;
 }
 
@@ -28,6 +37,12 @@ export function EventDetail({
   signedIn,
   meetingUrl,
   bannerUrl,
+  viewer,
+  myStatus,
+  spotsLeft,
+  registrationOpen,
+  hasEnded,
+  isFull,
   className,
   ...props
 }: EventDetailProps) {
@@ -128,6 +143,18 @@ export function EventDetail({
         {/* Right Column: Event Details Card */}
         <aside className="lg:col-span-1">
           <div className="rounded-lg border border-border bg-card/60 overflow-hidden divide-y divide-border/70">
+            {/* Registration Panel */}
+            <EventRegistrationPanel
+              eventId={event.id}
+              slug={event.slug}
+              viewer={viewer}
+              myStatus={myStatus}
+              spotsLeft={spotsLeft}
+              registrationOpen={registrationOpen}
+              hasEnded={hasEnded}
+              isFull={isFull}
+            />
+
             {/* Schedule */}
             <div className="flex items-start gap-3.5 p-5">
               <Calendar
@@ -197,6 +224,10 @@ export function EventDetail({
                     >
                       {publicCopy.events.signInForLink}
                     </Link>
+                  ) : viewer === "member" ? (
+                    <p className="text-sm text-muted-foreground">
+                      {publicCopy.events.signUp.meetingHint}
+                    </p>
                   ) : null}
                 </div>
               </div>

@@ -7,8 +7,18 @@ import { membersHeading, membersIntro } from "@/data/members";
 import { MembersDecor } from "@/components/features/members/MembersDecor";
 import { MembersExplorer } from "@/components/features/members/MembersExplorer";
 import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
+import { getPublicDirectory } from "@/lib/profile/queries.server";
+import { toPublicCard } from "@/lib/profile/directory";
+import { toMemberCard } from "@/lib/members/public-card";
+import { roleMeta } from "@/data/roles";
 
-export function MembersSection() {
+export async function MembersSection() {
+  const roleLabels = Object.fromEntries(
+    Object.entries(roleMeta).map(([k, v]) => [k, v.label])
+  );
+  const directory = await getPublicDirectory();
+  const members = directory.map((d) => toMemberCard(toPublicCard(d, roleLabels)));
+
   return (
     <section className="relative w-full overflow-hidden pb-16">
       <MembersDecor />
@@ -64,7 +74,7 @@ export function MembersSection() {
 
         {/* Members Explorer Section */}
         <div className="mt-8 sm:mt-10">
-          <MembersExplorer />
+          <MembersExplorer members={members} />
         </div>
       </div>
     </section>

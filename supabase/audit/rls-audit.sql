@@ -1,6 +1,6 @@
 -- ============================================================================
 -- Supabase Row Level Security & Database Foundation Audit Queries
--- Run these queries in the Supabase SQL Editor after applying migrations 001-012.
+-- Run these queries in the Supabase SQL Editor after applying migrations 001-013.
 -- ============================================================================
 
 -- 1 tables in schema public with row level security off (expect: no rows)
@@ -55,7 +55,7 @@ where n.nspname in ('public', 'private')
     )
   );
 
--- 4 security definer functions in schema public (expect: exactly the 7 event sign-up definer functions: cancel_event_registration, event_meeting_link, event_spots_left, my_event_registration, register_for_event, staff_event_counts, staff_event_meeting_url)
+-- 4 security definer functions in schema public (expect: exactly the 9 definer functions: cancel_event_registration, event_meeting_link, event_spots_left, my_event_registration, public_member_directory, register_for_event, set_member_public_title, staff_event_counts, staff_event_meeting_url)
 select
   n.nspname as schema_name,
   p.proname as function_name
@@ -120,7 +120,7 @@ where n.nspname = 'public'
     or not ('security_invoker=true' = any(c.reloptions))
   );
 
--- 9 functions in schema public with their security type (the definer functions in public are exactly register_for_event, cancel_event_registration, event_meeting_link, event_spots_left, my_event_registration, staff_event_counts and staff_event_meeting_url, each with search_path set (query 3 checks this). All other functions in public are security invoker)
+-- 9 functions in schema public with their security type (the security definer functions in public are exactly register_for_event, cancel_event_registration, event_meeting_link, event_spots_left, my_event_registration, staff_event_counts, staff_event_meeting_url, set_member_public_title and public_member_directory, and each sets search_path. Functions that do not match stay security invoker)
 select
   p.proname as function_name,
   p.prosecdef as is_security_definer
@@ -209,7 +209,7 @@ where schemaname = 'public'
   and tablename = 'blogs'
   and indexname = 'blogs_one_featured_idx';
 
--- 17 functions executable by anon (expect only event_spots_left)
+-- 17 functions executable by anon (expect event_spots_left and public_member_directory)
 select
   p.proname as function_name
 from pg_proc p
@@ -261,3 +261,55 @@ from information_schema.column_privileges
 where table_schema = 'public'
   and table_name = 'event_registrations'
   and grantee = 'anon';
+
+-- 21 columns granted to authenticated on public.profiles include is_public_profile and do not include public_title (expect exactly one row for each check: is_public_profile yes, public_title no)
+select
+  'is_public_profile' as column_name,
+  exists (
+    select 1
+    from information_schema.column_privileges
+    where table_schema = 'public'
+      and table_name = 'profiles'
+      and column_name = 'is_public_profile'
+      and grantee = 'authenticated'
+      and privilege_type = 'UPDATE'
+  ) as granted
+union all
+select
+  'public_title' as column_name,
+  exists (
+    select 1
+    from information_schema.column_privileges
+    where table_schema = 'public'
+      and table_name = 'profiles'
+      and column_name = 'public_title'
+      and grantee = 'authenticated'
+      and privilege_type = 'UPDATE'
+  ) as granted;
+
+-- 22 functions executable by anon (expect event_spots_left and public_member_directory only)
+select
+  p.proname as function_name
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public'
+  and has_function_privilege('anon', p.oid, 'execute')
+order by p.proname;
+
+-- 23 anon has no privileges on public.profiles (expect no rows)
+select
+  'anon_table_privilege' as issue,
+  table_name as tablename
+from information_schema.role_table_grants
+where table_schema = 'public'
+  and table_name = 'profiles'
+  and grantee = 'anon'
+union all
+select
+  'anon_column_privilege' as issue,
+  table_name as tablename
+from information_schema.column_privileges
+where table_schema = 'public'
+  and table_name = 'profiles'
+  and grantee = 'anon';
+

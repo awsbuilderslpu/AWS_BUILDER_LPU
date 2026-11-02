@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FaLinkedin, FaGithub } from "react-icons/fa6";
+import { FaLinkedin, FaGithub, FaInstagram, FaYoutube } from "react-icons/fa6";
 import { Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemberSocials as MemberSocialsType } from "@/data/members";
@@ -34,6 +34,22 @@ export function MemberSocials({ name, socials, className }: MemberSocialsProps) 
       label: `${name}'s website`,
       href: socials.website,
       icon: <Globe className="size-4 shrink-0 stroke-[1.5]" aria-hidden="true" />,
+    });
+  }
+
+  if (socials.instagram) {
+    items.push({
+      label: `${name} on Instagram`,
+      href: socials.instagram,
+      icon: <FaInstagram className="size-4 shrink-0" aria-hidden="true" />,
+    });
+  }
+
+  if (socials.youtube) {
+    items.push({
+      label: `${name} on YouTube`,
+      href: socials.youtube,
+      icon: <FaYoutube className="size-4 shrink-0" aria-hidden="true" />,
     });
   }
 

@@ -7,6 +7,7 @@ import { ContactForm } from "@/components/features/contact/ContactForm";
 import { ContactInfo } from "@/components/features/contact/ContactInfo";
 import { MapCard } from "@/components/features/contact/MapCard";
 import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
+import { Reveal } from "@/components/motion/Reveal";
 
 export function ContactSection() {
   return (
@@ -46,10 +47,16 @@ export function ContactSection() {
 
       {/* Main grid */}
       <div className="relative z-10 mt-8 grid w-full grid-cols-1 gap-6 px-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] xl:pl-[11.2%] xl:pr-[7.7%]">
-        <ContactForm />
+        <Reveal delay={0}>
+          <ContactForm />
+        </Reveal>
         <div className="flex flex-col gap-5">
-          <ContactInfo />
-          <MapCard className="flex-1" />
+          <Reveal delay={0.08}>
+            <ContactInfo />
+          </Reveal>
+          <Reveal delay={0.16} className="flex flex-1 flex-col">
+            <MapCard className="flex-1" />
+          </Reveal>
         </div>
       </div>
     </section>

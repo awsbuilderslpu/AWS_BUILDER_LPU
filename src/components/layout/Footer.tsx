@@ -23,6 +23,7 @@ import {
 } from "@/data/site";
 import { Logo } from "@/components/layout/Logo";
 import { NewsletterForm } from "@/components/layout/NewsletterForm";
+import { Reveal } from "@/components/motion/Reveal";
 
 export function Footer() {
   const currentYear = 2026;
@@ -39,7 +40,8 @@ export function Footer() {
   };
 
   return (
-    <footer className="relative z-10 w-full border-t border-border bg-transparent text-foreground">
+    <Reveal once>
+      <footer className="relative z-10 w-full border-t border-border bg-transparent text-foreground">
       <div className="mx-auto w-full max-w-[1400px] px-4 pt-16 pb-8 sm:px-6 lg:px-8">
         {/* Grid: 2-column on mobile, 5-column on lg */}
         <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:gap-x-12 lg:grid-cols-5 lg:gap-0">
@@ -207,5 +209,6 @@ export function Footer() {
         </div>
       </div>
     </footer>
+    </Reveal>
   );
 }

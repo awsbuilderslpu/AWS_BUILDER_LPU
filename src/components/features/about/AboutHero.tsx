@@ -21,6 +21,8 @@ import {
   aboutQuote,
 } from "@/data/about";
 import { siteConfig } from "@/data/site";
+import { Reveal } from "@/components/motion/Reveal";
+import { staggerDelay } from "@/lib/motion/tokens";
 
 export interface AboutHeroProps extends React.HTMLAttributes<HTMLElement> {
   className?: string;
@@ -121,13 +123,14 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
           </div>
 
           <div className="mt-7 grid w-full grid-cols-1 gap-[22px] sm:grid-cols-2 xl:grid-cols-3">
-            {aboutPillars.map((pillar) => (
-              <PillarCard
-                key={pillar.title}
-                title={pillar.title}
-                description={pillar.description}
-                icon={pillar.icon}
-              />
+            {aboutPillars.map((pillar, index) => (
+              <Reveal key={pillar.title} delay={staggerDelay(index)}>
+                <PillarCard
+                  title={pillar.title}
+                  description={pillar.description}
+                  icon={pillar.icon}
+                />
+              </Reveal>
             ))}
           </div>
         </div>

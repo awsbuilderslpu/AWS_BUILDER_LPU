@@ -15,7 +15,7 @@ export function MemberCoreCard({ member, className }: MemberCoreCardProps) {
   return (
     <article
       className={cn(
-        "group flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card/70 transition-colors duration-200 hover:border-primary/40",
+        "group flex h-full min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card/70 transition-colors duration-200 hover:border-primary/40 motion-safe:transition-transform motion-safe:duration-200 motion-safe:hover:translate-y-[-2px]",
         className
       )}
     >

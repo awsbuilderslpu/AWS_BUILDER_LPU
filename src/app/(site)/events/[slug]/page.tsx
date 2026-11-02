@@ -3,7 +3,12 @@ import { notFound } from "next/navigation";
 
 import { getPublicEvent, getMeetingLinkForSignedInUser } from "@/lib/public/events.server";
 import { getCurrentAccount } from "@/lib/auth/server";
-import { eventLifecycle } from "@/lib/events/lifecycle";
+import { eventLifecycle, registrationOpen } from "@/lib/events/lifecycle";
+import { viewerKind } from "@/lib/event-registrations/viewer";
+import {
+  getMyRegistrationStatus,
+  getSpotsLeft,
+} from "@/lib/event-registrations/queries.server";
 import { publicObjectUrl } from "@/lib/storage/urls";
 import { docToPlainText } from "@/lib/richtext";
 import { EventDetail } from "@/components/features/public/EventDetail";
@@ -53,6 +58,21 @@ export default async function EventPage({ params }: PageProps) {
 
   const account = await getCurrentAccount();
   const signedIn = account !== null;
+  const viewer = viewerKind(account);
+  const myStatus = account ? await getMyRegistrationStatus(event.id) : null;
+  const spotsLeft = await getSpotsLeft(event.id);
+  const isFull = spotsLeft === 0;
+  const isRegOpen = registrationOpen(
+    {
+      isPublished: true,
+      archivedAt: null,
+      registrationEnabled: event.registration_enabled,
+      registrationDeadline: event.registration_deadline,
+      startsAt: event.starts_at,
+    },
+    nowMs
+  );
+  const hasEnded = lifecycle === "completed";
 
   let meetingUrl: string | null = null;
   if (event.location_mode === "online" || event.location_mode === "hybrid") {
@@ -70,6 +90,12 @@ export default async function EventPage({ params }: PageProps) {
       signedIn={signedIn}
       meetingUrl={meetingUrl}
       bannerUrl={bannerUrl}
+      viewer={viewer}
+      myStatus={myStatus}
+      spotsLeft={spotsLeft}
+      registrationOpen={isRegOpen}
+      hasEnded={hasEnded}
+      isFull={isFull}
     />
   );
 }

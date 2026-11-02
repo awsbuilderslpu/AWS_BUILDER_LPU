@@ -9,7 +9,7 @@ export type AddTagResult =
  * - Must not be a case-insensitive duplicate ("duplicate").
  * - List may hold at most 10 tags ("limit").
  */
-export function addTag(current: string[], raw: string): AddTagResult {
+export function addTag(current: string[], raw: string, max = 10): AddTagResult {
   const trimmed = typeof raw === "string" ? raw.trim() : "";
 
   if (trimmed.length === 0) {
@@ -27,7 +27,7 @@ export function addTag(current: string[], raw: string): AddTagResult {
     return { ok: false, error: "duplicate" };
   }
 
-  if (current.length >= 10) {
+  if (current.length >= max) {
     return { ok: false, error: "limit" };
   }
 

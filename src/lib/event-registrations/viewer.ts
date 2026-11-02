@@ -21,3 +21,4 @@ export function viewerKind(account: AccountSummary | null): ViewerKind {
 
   return "signed-in-not-member";
 }
+

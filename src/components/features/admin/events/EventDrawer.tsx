@@ -7,7 +7,11 @@ import {
   Clock,
   ClipboardList,
   Globe,
+  Users,
+  Download,
+  LoaderCircle,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { adminCopy } from "@/data/admin";
@@ -15,6 +19,7 @@ import { notify } from "@/lib/admin/notify";
 import { DetailDrawer } from "@/components/features/admin/kit/DetailDrawer";
 import { DrawerSection } from "@/components/features/admin/kit/DrawerSection";
 import { ConfirmDialog } from "@/components/features/admin/kit/ConfirmDialog";
+import { StatusBadge } from "@/components/features/admin/kit/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/TextField";
 import { SelectField, type SelectOption } from "@/components/ui/SelectField";
@@ -38,12 +43,22 @@ import {
   updateEventAction,
   getEventDetailsAction,
 } from "@/lib/events/actions";
+import {
+  listAttendeesAction,
+  setAttendanceAction,
+  exportAttendeesAction,
+} from "@/lib/event-registrations/actions";
+import type { AttendeeRow } from "@/lib/event-registrations/types";
+import { toCsv, downloadCsv } from "@/lib/admin/csv";
+import { buildAttendeeCsvColumns } from "@/lib/event-registrations/csv-columns";
 
 export interface EventDrawerProps {
   open: boolean;
   mode: "create" | "edit";
   eventId: string | null;
   nowIso: string;
+  isAdmin?: boolean;
+  eventCounts?: { registered: number; attended: number } | null;
   onClose: () => void;
   onSaved: () => void;
 }
@@ -69,19 +84,106 @@ export function EventDrawer({
   mode,
   eventId,
   nowIso,
+  isAdmin = false,
+  eventCounts,
   onClose,
   onSaved,
 }: EventDrawerProps) {
   void nowIso;
 
+  const router = useRouter();
   const [loading, setLoading] = React.useState(false);
   const [loadError, setLoadError] = React.useState(false);
   const [loadedSlug, setLoadedSlug] = React.useState<string | null>(null);
   const [serverError, setServerError] = React.useState<string | null>(null);
   const [showDiscard, setShowDiscard] = React.useState(false);
 
+  // Attendees state
+  const [attendees, setAttendees] = React.useState<AttendeeRow[] | null>(null);
+  const [attendeesLoading, setAttendeesLoading] = React.useState(false);
+  const [updatingAttendeeId, setUpdatingAttendeeId] = React.useState<string | null>(null);
+  const [exportingAttendees, setExportingAttendees] = React.useState(false);
+
   // Track banners uploaded in this drawer session for cleanup on discard
   const sessionUploadsRef = React.useRef<Set<string>>(new Set());
+
+  const loadAttendees = React.useCallback(async (id: string) => {
+    setAttendeesLoading(true);
+    try {
+      const res = await listAttendeesAction(id);
+      if (res.ok && res.rows) {
+        setAttendees(res.rows);
+      } else {
+        setAttendees([]);
+      }
+    } catch {
+      setAttendees([]);
+    } finally {
+      setAttendeesLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (open && mode === "edit" && eventId && isAdmin) {
+      void loadAttendees(eventId);
+    } else {
+      setAttendees(null);
+    }
+  }, [open, mode, eventId, isAdmin, loadAttendees]);
+
+  const handleToggleAttendance = async (attendee: AttendeeRow) => {
+    if (!eventId || updatingAttendeeId) return;
+    const nextStatus = attendee.status === "registered" ? "attended" : "registered";
+    setUpdatingAttendeeId(attendee.registrationId);
+    try {
+      const res = await setAttendanceAction({
+        registrationId: attendee.registrationId,
+        status: nextStatus,
+      });
+      if (res.ok) {
+        await loadAttendees(eventId);
+        router.refresh();
+      } else {
+        notify.error(copy.attendees.actionFailed);
+      }
+    } catch {
+      notify.error(copy.attendees.actionFailed);
+    } finally {
+      setUpdatingAttendeeId(null);
+    }
+  };
+
+  const handleExportAttendees = async () => {
+    if (!eventId || exportingAttendees) return;
+    setExportingAttendees(true);
+    try {
+      const res = await exportAttendeesAction(eventId);
+      if (!res.ok || !res.rows) {
+        notify.error(copy.attendees.exportFailed);
+        return;
+      }
+      const columns = buildAttendeeCsvColumns(copy.attendees.statusBadge);
+      const csv = toCsv(res.rows, columns);
+      const exportSlug = loadedSlug || "event";
+      downloadCsv("attendees-" + exportSlug, csv);
+      if (res.truncated) {
+        notify.info(copy.attendees.exportTruncated(res.rows.length));
+      }
+    } catch {
+      notify.error(copy.attendees.exportFailed);
+    } finally {
+      setExportingAttendees(false);
+    }
+  };
+
+  const registeredCount =
+    attendees !== null
+      ? attendees.filter((a) => a.status === "registered").length
+      : (eventCounts?.registered ?? 0);
+  const attendedCount =
+    attendees !== null
+      ? attendees.filter((a) => a.status === "attended").length
+      : (eventCounts?.attended ?? 0);
 
   const {
     register,
@@ -469,6 +571,30 @@ export function EventDrawer({
                   )}
                 />
 
+                <Controller
+                  name="capacity"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      id="event-capacity"
+                      label={copy.form.labels.capacity}
+                      inputMode="numeric"
+                      placeholder={copy.form.placeholders.capacity}
+                      hint={copy.form.hints.capacity}
+                      value={
+                        field.value === null || field.value === undefined
+                          ? ""
+                          : String(field.value)
+                      }
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        field.onChange(val === "" ? null : val);
+                      }}
+                      error={errors.capacity?.message}
+                    />
+                  )}
+                />
+
                 {showDeadline(registrationEnabled) && (
                   <Controller
                     name="registrationDeadline"
@@ -549,6 +675,130 @@ export function EventDrawer({
                 )}
               </div>
             </DrawerSection>
+
+            {/* 6. Attendees (edit mode only) */}
+            {mode === "edit" && eventId && (
+              <DrawerSection
+                title={copy.attendees.title}
+                icon={Users}
+              >
+                <div className="space-y-4">
+                  {/* Counts for all staff */}
+                  <div className="flex items-center justify-between gap-4 pb-1">
+                    <div className="flex items-center gap-6 text-sm">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground">{copy.attendees.registered}:</span>
+                        <span className="font-semibold text-foreground">{registeredCount}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-muted-foreground">{copy.attendees.attended}:</span>
+                        <span className="font-semibold text-foreground">{attendedCount}</span>
+                      </div>
+                    </div>
+                    {isAdmin && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={exportingAttendees || !attendees || attendees.length === 0}
+                        onClick={handleExportAttendees}
+                        className="h-8 text-xs font-medium gap-1.5 cursor-pointer"
+                      >
+                        {exportingAttendees ? (
+                          <LoaderCircle className="size-3.5 animate-spin" />
+                        ) : (
+                          <Download className="size-3.5" />
+                        )}
+                        {copy.attendees.exportButton}
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Core note */}
+                  {!isAdmin && (
+                    <p className="text-[12.5px] text-muted-foreground">
+                      {copy.attendees.coreNote}
+                    </p>
+                  )}
+
+                  {/* Admin attendee list */}
+                  {isAdmin && (
+                    <div className="space-y-3">
+                      {attendeesLoading ? (
+                        <div className="space-y-3 animate-pulse">
+                          <div className="h-16 w-full rounded-md bg-card/60 border border-border" />
+                          <div className="h-16 w-full rounded-md bg-card/60 border border-border" />
+                        </div>
+                      ) : !attendees || attendees.length === 0 ? (
+                        <p className="text-[12.5px] text-muted-foreground">
+                          {copy.attendees.empty}
+                        </p>
+                      ) : (
+                        <>
+                          <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">
+                            {attendees.map((row) => (
+                              <div
+                                key={row.registrationId}
+                                className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-md border border-border bg-card/40"
+                              >
+                                <div className="min-w-0 flex-1 space-y-0.5">
+                                  <p className="text-sm font-medium text-foreground truncate">
+                                    {row.fullName || "—"}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    {row.email}
+                                  </p>
+                                  {row.registrationNumber && (
+                                    <p className="text-[11px] font-mono text-muted-foreground">
+                                      {row.registrationNumber}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <StatusBadge
+                                    tone={
+                                      row.status === "attended"
+                                        ? "success"
+                                        : row.status === "registered"
+                                        ? "info"
+                                        : "muted"
+                                    }
+                                  >
+                                    {copy.attendees.statusBadge[row.status] ?? row.status}
+                                  </StatusBadge>
+                                  {row.status !== "cancelled" && (
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      disabled={updatingAttendeeId === row.registrationId}
+                                      onClick={() => handleToggleAttendance(row)}
+                                      className="h-7 text-xs px-2.5 cursor-pointer"
+                                    >
+                                      {updatingAttendeeId === row.registrationId ? (
+                                        <LoaderCircle className="size-3 animate-spin mr-1" />
+                                      ) : null}
+                                      {row.status === "registered"
+                                        ? copy.attendees.markAttended
+                                        : copy.attendees.markRegistered}
+                                    </Button>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          {attendees.length >= 500 && (
+                            <p className="text-[12px] text-muted-foreground">
+                              {copy.attendees.limit(500)}
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </DrawerSection>
+            )}
           </form>
         )}
       </DetailDrawer>

@@ -12,10 +12,10 @@ import {
 } from "./types";
 
 const EVENT_LIST_COLUMNS =
-  "id, slug, title, category, location_mode, venue, starts_at, ends_at, registration_enabled, registration_deadline, banner_path, is_published, archived_at, updated_at";
+  "id, slug, title, category, location_mode, venue, starts_at, ends_at, registration_enabled, registration_deadline, capacity, banner_path, is_published, archived_at, updated_at";
 
 const EVENT_DETAILS_COLUMNS =
-  "id, slug, title, category, description, location_mode, venue, starts_at, ends_at, registration_enabled, registration_deadline, banner_path, is_published, archived_at, updated_at";
+  "id, slug, title, category, description, location_mode, venue, starts_at, ends_at, registration_enabled, registration_deadline, capacity, banner_path, is_published, archived_at, updated_at";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function applyEventFilters(query: any, params: ListParams, nowIso: string): any {

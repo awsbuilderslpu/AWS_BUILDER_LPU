@@ -3,6 +3,8 @@
 import * as React from "react";
 import { FilterChips } from "@/components/ui/FilterChips";
 import { EventCard } from "@/components/features/events/EventCard";
+import { Reveal } from "@/components/motion/Reveal";
+import { staggerDelay } from "@/lib/motion/tokens";
 import { eventFilters, type EventItem } from "@/data/events";
 
 export interface EventsExplorerProps {
@@ -41,10 +43,15 @@ export function EventsExplorer({ events }: EventsExplorerProps) {
 
       <ul className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
         {filteredEvents.length > 0 ? (
-          filteredEvents.map((event) => (
-            <li key={event.slug} className="flex">
+          filteredEvents.map((event, index) => (
+            <Reveal
+              as="li"
+              key={event.slug}
+              delay={staggerDelay(index, 0.05)}
+              className="flex"
+            >
               <EventCard event={event} />
-            </li>
+            </Reveal>
           ))
         ) : (
           <li className="col-span-full flex min-h-[220px] items-center justify-center rounded-lg border border-dashed border-border bg-card/30 p-8 text-center text-muted-foreground">

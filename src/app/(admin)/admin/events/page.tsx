@@ -8,6 +8,7 @@ import {
   listEvents,
   getEventCounts,
 } from "@/lib/events/list-query.server";
+import { getStaffEventCounts } from "@/lib/event-registrations/queries.server";
 import type { EventAdminRow } from "@/lib/events/types";
 import { clampPage } from "@/lib/registrations/view-logic";
 import {
@@ -24,7 +25,7 @@ interface PageProps {
 }
 
 export default async function AdminEventsPage({ searchParams }: PageProps) {
-  await requireStaff("/admin/events");
+  const account = await requireStaff("/admin/events");
 
   const rawParams = await searchParams;
   const params = parseListParams(rawParams, eventsListConfig);
@@ -35,16 +36,19 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
   let rows: EventAdminRow[] = [];
   let total = 0;
   let counts: EventCounts | null = null;
+  let eventCounts: Record<string, { registered: number; attended: number }> = {};
   let loadError = false;
 
   try {
-    const [listResult, countsResult] = await Promise.all([
+    const [listResult, countsResult, staffCounts] = await Promise.all([
       listEvents(supabase, params, nowIso),
       getEventCounts(supabase, nowIso),
+      getStaffEventCounts(),
     ]);
     rows = listResult.rows;
     total = listResult.total;
     counts = countsResult;
+    eventCounts = staffCounts ?? {};
   } catch {
     loadError = true;
   }
@@ -64,6 +68,8 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
       rows={rows}
       total={total}
       counts={counts}
+      eventCounts={eventCounts}
+      isAdmin={account?.role === "admin"}
       params={params}
       nowIso={nowIso}
       loadError={loadError}

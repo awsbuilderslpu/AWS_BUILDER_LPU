@@ -15,6 +15,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { useAuth } from "@/components/features/auth/AuthProvider";
 import { roleMeta, type Role } from "@/data/roles";
 import { adminCopy } from "@/data/admin";
+import { profileCopy } from "@/data/profile";
 import type { AccountSummary } from "@/lib/auth/account";
 
 export interface AdminUserMenuProps {
@@ -78,11 +79,11 @@ export function AdminUserMenu({ account }: AdminUserMenuProps) {
 
         <DropdownMenuItem asChild className="cursor-pointer rounded-lg text-sm">
           <Link
-            href="/account"
+            href="/profile"
             className="flex items-center gap-2.5 px-3 py-2 text-foreground/90 hover:text-white"
           >
             <User className="size-4 text-muted-foreground" />
-            <span>{adminCopy.userMenu.account}</span>
+            <span>{profileCopy.myProfile}</span>
           </Link>
         </DropdownMenuItem>
 
