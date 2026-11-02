@@ -25,7 +25,47 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+export function NavbarFallback() {
+  return (
+    <header className="sticky top-0 z-50 h-[72px] w-full border-b border-border bg-background/80 backdrop-blur-md">
+      <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8">
+        <Logo />
+        <nav
+          className="hidden h-full items-center gap-1 lg:flex xl:gap-2"
+          aria-label="Main Navigation"
+        >
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="relative flex h-full items-center px-3.5 py-1 text-[15px] font-medium text-foreground/90 transition-colors duration-200 hover:text-primary"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="hidden items-center gap-3 lg:flex">
+          <div className="size-10 rounded-lg border border-border/80 bg-card/40" />
+          <div className="size-10 rounded-lg border border-border/80 bg-card/40" />
+          <div className="size-10 rounded-full border border-border/80 bg-card/40" />
+        </div>
+        <div className="flex items-center gap-2 lg:hidden">
+          <div className="size-10" />
+        </div>
+      </div>
+    </header>
+  );
+}
+
 export function Navbar() {
+  return (
+    <React.Suspense fallback={<NavbarFallback />}>
+      <NavbarContent />
+    </React.Suspense>
+  );
+}
+
+function NavbarContent() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
   const { account, signOut } = useAuth();
