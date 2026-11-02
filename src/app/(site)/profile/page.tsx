@@ -9,6 +9,8 @@ import {
 import { ProfileView } from "@/components/features/profile/ProfileView";
 import { profileCopy } from "@/data/profile";
 
+export const instant = false;
+
 export const metadata: Metadata = {
   title: profileCopy.myProfile,
   robots: {
