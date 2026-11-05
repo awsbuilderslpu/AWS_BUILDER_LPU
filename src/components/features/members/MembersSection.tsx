@@ -52,8 +52,8 @@ export async function MembersSection() {
           </div>
 
           {/* Right Column: Hero Artwork scaling proportionally */}
-          <div className="relative flex w-full flex-1 items-center justify-center lg:justify-end">
-            <div className="relative aspect-[3/2] w-full max-w-[420px] sm:max-w-[480px] lg:max-w-[520px] xl:max-w-[580px]">
+          <div className="relative flex w-full flex-1 items-center justify-center lg:self-start lg:justify-end -mt-2 sm:-mt-4 lg:-mt-6 xl:-mt-8 lg:pr-6 xl:pr-12">
+            <div className="relative aspect-[3/2] w-full max-w-[260px] sm:max-w-[300px] lg:max-w-[330px] xl:max-w-[360px]">
               {/* Ambient Radial Background Glow */}
               <div
                 aria-hidden="true"
