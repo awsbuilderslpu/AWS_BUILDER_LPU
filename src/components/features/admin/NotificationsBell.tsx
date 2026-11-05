@@ -25,9 +25,11 @@ export function NotificationsBell() {
   const [open, setOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState<AnnouncementItem[]>([]);
   const [readIds, setReadIds] = React.useState<string[]>([]);
+  const [mounted, setMounted] = React.useState(false);
 
   // Load read IDs from localStorage on mount
   React.useEffect(() => {
+    setMounted(true);
     try {
       const stored = localStorage.getItem("read_notification_ids");
       if (stored) {
@@ -73,6 +75,7 @@ export function NotificationsBell() {
   };
 
   const formatRelativeTime = (isoString: string) => {
+    if (!mounted) return "Recent";
     try {
       const diff = Date.now() - new Date(isoString).getTime();
       const mins = Math.floor(diff / (1000 * 60));

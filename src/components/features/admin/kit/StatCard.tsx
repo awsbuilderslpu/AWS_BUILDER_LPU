@@ -61,7 +61,7 @@ export function StatCard({
   href,
   className,
 }: StatCardProps) {
-  const styles = toneStyles[tone];
+  const styles = toneStyles[tone] ?? toneStyles.blue;
 
   const content = (
     <>

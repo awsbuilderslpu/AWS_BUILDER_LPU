@@ -273,7 +273,7 @@ export function BlogDrawer({
         open={open}
         onOpenChange={handleOpenChange}
         title={mode === "create" ? copy.form.createTitle : copy.form.editTitle}
-        widthClass="sm:max-w-[600px]"
+        widthClass="sm:max-w-3xl"
         footer={
           !isArchived && !loading && !loadError ? (
             <div className="flex w-full items-center justify-between gap-3">

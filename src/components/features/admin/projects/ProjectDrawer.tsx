@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +22,15 @@ import {
   Users,
   Info,
   Calendar,
+  UploadCloud,
+  Image as ImageIcon,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { uploadImage } from "@/lib/storage/upload";
+import { publicObjectUrl } from "@/lib/storage/urls";
 import {
   createProjectAction,
   updateProjectAction,
@@ -119,6 +127,107 @@ export function ProjectDrawer({
   const [likes, setLikes] = React.useState(0);
   const [views, setViews] = React.useState("1.2K");
   const [rating, setRating] = React.useState(4.8);
+
+  // Image Upload States
+  const [imageUploadMode, setImageUploadMode] = React.useState<"upload" | "url">("upload");
+  const [isUploadingImage, setIsUploadingImage] = React.useState(false);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const [avatarUploading, setAvatarUploading] = React.useState(false);
+  const avatarInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file (PNG, JPG, WebP).");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image file must be under 5 MB.");
+      return;
+    }
+
+    setIsUploadingImage(true);
+    try {
+      // 1. Try Supabase Storage upload
+      try {
+        const res = await uploadImage({
+          bucket: "event-banners",
+          file,
+        });
+        if (res?.path) {
+          const publicUrl = publicObjectUrl("event-banners", res.path);
+          if (publicUrl) {
+            setImage(publicUrl);
+            toast.success("Cover image uploaded to cloud storage!");
+            setIsUploadingImage(false);
+            return;
+          }
+        }
+      } catch (storageErr) {
+        console.warn("Storage upload fallback to data URL:", storageErr);
+      }
+
+      // 2. Resilient Fallback: Local Data URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          setImage(reader.result);
+          toast.success("Cover image selected and preview ready!");
+        }
+        setIsUploadingImage(false);
+      };
+      reader.onerror = () => {
+        toast.error("Failed to read image file.");
+        setIsUploadingImage(false);
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      toast.error("Failed to upload image.");
+      setIsUploadingImage(false);
+    }
+  };
+
+  const handleAvatarUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file.");
+      return;
+    }
+    setAvatarUploading(true);
+    try {
+      try {
+        const res = await uploadImage({
+          bucket: "event-banners",
+          file,
+          aspect: 1,
+        });
+        if (res?.path) {
+          const publicUrl = publicObjectUrl("event-banners", res.path);
+          if (publicUrl) {
+            setAuthorAvatar(publicUrl);
+            toast.success("Author avatar uploaded!");
+            setAvatarUploading(false);
+            return;
+          }
+        }
+      } catch (storageErr) {
+        console.warn("Avatar storage fallback to data URL:", storageErr);
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") {
+          setAuthorAvatar(reader.result);
+          toast.success("Author avatar selected!");
+        }
+        setAvatarUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch {
+      toast.error("Failed to upload avatar.");
+      setAvatarUploading(false);
+    }
+  };
 
   // Auto-slugify on title change when not editing
   const handleTitleChange = (val: string) => {
@@ -341,24 +450,25 @@ export function ProjectDrawer({
   const statuses = projectStatuses.filter((s) => s !== "All Status") as ProjectStatus[];
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        className="w-full sm:max-w-2xl bg-[#090E17] border-l border-white/10 text-white p-0 flex flex-col h-full shadow-2xl overflow-hidden"
-      >
-        {/* Drawer Header */}
-        <SheetHeader className="p-6 border-b border-white/10 bg-black/30 shrink-0">
-          <div className="flex items-center justify-between">
-            <div>
-              <SheetTitle className="text-xl font-bold text-white flex items-center gap-2">
-                <Code2 className="size-5 text-[#FF9900]" />
-                {isEditing ? "Edit Project" : "Add New Project"}
-              </SheetTitle>
-              <SheetDescription className="text-sm text-slate-400 mt-1">
-                {isEditing
-                  ? `Update details and configurations for "${project?.title}"`
-                  : "Publish a new student project or cloud architecture to the club portfolio."}
-              </SheetDescription>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-[94vw] max-w-3xl max-h-[90vh] bg-[#090E17] border border-white/10 text-white p-0 flex flex-col shadow-2xl overflow-hidden rounded-2xl gap-0">
+        {/* Modal Header */}
+        <DialogHeader className="p-6 border-b border-white/10 bg-black/40 shrink-0 text-left">
+          <div className="flex items-center justify-between pr-6">
+            <div className="flex items-center gap-3.5">
+              <div className="size-10 rounded-xl bg-[#FF9900]/15 border border-[#FF9900]/30 flex items-center justify-center text-[#FF9900] shrink-0">
+                <Code2 className="size-5" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl font-bold text-white">
+                  {isEditing ? "Edit Project" : "Add New Project"}
+                </DialogTitle>
+                <DialogDescription className="text-xs sm:text-sm text-slate-400 mt-0.5">
+                  {isEditing
+                    ? `Update details and configurations for "${project?.title}"`
+                    : "Publish a new student project or cloud architecture to the club portfolio."}
+                </DialogDescription>
+              </div>
             </div>
             {featured && (
               <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FF9900]/15 text-[#FF9900] border border-[#FF9900]/30 shadow-[0_0_10px_rgba(255,153,0,0.2)]">
@@ -367,7 +477,7 @@ export function ProjectDrawer({
               </span>
             )}
           </div>
-        </SheetHeader>
+        </DialogHeader>
 
         {/* Tab Navigation */}
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
@@ -525,31 +635,193 @@ export function ProjectDrawer({
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                    Cover Image URL / Path
-                  </label>
-                  <input
-                    type="text"
-                    value={image}
-                    onChange={(e) => setImage(e.target.value)}
-                    placeholder="/images/projects/thefleetfly.jpg"
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900]"
-                  />
-                  <div className="flex gap-2 mt-2">
-                    {["/images/projects/thefleetfly.jpg", "/images/projects/vulnix.jpg", "/images/projects/cloudsec.jpg"].map(
-                      (preset) => (
-                        <button
-                          key={preset}
-                          type="button"
-                          onClick={() => setImage(preset)}
-                          className="text-[11px] px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10"
-                        >
-                          Preset: {preset.split("/").pop()}
-                        </button>
-                      )
-                    )}
+                {/* Cover Image Upload & Preview */}
+                <div className="space-y-2.5 pt-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                      Cover Image *
+                    </label>
+                    <div className="flex items-center rounded-lg border border-white/10 bg-black/40 p-0.5 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => setImageUploadMode("upload")}
+                        className={cn(
+                          "px-2.5 py-1 rounded-md transition-colors flex items-center gap-1.5",
+                          imageUploadMode === "upload"
+                            ? "bg-[#FF9900] text-black font-semibold shadow-sm"
+                            : "text-slate-400 hover:text-white"
+                        )}
+                      >
+                        <UploadCloud className="size-3.5" />
+                        Upload Image
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setImageUploadMode("url")}
+                        className={cn(
+                          "px-2.5 py-1 rounded-md transition-colors flex items-center gap-1.5",
+                          imageUploadMode === "url"
+                            ? "bg-[#FF9900] text-black font-semibold shadow-sm"
+                            : "text-slate-400 hover:text-white"
+                        )}
+                      >
+                        <ImageIcon className="size-3.5" />
+                        URL / Preset
+                      </button>
+                    </div>
                   </div>
+
+                  {imageUploadMode === "upload" ? (
+                    <div className="space-y-3">
+                      {/* Hidden native input */}
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload(file);
+                        }}
+                      />
+
+                      {/* Active Image Preview with replace/remove */}
+                      {image ? (
+                        <div className="relative rounded-xl border border-white/15 bg-black/40 overflow-hidden group">
+                          <div className="relative aspect-video w-full overflow-hidden bg-black/60">
+                            <Image
+                              src={image}
+                              alt="Project Cover Preview"
+                              fill
+                              unoptimized
+                              className="object-cover"
+                              sizes="500px"
+                            />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isUploadingImage}
+                                className="bg-[#FF9900] text-black hover:bg-[#FF9900]/90 text-xs font-semibold shadow-lg"
+                              >
+                                <UploadCloud className="size-3.5 mr-1.5" />
+                                Upload New Image
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="destructive"
+                                onClick={() => setImage("")}
+                                className="text-xs"
+                              >
+                                <Trash2 className="size-3.5 mr-1.5" />
+                                Remove
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="p-2.5 flex items-center justify-between text-xs text-slate-400 bg-black/40 border-t border-white/10">
+                            <span className="truncate max-w-[280px]">
+                              {image.startsWith("data:") ? "Custom uploaded image" : image}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => fileInputRef.current?.click()}
+                              className="text-[#FF9900] hover:underline flex items-center gap-1 font-medium text-xs"
+                            >
+                              <RefreshCw className="size-3" /> Change Image
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        /* Empty dropzone */
+                        <div
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setIsDragging(true);
+                          }}
+                          onDragLeave={() => setIsDragging(false)}
+                          onDrop={(e) => {
+                            e.preventDefault();
+                            setIsDragging(false);
+                            const file = e.dataTransfer.files?.[0];
+                            if (file) handleFileUpload(file);
+                          }}
+                          onClick={() => fileInputRef.current?.click()}
+                          className={cn(
+                            "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors flex flex-col items-center justify-center gap-3",
+                            isDragging
+                              ? "border-[#FF9900] bg-[#FF9900]/10"
+                              : "border-white/20 bg-white/[0.02] hover:border-[#FF9900]/50 hover:bg-white/[0.04]"
+                          )}
+                        >
+                          {isUploadingImage ? (
+                            <div className="flex flex-col items-center gap-2">
+                              <Loader2 className="size-8 text-[#FF9900] animate-spin" />
+                              <span className="text-sm text-slate-300">Processing & uploading image...</span>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="size-12 rounded-full bg-[#FF9900]/15 flex items-center justify-center text-[#FF9900]">
+                                <UploadCloud className="size-6" />
+                              </div>
+                              <div>
+                                <span className="text-sm font-semibold text-white block">
+                                  Click to upload or drag & drop cover image
+                                </span>
+                                <span className="text-xs text-slate-400 mt-1 block">
+                                  Supports JPG, PNG, or WebP (max 5 MB · Recommended 1200 × 630)
+                                </span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    /* URL / Presets mode */
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        value={image}
+                        onChange={(e) => setImage(e.target.value)}
+                        placeholder="https://... or /images/projects/thefleetfly.jpg"
+                        className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900]"
+                      />
+                      <div className="flex flex-wrap gap-2">
+                        {["/images/projects/thefleetfly.jpg", "/images/projects/vulnix.jpg", "/images/projects/cloudsec.jpg"].map(
+                          (preset) => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => setImage(preset)}
+                              className={cn(
+                                "text-[11px] px-2.5 py-1 rounded-md border transition-colors",
+                                image === preset
+                                  ? "bg-[#FF9900]/20 border-[#FF9900] text-[#FF9900] font-medium"
+                                  : "bg-white/5 hover:bg-white/10 text-slate-300 border-white/10"
+                              )}
+                            >
+                              Preset: {preset.split("/").pop()}
+                            </button>
+                          )
+                        )}
+                      </div>
+
+                      {image && (
+                        <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-white/15 bg-black/50 mt-2">
+                          <Image
+                            src={image}
+                            alt="Preview"
+                            fill
+                            unoptimized
+                            className="object-cover"
+                            sizes="400px"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
@@ -774,15 +1046,77 @@ export function ProjectDrawer({
 
                   <div>
                     <label className="block text-xs font-medium text-slate-300 mb-1">
-                      Avatar URL (Optional)
+                      Lead Author Avatar (Optional)
                     </label>
-                    <input
-                      type="text"
-                      value={authorAvatar}
-                      onChange={(e) => setAuthorAvatar(e.target.value)}
-                      placeholder="/images/members/arfaa.png"
-                      className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900]"
-                    />
+                    <div className="flex items-center gap-3">
+                      {/* Hidden avatar input */}
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleAvatarUpload(file);
+                        }}
+                      />
+
+                      {/* Avatar preview circle */}
+                      <div className="relative size-10 rounded-full overflow-hidden border border-white/20 bg-black/50 shrink-0">
+                        {authorAvatar ? (
+                          <Image
+                            src={authorAvatar}
+                            alt={authorName || "Author"}
+                            fill
+                            unoptimized
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="size-full flex items-center justify-center text-xs font-bold text-slate-400 bg-white/5">
+                            {authorName ? authorName.charAt(0).toUpperCase() : "?"}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 flex gap-2">
+                        <input
+                          type="text"
+                          value={authorAvatar}
+                          onChange={(e) => setAuthorAvatar(e.target.value)}
+                          placeholder="/images/members/arfaa.png or URL"
+                          className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-xs focus:outline-none focus:border-[#FF9900]"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={avatarUploading}
+                          onClick={() => avatarInputRef.current?.click()}
+                          className="border-white/15 text-white hover:bg-white/10 text-xs shrink-0"
+                        >
+                          {avatarUploading ? (
+                            <Loader2 className="size-3.5 animate-spin" />
+                          ) : (
+                            <>
+                              <UploadCloud className="size-3.5 mr-1" />
+                              Upload
+                            </>
+                          )}
+                        </Button>
+                        {authorAvatar && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setAuthorAvatar("")}
+                            className="text-slate-400 hover:text-red-400 px-2"
+                            title="Remove avatar"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -1005,8 +1339,8 @@ export function ProjectDrawer({
             </Button>
           </div>
         </form>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }
 

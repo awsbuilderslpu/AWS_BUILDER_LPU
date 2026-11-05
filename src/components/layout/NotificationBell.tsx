@@ -2,57 +2,68 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Bell, Check, Calendar, Sparkles, BookOpen, ExternalLink } from "lucide-react";
+import {
+  Bell,
+  Check,
+  Calendar,
+  Sparkles,
+  BookOpen,
+  AlertTriangle,
+  ExternalLink,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { fetchPublicNotificationsAction } from "@/lib/notifications/actions";
+import type { AnnouncementItem, NotificationType } from "@/lib/notifications/types";
+import { defaultAnnouncements } from "@/lib/notifications/defaults";
 
-export interface NotificationItem {
-  id: string;
-  title: string;
-  description: string;
-  time: string;
-  href: string;
-  unread: boolean;
-  type: "event" | "announcement" | "blog";
-}
-
-const initialNotifications: NotificationItem[] = [
-  {
-    id: "notif-1",
-    title: "AWS Cloud Practitioner Workshop",
-    description: "Hands-on labs on EC2, S3 & IAM. Seats filling fast!",
-    time: "2 hours ago",
-    href: "/events",
-    unread: true,
-    type: "event",
-  },
-  {
-    id: "notif-2",
-    title: "Cloud Builder Hackathon 2026",
-    description: "Registrations are officially open for all LPU students.",
-    time: "Yesterday",
-    href: "/events",
-    unread: true,
-    type: "announcement",
-  },
-  {
-    id: "notif-3",
-    title: "New Blog: AWS Beginner Guide",
-    description: "Learn how to deploy your first full-stack application.",
-    time: "3 days ago",
-    href: "/blogs",
-    unread: true,
-    type: "blog",
-  },
-];
+export type { AnnouncementItem as NotificationItem };
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [notifications, setNotifications] =
-    React.useState<NotificationItem[]>(initialNotifications);
+    React.useState<AnnouncementItem[]>(defaultAnnouncements.filter((a) => a.is_published));
+  const [readIds, setReadIds] = React.useState<string[]>([]);
+  const [mounted, setMounted] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
 
-  const unreadCount = notifications.filter((n) => n.unread).length;
+  // Load read IDs from localStorage on mount
+  React.useEffect(() => {
+    setMounted(true);
+    try {
+      const stored = localStorage.getItem("read_notification_ids");
+      if (stored) {
+        setReadIds(JSON.parse(stored));
+      }
+    } catch {
+      // ignore storage error
+    }
+  }, []);
+
+  const refreshNotifications = React.useCallback(async () => {
+    try {
+      const data = await fetchPublicNotificationsAction();
+      if (Array.isArray(data)) {
+        setNotifications(data);
+      }
+    } catch {
+      // ignore fetch error and retain state
+    }
+  }, []);
+
+  // Fetch live notifications on mount and when dropdown opens
+  React.useEffect(() => {
+    refreshNotifications();
+  }, [refreshNotifications, isOpen]);
+
+  // Refetch when window regains focus (e.g. returning from admin tab)
+  React.useEffect(() => {
+    const handleFocus = () => {
+      refreshNotifications();
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [refreshNotifications]);
 
   // Handle click outside to close dropdown
   React.useEffect(() => {
@@ -85,22 +96,60 @@ export function NotificationBell() {
     };
   }, [isOpen]);
 
+  const unreadItems = notifications.filter((n) => !readIds.includes(n.id));
+  const unreadCount = unreadItems.length;
+  const displayCount = unreadCount > 9 ? "9+" : unreadCount > 0 ? String(unreadCount) : null;
+
   const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    const allIds = notifications.map((n) => n.id);
+    const updated = Array.from(new Set([...readIds, ...allIds]));
+    setReadIds(updated);
+    try {
+      localStorage.setItem("read_notification_ids", JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
   };
 
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, unread: false } : n))
-    );
+  const markSingleAsRead = (id: string) => {
+    if (!readIds.includes(id)) {
+      const updated = [...readIds, id];
+      setReadIds(updated);
+      try {
+        localStorage.setItem("read_notification_ids", JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+    }
   };
 
-  const getIcon = (type: NotificationItem["type"]) => {
+  const formatRelativeTime = (isoString?: string) => {
+    if (!mounted || !isoString) return "Recent";
+    try {
+      const diff = Date.now() - new Date(isoString).getTime();
+      const mins = Math.floor(diff / (1000 * 60));
+      if (mins < 5) return "Just now";
+      if (mins < 60) return `${mins}m ago`;
+      const hours = Math.floor(mins / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      if (days === 1) return "Yesterday";
+      if (days < 7) return `${days}d ago`;
+      return new Date(isoString).toLocaleDateString();
+    } catch {
+      return "Recent";
+    }
+  };
+
+  const getIcon = (type: NotificationType) => {
     switch (type) {
       case "event":
         return <Calendar className="size-4 text-primary" />;
       case "blog":
         return <BookOpen className="size-4 text-[#2F8CFF]" />;
+      case "alert":
+        return <AlertTriangle className="size-4 text-rose-400" />;
+      case "announcement":
       default:
         return <Sparkles className="size-4 text-[#9D48FA]" />;
     }
@@ -126,9 +175,9 @@ export function NotificationBell() {
         <Bell className="size-5 transition-transform duration-200 hover:rotate-6" />
 
         {/* Unread count badge */}
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-black leading-none shadow-sm">
-            {unreadCount}
+        {displayCount && (
+          <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-black leading-none shadow-sm animate-in zoom-in-50">
+            {displayCount}
           </span>
         )}
       </button>
@@ -173,50 +222,82 @@ export function NotificationBell() {
                 No notifications right now.
               </p>
             ) : (
-              notifications.map((item) => (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  onClick={() => {
-                    markAsRead(item.id);
-                    setIsOpen(false);
-                  }}
-                  className={cn(
-                    "group flex items-start gap-3 rounded-lg p-2.5 transition-colors duration-150 hover:bg-white/5",
-                    item.unread && "bg-primary/[0.04]"
-                  )}
-                >
-                  {/* Icon badge */}
-                  <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background/80">
-                    {getIcon(item.type)}
-                  </div>
+              notifications.map((item) => {
+                const isUnread = !readIds.includes(item.id);
 
-                  {/* Text */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <h4
-                        className={cn(
-                          "truncate text-[13.5px] font-medium transition-colors group-hover:text-primary",
-                          item.unread
-                            ? "text-foreground font-semibold"
-                            : "text-foreground/80"
-                        )}
-                      >
-                        {item.title}
-                      </h4>
-                      {item.unread && (
-                        <span className="size-1.5 shrink-0 rounded-full bg-primary" />
-                      )}
+                const itemContent = (
+                  <div
+                    className={cn(
+                      "group flex items-start gap-3 rounded-lg p-2.5 transition-colors duration-150 hover:bg-white/5 cursor-pointer",
+                      isUnread && "bg-primary/[0.04]"
+                    )}
+                  >
+                    {/* Icon badge */}
+                    <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md border border-border bg-background/80">
+                      {getIcon(item.type)}
                     </div>
-                    <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground line-clamp-2">
-                      {item.description}
-                    </p>
-                    <span className="mt-1 block font-mono text-[10.5px] text-muted-foreground/75">
-                      {item.time}
-                    </span>
+
+                    {/* Text */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h4
+                          className={cn(
+                            "truncate text-[13.5px] font-medium transition-colors group-hover:text-primary",
+                            isUnread
+                              ? "text-foreground font-semibold"
+                              : "text-foreground/80"
+                          )}
+                        >
+                          {item.title}
+                        </h4>
+                        {isUnread && (
+                          <span className="size-1.5 shrink-0 rounded-full bg-primary" />
+                        )}
+                      </div>
+                      <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground line-clamp-2">
+                        {item.description}
+                      </p>
+                      <div className="mt-1 flex items-center justify-between gap-2">
+                        <span className="block font-mono text-[10.5px] text-muted-foreground/75">
+                          {formatRelativeTime(item.created_at)}
+                        </span>
+                        {item.href && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-primary">
+                            <span>View</span>
+                            <ExternalLink className="size-2.5" />
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </Link>
-              ))
+                );
+
+                if (item.href) {
+                  return (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      onClick={() => {
+                        markSingleAsRead(item.id);
+                        setIsOpen(false);
+                      }}
+                    >
+                      {itemContent}
+                    </Link>
+                  );
+                }
+
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      markSingleAsRead(item.id);
+                    }}
+                  >
+                    {itemContent}
+                  </div>
+                );
+              })
             )}
           </div>
 

@@ -306,9 +306,9 @@ export function EventDrawer({
         onOpenChange={handleOpenChange}
         title={mode === "create" ? copy.form.createTitle : copy.form.editTitle}
         description={copy.form.subtitle}
-        widthClass="sm:max-w-[560px]"
+        widthClass="sm:max-w-2xl"
         footer={
-          <div className="flex w-full items-center justify-between gap-3 border-t border-border px-6 py-4">
+          <div className="flex w-full items-center justify-between gap-3">
             <Button
               type="button"
               variant="outline"

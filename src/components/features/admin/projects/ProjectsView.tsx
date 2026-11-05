@@ -18,12 +18,12 @@ import {
   Cloud,
   LayoutGrid,
   Table as TableIcon,
-  Github,
   MoreVertical,
   Check,
   AlertCircle,
   RotateCcw,
 } from "lucide-react";
+import { FaGithub } from "react-icons/fa6";
 import { AdminPageHeader } from "@/components/features/admin/kit/AdminPageHeader";
 import { StatCard } from "@/components/features/admin/kit/StatCard";
 import { StatCardRow } from "@/components/features/admin/kit/StatCardRow";
@@ -303,7 +303,7 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
           label="Featured Showcase"
           value={counts.featured}
           icon={Star}
-          tone="purple"
+          tone="violet"
         />
       </StatCardRow>
 
@@ -490,6 +490,7 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
                             src={project.image || "/images/projects/thefleetfly.jpg"}
                             alt={project.title}
                             fill
+                            unoptimized
                             className="object-cover"
                             sizes="48px"
                           />
@@ -694,7 +695,7 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
                                   rel="noreferrer"
                                   className="text-xs cursor-pointer flex items-center gap-2"
                                 >
-                                  <Github className="size-3.5" />
+                                  <FaGithub className="size-3.5" />
                                   GitHub Repo
                                 </a>
                               </DropdownMenuItem>
@@ -746,6 +747,7 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
                   src={project.image || "/images/projects/thefleetfly.jpg"}
                   alt={project.title}
                   fill
+                  unoptimized
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 />

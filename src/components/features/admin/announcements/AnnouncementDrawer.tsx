@@ -2,12 +2,12 @@
 
 import * as React from "react";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -120,154 +120,153 @@ export function AnnouncementDrawer({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        className="w-full sm:max-w-lg overflow-y-auto border-l border-border bg-[#050b17] p-6 text-foreground"
-      >
-        <SheetHeader className="mb-6">
-          <SheetTitle className="text-xl font-bold text-white">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="w-[95vw] sm:max-w-xl max-h-[90vh] flex flex-col p-0 gap-0 border border-slate-800 bg-[#0A0E17] text-slate-100 shadow-2xl rounded-2xl overflow-hidden">
+        <DialogHeader className="p-5 sm:p-6 border-b border-slate-800/80 bg-[#0B101C]/80 shrink-0 text-left pr-12">
+          <DialogTitle className="text-xl font-bold text-white">
             {isEditing ? "Edit Notification" : "Create Notification"}
-          </SheetTitle>
-          <SheetDescription className="text-sm text-muted-foreground">
+          </DialogTitle>
+          <DialogDescription className="text-xs sm:text-sm text-slate-400 mt-1">
             {isEditing
               ? "Update this notification's details and broadcast settings."
               : "Compose a new broadcast announcement to display in notification bells and feeds."}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="title" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Title <span className="text-primary">*</span>
-            </label>
-            <input
-              id="title"
-              value={title}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
-              placeholder="e.g. Workshop Registrations Open"
-              required
-              className="h-10 rounded-md border border-border bg-card/60 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4 [scrollbar-width:thin]">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="type" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Type
+              <label htmlFor="title" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Title <span className="text-[#FF9900]">*</span>
+              </label>
+              <input
+                id="title"
+                value={title}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+                placeholder="e.g. Workshop Registrations Open"
+                required
+                className="h-10 rounded-lg border border-slate-700 bg-slate-900/60 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FF9900]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="type" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Type
+                </label>
+                <select
+                  id="type"
+                  value={type}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setType(e.target.value as NotificationType)}
+                  className="h-10 rounded-lg border border-slate-700 bg-slate-900/80 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FF9900]"
+                >
+                  <option value="announcement">Announcement</option>
+                  <option value="event">Event Notice</option>
+                  <option value="blog">Blog / Article</option>
+                  <option value="alert">Important Alert</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="priority" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Priority
+                </label>
+                <select
+                  id="priority"
+                  value={priority}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPriority(e.target.value as NotificationPriority)}
+                  className="h-10 rounded-lg border border-slate-700 bg-slate-900/80 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FF9900]"
+                >
+                  <option value="normal">Normal</option>
+                  <option value="high">High</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="audience" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Target Audience
               </label>
               <select
-                id="type"
-                value={type}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setType(e.target.value as NotificationType)}
-                className="h-10 rounded-md border border-border bg-card/80 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                id="audience"
+                value={targetAudience}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setTargetAudience(e.target.value as NotificationAudience)}
+                className="h-10 rounded-lg border border-slate-700 bg-slate-900/80 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FF9900]"
               >
-                <option value="announcement">Announcement</option>
-                <option value="event">Event Notice</option>
-                <option value="blog">Blog / Article</option>
-                <option value="alert">Important Alert</option>
+                <option value="all">All Members & Visitors</option>
+                <option value="members">Approved Club Members Only</option>
+                <option value="staff">Staff & Core Team Only</option>
               </select>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="priority" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Priority
+              <label htmlFor="href" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Action Link (Optional)
               </label>
-              <select
-                id="priority"
-                value={priority}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPriority(e.target.value as NotificationPriority)}
-                className="h-10 rounded-md border border-border bg-card/80 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="normal">Normal</option>
-                <option value="high">High</option>
-                <option value="urgent">Urgent</option>
-              </select>
+              <input
+                id="href"
+                value={href}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHref(e.target.value)}
+                placeholder="e.g. /events or https://..."
+                className="h-10 rounded-lg border border-slate-700 bg-slate-900/60 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FF9900]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="description" className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Message <span className="text-[#FF9900]">*</span>
+              </label>
+              <textarea
+                id="description"
+                value={description}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
+                placeholder="Write the notification message here..."
+                rows={4}
+                required
+                className="rounded-lg border border-slate-700 bg-slate-900/60 p-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#FF9900]"
+              />
+            </div>
+
+            <div className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/40 p-3.5">
+              <input
+                type="checkbox"
+                id="is_published"
+                checked={isPublished}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsPublished(e.target.checked)}
+                className="size-4 rounded border-slate-700 text-[#FF9900] focus:ring-[#FF9900] cursor-pointer"
+              />
+              <div className="flex flex-col">
+                <label htmlFor="is_published" className="text-sm font-medium text-white cursor-pointer">
+                  Publish immediately
+                </label>
+                <span className="text-xs text-slate-400">
+                  Visible to users in notification bells and lists right away.
+                </span>
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="audience" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Target Audience
-            </label>
-            <select
-              id="audience"
-              value={targetAudience}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setTargetAudience(e.target.value as NotificationAudience)}
-              className="h-10 rounded-md border border-border bg-card/80 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="all">All Members & Visitors</option>
-              <option value="members">Approved Club Members Only</option>
-              <option value="staff">Staff & Core Team Only</option>
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="href" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Action Link (Optional)
-            </label>
-            <input
-              id="href"
-              value={href}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setHref(e.target.value)}
-              placeholder="e.g. /events or https://..."
-              className="h-10 rounded-md border border-border bg-card/60 px-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label htmlFor="description" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Message <span className="text-primary">*</span>
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)}
-              placeholder="Write the notification message here..."
-              rows={4}
-              required
-              className="rounded-md border border-border bg-card/60 p-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-
-          <div className="flex items-center gap-3 rounded-lg border border-border/80 bg-card/30 p-3.5">
-            <input
-              type="checkbox"
-              id="is_published"
-              checked={isPublished}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsPublished(e.target.checked)}
-              className="size-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
-            />
-            <div className="flex flex-col">
-              <label htmlFor="is_published" className="text-sm font-medium text-white cursor-pointer">
-                Publish immediately
-              </label>
-              <span className="text-xs text-muted-foreground">
-                Visible to users in notification bells and lists right away.
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-4 flex items-center justify-end gap-3 pt-3 border-t border-border/80">
+          <div className="flex items-center justify-end gap-3 p-4 sm:p-5 border-t border-slate-800/80 bg-[#0B101C]/90 shrink-0">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={loading}
-              className="border-border text-white hover:bg-white/5 cursor-pointer"
+              className="border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 cursor-pointer text-xs"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={loading}
-              className="bg-primary text-black font-semibold hover:bg-primary/90 cursor-pointer"
+              className="bg-[#FF9900] text-black font-semibold hover:bg-[#FF9900]/90 cursor-pointer text-xs shadow-[0_0_15px_rgba(255,153,0,0.25)]"
             >
               {loading ? "Saving..." : isEditing ? "Save Changes" : "Create Notification"}
             </Button>
           </div>
         </form>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }

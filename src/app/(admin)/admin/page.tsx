@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { ClipboardList, UserCheck, Users } from "lucide-react";
 import { requireRole } from "@/lib/auth/server";
 import { roleMeta, type Role } from "@/data/roles";
@@ -7,6 +8,7 @@ import { getAdminCounts } from "@/lib/admin/queries";
 import { StatCard, StatCardRow } from "@/components/features/admin/kit";
 
 export default async function AdminDashboardPage() {
+  await connection();
   const account = await requireRole(["admin", "core"], "/admin");
 
   const roleKey = (account.role as Role) || "participant";
