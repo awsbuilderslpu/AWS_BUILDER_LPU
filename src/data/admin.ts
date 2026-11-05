@@ -66,8 +66,8 @@ export const adminNav: AdminNavItem[] = [
     label: "Announcements",
     href: "/admin/announcements",
     icon: Megaphone,
-    roles: ["admin"],
-    ready: false,
+    roles: ["admin", "core"],
+    ready: true,
   },
   {
     key: "analytics",

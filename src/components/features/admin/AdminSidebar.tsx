@@ -38,6 +38,8 @@ export function AdminSidebar({
           src="/images/artwork/Neon Orbital Network Overlay.png"
           alt=""
           fill
+          priority
+          sizes="250px"
           className="object-cover object-bottom"
         />
       </div>
@@ -116,6 +118,7 @@ export function AdminSidebar({
               alt="AWS Cloud"
               width={160}
               height={90}
+              style={{ width: "auto" }}
               className="h-full w-auto object-contain drop-shadow-[0_0_14px_rgba(255,153,0,0.4)]"
             />
           </div>
