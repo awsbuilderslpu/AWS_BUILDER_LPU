@@ -71,7 +71,7 @@ export function MembersExplorer({ members }: MembersExplorerProps) {
           aria-label="Join the community"
           className="flex flex-col gap-4 sm:flex-row lg:flex-col lg:gap-5 shrink-0"
         >
-          {joinCards.map((card, idx) => (
+          {joinCards.slice(1).map((card, idx) => (
             <JoinCard key={idx} data={card} className="w-full" />
           ))}
         </aside>
@@ -408,7 +408,7 @@ export function MembersExplorer({ members }: MembersExplorerProps) {
           aria-label="Join the community"
           className="flex flex-col gap-4 sm:flex-row lg:flex-col lg:gap-5 shrink-0"
         >
-          {joinCards.map((card, idx) => (
+          {joinCards.slice(1).map((card, idx) => (
             <JoinCard key={idx} data={card} className="w-full" />
           ))}
         </aside>

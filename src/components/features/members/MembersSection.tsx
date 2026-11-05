@@ -3,10 +3,11 @@ import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { PageHeading } from "@/components/ui/PageHeading";
 import { StatsRow } from "@/components/ui/StatsRow";
 import { memberStats } from "@/data/stats";
-import { membersHeading, membersIntro } from "@/data/members";
+import { membersHeading, membersIntro, joinCards } from "@/data/members";
 import { MembersDecor } from "@/components/features/members/MembersDecor";
 import { MembersExplorer } from "@/components/features/members/MembersExplorer";
 import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
+import { JoinCard } from "@/components/features/members/JoinCard";
 import { getPublicDirectory } from "@/lib/profile/queries.server";
 import { toPublicCard } from "@/lib/profile/directory";
 import { toMemberCard } from "@/lib/members/public-card";
@@ -51,8 +52,8 @@ export async function MembersSection() {
             </div>
           </div>
 
-          {/* Right Column: Hero Artwork scaling proportionally */}
-          <div className="relative flex w-full flex-1 items-center justify-center lg:self-start lg:justify-end -mt-2 sm:-mt-4 lg:-mt-6 xl:-mt-8 lg:pr-6 xl:pr-12">
+          {/* Right Column: Hero Artwork & Join Community Card */}
+          <div className="relative flex w-full flex-1 flex-col items-center lg:items-end -mt-2 sm:-mt-4 lg:-mt-6 xl:-mt-8 lg:pr-6 xl:pr-12">
             <div className="relative aspect-[3/2] w-full max-w-[260px] sm:max-w-[300px] lg:max-w-[330px] xl:max-w-[360px]">
               {/* Ambient Radial Background Glow */}
               <div
@@ -69,6 +70,13 @@ export async function MembersSection() {
                 imageClassName="drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]"
               />
             </div>
+
+            {/* "Be a part of our community" Box */}
+            {joinCards[0] && (
+              <div className="mt-3 w-full max-w-[260px] sm:max-w-[300px] lg:max-w-[330px] xl:max-w-[360px]">
+                <JoinCard data={joinCards[0]} className="w-full" />
+              </div>
+            )}
           </div>
         </div>
 
