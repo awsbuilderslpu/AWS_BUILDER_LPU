@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Search } from "lucide-react";
+import { LogIn, Menu, Search } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { siteConfig, navLinks } from "@/data/site";
@@ -68,7 +68,7 @@ export function Navbar() {
 function NavbarContent() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = React.useState(false);
-  const { account, signOut } = useAuth();
+  const { account, isLoading, signOut } = useAuth();
   const shouldReduceMotion = useReducedMotion();
 
   const isLinkActive = (href: string) => {
@@ -133,20 +133,22 @@ function NavbarContent() {
 
           <NotificationBell />
 
-          <UserMenu
-            account={
-              account || {
-                id: "arfaa-taj",
-                email: "arfaataj@gmail.com",
-                displayName: "MD ARFAA TAJ",
-                role: "admin",
-                isActive: true,
-                registrationStatus: "approved",
-                profileComplete: true,
-                avatarUrl: "/images/members/arfaa.png",
-              }
-            }
-          />
+          {isLoading ? (
+            <div className="h-10 w-24 animate-pulse rounded-lg border border-border/80 bg-card/40" />
+          ) : account ? (
+            <UserMenu account={account} />
+          ) : (
+            <Button
+              asChild
+              variant="primary"
+              className="h-10 px-4 font-semibold shadow-sm"
+            >
+              <Link href={siteConfig.signInUrl} scroll={false}>
+                <LogIn className="size-4" />
+                <span>Log In</span>
+              </Link>
+            </Button>
+          )}
         </div>
 
         {/* Mobile: Notification and Hamburger */}
@@ -265,19 +267,20 @@ function NavbarContent() {
                         Join the Club
                       </Link>
                     </Button>
-                    <div className="text-center">
-                      <Link
-                        href={siteConfig.signInUrl}
-                        scroll={false}
-                        onClick={() => setIsOpen(false)}
-                        className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                      >
-                        Sign in
-                      </Link>
-                    </div>
-                  </>
+                        <Button
+                          asChild
+                          variant="outline"
+                          className="w-full justify-center gap-2"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <Link href={siteConfig.signInUrl} scroll={false}>
+                            <LogIn className="size-4" />
+                            <span>Log In</span>
+                          </Link>
+                      </Button>
+                    </>
                 )}
-              </div>
+                  </div>
             </SheetContent>
           </Sheet>
         </div>
