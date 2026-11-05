@@ -4,7 +4,7 @@ import { projectsCopy } from "@/data/projects";
 
 export function ProjectsHero() {
   return (
-    <div className="relative z-10 w-full overflow-hidden border-b border-border/40 bg-gradient-to-b from-background via-card/20 to-background/90 py-6 sm:py-8 lg:py-10">
+    <div className="relative z-10 w-full overflow-hidden bg-transparent py-6 sm:py-8 lg:py-10">
       <div className="mx-auto flex max-w-[1560px] flex-col items-start justify-between gap-6 px-4 sm:px-6 lg:flex-row lg:items-center lg:px-8">
         {/* Left Column: Heading, Eyebrow, Subtitle */}
         <div className="relative z-10 max-w-lg xl:max-w-xl shrink-0">
