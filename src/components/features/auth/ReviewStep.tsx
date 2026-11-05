@@ -136,15 +136,15 @@ export function ReviewStep() {
         <div className="mx-auto my-auto flex w-full max-w-[500px] flex-col items-center py-6 text-center">
           <div
             aria-hidden="true"
-            className="flex size-20 items-center justify-center rounded-full border-2 border-emerald-500 bg-emerald-500/10 shadow-[0_0_25px_rgba(16,185,129,0.3)] select-none"
+            className="flex size-20 items-center justify-center rounded-full border-2 border-success bg-success/10 shadow-[0_0_25px_rgba(34,197,94,0.3)] select-none"
           >
-            <Check className="size-10 text-emerald-400 stroke-[2.5]" />
+            <Check className="size-10 text-success stroke-[2.5]" />
           </div>
 
           <h2
             id="auth-view-heading"
             tabIndex={-1}
-            className="mt-6 text-[clamp(24px,2vw,30px)] font-bold leading-tight text-white tracking-tight outline-none"
+            className="mt-6 text-[clamp(24px,2vw,30px)] font-bold leading-tight text-foreground tracking-tight outline-none"
           >
             {authCopy.complete.successTitle}
           </h2>
@@ -184,7 +184,7 @@ export function ReviewStep() {
           <div className="flex items-center gap-4 min-w-0">
             <Avatar name={fullName || "User"} size={64} />
             <div className="min-w-0">
-              <div className="text-[20px] font-semibold text-white truncate">
+              <div className="text-[20px] font-semibold text-foreground truncate">
                 {fullName || "—"}
               </div>
               <div className="text-[14px] text-muted-foreground break-all">
@@ -207,7 +207,7 @@ export function ReviewStep() {
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div className="flex items-center gap-2">
               <UserRound className="size-4 text-primary" />
-              <h3 className="text-[15px] font-semibold text-white">
+              <h3 className="text-[15px] font-semibold text-foreground">
                 {registrationCopy.review.sections.personal}
               </h3>
             </div>
@@ -226,7 +226,7 @@ export function ReviewStep() {
               <span className="text-muted-foreground">
                 {registrationCopy.review.labels.registrationNumber}
               </span>
-              <p className="mt-0.5 font-medium text-white">
+              <p className="mt-0.5 font-medium text-foreground">
                 {state.data.registrationNumber || "—"}
               </p>
             </div>
@@ -234,7 +234,7 @@ export function ReviewStep() {
               <span className="text-muted-foreground">
                 {registrationCopy.review.labels.phone}
               </span>
-              <p className="mt-0.5 font-medium text-white">
+              <p className="mt-0.5 font-medium text-foreground">
                 {state.data.phone
                   ? `${state.data.countryCode ?? "+91"} ${state.data.phone}`
                   : "—"}
@@ -244,7 +244,7 @@ export function ReviewStep() {
               <span className="text-muted-foreground">
                 {registrationCopy.review.labels.dateOfBirth}
               </span>
-              <p className="mt-0.5 font-medium text-white">
+              <p className="mt-0.5 font-medium text-foreground">
                 {formatDob(state.data.dateOfBirth) || "—"}
               </p>
             </div>
@@ -256,7 +256,7 @@ export function ReviewStep() {
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
             <div className="flex items-center gap-2">
               <GraduationCap className="size-4 text-primary" />
-              <h3 className="text-[15px] font-semibold text-white">
+              <h3 className="text-[15px] font-semibold text-foreground">
                 {registrationCopy.review.sections.academic}
               </h3>
             </div>
@@ -275,7 +275,7 @@ export function ReviewStep() {
               <span className="text-muted-foreground">
                 {registrationCopy.review.labels.university}
               </span>
-              <p className="mt-0.5 font-medium text-white">
+              <p className="mt-0.5 font-medium text-foreground">
                 {universityLabel || "—"}
               </p>
             </div>
@@ -283,7 +283,7 @@ export function ReviewStep() {
               <span className="text-muted-foreground">
                 {registrationCopy.review.labels.programme}
               </span>
-              <p className="mt-0.5 font-medium text-white">
+              <p className="mt-0.5 font-medium text-foreground">
                 {programmeDisplay || "—"}
               </p>
             </div>
@@ -291,7 +291,7 @@ export function ReviewStep() {
               <span className="text-muted-foreground">
                 {registrationCopy.review.labels.year}
               </span>
-              <p className="mt-0.5 font-medium text-white">
+              <p className="mt-0.5 font-medium text-foreground">
                 {yearDisplay || "—"}
               </p>
             </div>
@@ -299,7 +299,7 @@ export function ReviewStep() {
               <span className="text-muted-foreground">
                 {registrationCopy.review.labels.graduation}
               </span>
-              <p className="mt-0.5 font-medium text-white">
+              <p className="mt-0.5 font-medium text-foreground">
                 {state.data.graduationYear || "—"}
               </p>
             </div>
@@ -309,7 +309,7 @@ export function ReviewStep() {
         {/* Section 3: Interests & Role */}
         <div className="rounded-lg border border-border bg-card/40 p-5">
           <div className="flex items-center justify-between border-b border-border/60 pb-3">
-            <h3 className="text-[15px] font-semibold text-white">
+            <h3 className="text-[15px] font-semibold text-foreground">
               {registrationCopy.review.sections.interests}
             </h3>
             <button
@@ -370,7 +370,7 @@ export function ReviewStep() {
         {error && (
           <div
             role="alert"
-            className="rounded-md border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-300"
+            className="rounded-md border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-400"
           >
             {error}
           </div>

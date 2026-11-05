@@ -139,7 +139,7 @@ export function SignInView({ urlError }: SignInViewProps) {
           ref={headingRef}
           id="auth-view-heading"
           tabIndex={-1}
-          className="text-[clamp(20px,1.8vw,25px)] font-bold leading-[1.15] text-white tracking-tight outline-none"
+          className="text-[clamp(20px,1.8vw,25px)] font-bold leading-[1.15] text-foreground tracking-tight outline-none"
         >
           {authCopy.signin.title}
         </h2>
@@ -163,12 +163,12 @@ export function SignInView({ urlError }: SignInViewProps) {
           >
             <div
               aria-hidden="true"
-              className="flex size-11 shrink-0 items-center justify-center rounded-full border border-emerald-500/50 bg-emerald-500/10"
+              className="flex size-11 shrink-0 items-center justify-center rounded-full border border-success/50 bg-success/10"
             >
-              <Check className="size-5 text-emerald-400" />
+              <Check className="size-5 text-success" />
             </div>
 
-            <h3 className="text-[18px] font-semibold text-white">
+            <h3 className="text-[18px] font-semibold text-foreground">
               {authCopy.signin.success}
             </h3>
 
@@ -222,7 +222,7 @@ export function SignInView({ urlError }: SignInViewProps) {
             {formError && (
               <div
                 role="alert"
-                className="rounded-md border border-red-400/40 bg-red-400/10 px-4 py-2.5 text-sm text-red-300"
+                className="rounded-md border border-red-400/40 bg-red-400/10 px-4 py-2.5 text-sm text-red-400"
               >
                 <p>{formError}</p>
                 {unconfirmedEmail && (

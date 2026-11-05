@@ -44,9 +44,9 @@ export function SuccessView() {
         {/* 96px circle with 2px border-emerald-500, bg-emerald-500/10, soft success glow */}
         <div
           aria-hidden="true"
-          className="flex size-24 items-center justify-center rounded-full border-2 border-emerald-500 bg-emerald-500/10 shadow-[0_0_25px_rgba(16,185,129,0.3)] select-none"
+          className="flex size-24 items-center justify-center rounded-full border-2 border-success bg-success/10 shadow-[0_0_25px_rgba(34,197,94,0.3)] select-none"
         >
-          <Check className="size-12 text-emerald-400 stroke-[2.5]" />
+          <Check className="size-12 text-success stroke-[2.5]" />
         </div>
 
         {/* Heading */}
@@ -54,13 +54,13 @@ export function SuccessView() {
           ref={headingRef}
           id="auth-view-heading"
           tabIndex={-1}
-          className="mt-6 text-[clamp(26px,2.3vw,34px)] font-bold leading-[1.15] text-white tracking-tight outline-none"
+          className="mt-6 text-[clamp(26px,2.3vw,34px)] font-bold leading-[1.15] text-foreground tracking-tight outline-none"
         >
           {registrationCopy.success.title}
         </h2>
 
         {/* Welcome */}
-        <div className="mt-3 text-[18px] font-semibold text-white">
+        <div className="mt-3 text-[18px] font-semibold text-foreground">
           {registrationCopy.success.welcome}
         </div>
 
@@ -97,7 +97,7 @@ export function SuccessView() {
                   strokeWidth={1.5}
                   aria-hidden="true"
                 />
-                <span className="text-[13.5px] text-muted-foreground transition-colors group-hover:text-white">
+                <span className="text-[13.5px] text-muted-foreground transition-colors group-hover:text-foreground">
                   {linkItem.label}
                 </span>
               </Link>

@@ -1,5 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
+import { io } from "next/cache";
 
 import { cn } from "@/lib/utils";
 import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
@@ -25,6 +26,7 @@ export interface EventsSectionProps extends React.HTMLAttributes<HTMLElement> {
 }
 
 export async function EventsSection({ className, ...props }: EventsSectionProps) {
+  await io();
   const nowIso = new Date().toISOString();
   const rows = await listPublicEvents(nowIso);
   const events = rows.map((row) =>

@@ -66,7 +66,7 @@ export function VerifyView() {
         {/* 84px Tile with 2px primary outline and soft primary glow */}
         <div
           aria-hidden="true"
-          className="flex size-[84px] items-center justify-center rounded-2xl border-2 border-primary bg-primary/10 shadow-[0_0_25px_rgba(255,153,0,0.3)] select-none"
+          className="flex size-[84px] items-center justify-center rounded-2xl border-2 border-primary bg-primary/10 shadow-[0_0_25px_rgba(217,119,6,0.3)] select-none"
         >
           <Mail className="size-10 text-primary" strokeWidth={1.75} />
         </div>
@@ -76,7 +76,7 @@ export function VerifyView() {
           ref={headingRef}
           id="auth-view-heading"
           tabIndex={-1}
-          className="mt-6 text-[clamp(26px,2.3vw,34px)] font-bold leading-[1.15] text-white tracking-tight outline-none"
+          className="mt-6 text-[clamp(26px,2.3vw,34px)] font-bold leading-[1.15] text-foreground tracking-tight outline-none"
         >
           {registrationCopy.verify.title}
         </h2>
@@ -84,7 +84,7 @@ export function VerifyView() {
         {/* Intro and email */}
         <div className="mt-3 text-[16px] leading-[1.5] text-muted-foreground">
           <span>{registrationCopy.verify.intro}</span>
-          <div className="font-semibold text-white break-all">
+          <div className="font-semibold text-foreground break-all">
             {email || "your email"}
           </div>
         </div>
@@ -120,7 +120,7 @@ export function VerifyView() {
             </Button>
 
             {resendSuccess && (
-              <p role="status" className="text-[13.5px] text-emerald-400">
+              <p role="status" className="text-[13.5px] text-success">
                 {registrationCopy.verify.resent}
               </p>
             )}
@@ -128,7 +128,7 @@ export function VerifyView() {
             {resendError && (
               <div
                 role="alert"
-                className="w-full rounded-md border border-red-400/40 bg-red-400/10 px-4 py-2.5 text-center text-sm text-red-300"
+                className="w-full rounded-md border border-red-400/40 bg-red-400/10 px-4 py-2.5 text-center text-sm text-red-400"
               >
                 {resendError}
               </div>
@@ -143,7 +143,7 @@ export function VerifyView() {
           type="button"
           variant="outline"
           onClick={changeEmail}
-          className="h-12 w-full text-[15px] font-medium text-white hover:bg-white/5"
+          className="h-12 w-full text-[15px] font-medium text-foreground hover:bg-primary/10"
         >
           <Pencil className="size-4 shrink-0" aria-hidden="true" />
           <span>{registrationCopy.verify.change}</span>
