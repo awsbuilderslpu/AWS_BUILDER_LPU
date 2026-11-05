@@ -3,12 +3,14 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LogIn, Menu, Search } from "lucide-react";
+import { LayoutDashboard, LogIn, Menu, Search, UserRound } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { siteConfig, navLinks } from "@/data/site";
 import { authCopy } from "@/data/auth";
 import { profileCopy } from "@/data/profile";
+import { canAccessAdmin } from "@/data/admin";
+import { roleMeta } from "@/data/roles";
 import { cn } from "@/lib/utils";
 import { durations, easing } from "@/lib/motion/tokens";
 import { Logo } from "@/components/layout/Logo";
@@ -70,6 +72,13 @@ function NavbarContent() {
   const [isOpen, setIsOpen] = React.useState(false);
   const { account, isLoading, signOut } = useAuth();
   const shouldReduceMotion = useReducedMotion();
+
+  const isPending = account?.registrationStatus === "pending";
+  const roleLabel = isPending
+    ? profileCopy.access.pending
+    : account?.role && roleMeta[account.role]
+      ? roleMeta[account.role].label
+      : null;
 
   const isLinkActive = (href: string) => {
     if (href === "/") {
@@ -205,6 +214,29 @@ function NavbarContent() {
                       </Link>
                     );
                   })}
+                  {canAccessAdmin(account?.role ?? null) && (
+                    <div className="pt-2">
+                      <div className="my-2 h-px bg-border/60" />
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsOpen(false)}
+                        className={cn(
+                          "flex items-center justify-between rounded-lg px-3 py-2.5 text-base font-medium transition-colors",
+                          pathname.startsWith("/admin")
+                            ? "bg-primary/10 text-primary font-semibold"
+                            : "text-foreground/80 hover:bg-primary/10 hover:text-primary"
+                        )}
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <LayoutDashboard className="size-4 text-primary" />
+                          <span>Admin Dashboard</span>
+                        </span>
+                        <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                          Admin
+                        </span>
+                      </Link>
+                    </div>
+                  )}
                 </nav>
               </div>
 
@@ -215,9 +247,16 @@ function NavbarContent() {
                     <div className="flex items-center gap-3">
                       <Avatar name={account.displayName || "User"} size={40} />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-white">
-                          {account.displayName}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="truncate text-sm font-semibold text-white">
+                            {account.displayName}
+                          </p>
+                          {roleLabel && (
+                            <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
+                              {roleLabel}
+                            </span>
+                          )}
+                        </div>
                         <p className="truncate text-xs text-muted-foreground">
                           {account.email}
                         </p>
@@ -235,13 +274,29 @@ function NavbarContent() {
                         </Link>
                       </Button>
                     )}
+                    {canAccessAdmin(account.role) && (
+                      <Button
+                        asChild
+                        variant="primary"
+                        className="w-full justify-center gap-2 font-semibold shadow-sm"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Link href="/admin">
+                          <LayoutDashboard className="size-4" />
+                          <span>{authCopy.menu.account.dashboard}</span>
+                        </Link>
+                      </Button>
+                    )}
                     <Button
                       asChild
                       variant="outline"
-                      className="w-full justify-center"
+                      className="w-full justify-center gap-2"
                       onClick={() => setIsOpen(false)}
                     >
-                      <Link href="/profile">{profileCopy.myProfile}</Link>
+                      <Link href="/profile">
+                        <UserRound className="size-4" />
+                        <span>{profileCopy.myProfile}</span>
+                      </Link>
                     </Button>
                     <Button
                       variant="ghost"
