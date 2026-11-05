@@ -174,59 +174,37 @@ export function ProjectsExplorer() {
   return (
     <div className="mx-auto max-w-[1560px] px-4 sm:px-6 lg:px-8 py-8">
       {/* =========================================================================
-          FILTER ROW 1: Status Tabs & Search Box
+          FILTER ROW 1: Status Tabs
          ========================================================================= */}
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        {/* Status Tabs */}
-        <div
-          role="tablist"
-          aria-label="Filter projects by status"
-          className="flex flex-wrap items-center gap-2"
-        >
-          {projectStatusTabs.map((tab) => {
-            const isSelected = selectedStatusTab === tab;
-            return (
-              <button
-                key={tab}
-                type="button"
-                role="tab"
-                aria-selected={isSelected}
-                onClick={() => handleStatusTabSelect(tab)}
-                className={cn(
-                  "h-10 rounded-lg px-4 text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer select-none",
-                  isSelected
-                    ? "border border-primary bg-primary text-primary-foreground font-semibold shadow-xs"
-                    : "border border-border/80 bg-card/50 text-muted-foreground hover:border-primary/50 hover:bg-card hover:text-white"
-                )}
-              >
-                {tab}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Search Input Box */}
-        <div className="relative w-full lg:w-80">
-          <Search
-            aria-hidden="true"
-            className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-          />
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder={projectsCopy.searchPlaceholder}
-            aria-label="Search projects"
-            className={cn(
-              "h-10 w-full rounded-lg border border-border/80 bg-card/50 pl-10 pr-4 text-xs sm:text-sm text-foreground placeholder:text-muted-foreground",
-              "transition-colors focus:border-primary focus:bg-card/90 focus:outline-none focus:ring-1 focus:ring-primary"
-            )}
-          />
-        </div>
+      <div
+        role="tablist"
+        aria-label="Filter projects by status"
+        className="flex flex-wrap items-center gap-2"
+      >
+        {projectStatusTabs.map((tab) => {
+          const isSelected = selectedStatusTab === tab;
+          return (
+            <button
+              key={tab}
+              type="button"
+              role="tab"
+              aria-selected={isSelected}
+              onClick={() => handleStatusTabSelect(tab)}
+              className={cn(
+                "h-10 rounded-lg px-4 text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer select-none",
+                isSelected
+                  ? "border border-primary bg-primary text-primary-foreground font-semibold shadow-xs"
+                  : "border border-border/80 bg-card/50 text-muted-foreground hover:border-primary/50 hover:bg-card hover:text-white"
+              )}
+            >
+              {tab}
+            </button>
+          );
+        })}
       </div>
 
       {/* =========================================================================
-          FILTER ROW 2: Dropdowns & Reset Button
+          FILTER ROW 2: Dropdowns, Search Box & Reset Button
          ========================================================================= */}
       <div className="mt-4 flex flex-wrap items-center gap-3">
         {/* Category Dropdown */}
@@ -297,12 +275,31 @@ export function ProjectsExplorer() {
           <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
         </div>
 
+        {/* Search Input Box */}
+        <div className="relative w-full sm:w-64 md:w-72 lg:w-80">
+          <Search
+            aria-hidden="true"
+            className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground"
+          />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder={projectsCopy.searchPlaceholder}
+            aria-label="Search projects"
+            className={cn(
+              "h-9 w-full rounded-lg border border-border/80 bg-card/60 pl-8 pr-4 text-xs text-foreground placeholder:text-muted-foreground",
+              "transition-colors hover:border-primary/40 focus:border-primary focus:bg-card/90 focus:outline-none focus:ring-1 focus:ring-primary"
+            )}
+          />
+        </div>
+
         {/* Reset Link/Button */}
         <button
           type="button"
           onClick={handleResetFilters}
           className={cn(
-            "ml-auto inline-flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-colors",
+            "inline-flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-colors whitespace-nowrap",
             hasActiveFilters
               ? "text-primary hover:underline"
               : "text-muted-foreground hover:text-white"
