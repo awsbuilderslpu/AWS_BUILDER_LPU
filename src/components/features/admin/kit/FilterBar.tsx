@@ -50,11 +50,11 @@ export function FilterBar({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-end gap-3",
+        "flex flex-wrap items-end gap-2.5 sm:gap-3",
         className
       )}
     >
-      <div className="flex-1 min-w-[240px] max-w-[480px]">
+      <div className="w-full sm:w-auto sm:flex-1 sm:min-w-[240px] sm:max-w-[480px]">
         <SearchInput
           value={queryText}
           onChange={onQueryTextChange}

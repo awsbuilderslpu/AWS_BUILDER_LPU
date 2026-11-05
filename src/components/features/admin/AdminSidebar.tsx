@@ -45,7 +45,7 @@ export function AdminSidebar({
       </div>
 
       {/* Top Header with Logo linking to /admin */}
-      <div className="relative z-10 flex h-[76px] shrink-0 items-center border-b border-border/80 px-6">
+      <div className="relative z-10 flex h-[76px] shrink-0 items-center border-b border-border/80 px-6 pr-14">
         <Logo href="/admin" />
       </div>
 

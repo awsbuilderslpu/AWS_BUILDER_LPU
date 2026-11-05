@@ -125,7 +125,7 @@ export function NotificationsBell() {
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="w-80 sm:w-96 rounded-2xl border border-border bg-[#060c18]/95 p-0 shadow-2xl backdrop-blur-xl"
+        className="w-[calc(100vw-2rem)] sm:w-96 max-w-sm rounded-2xl border border-border bg-[#060c18]/95 p-0 shadow-2xl backdrop-blur-xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border/80 px-4 py-3">

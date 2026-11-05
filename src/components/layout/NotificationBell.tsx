@@ -139,7 +139,7 @@ export function NotificationBell() {
           ref={dropdownRef}
           role="dialog"
           aria-label="Notifications"
-          className="absolute right-0 top-full mt-2.5 w-[320px] sm:w-[380px] rounded-xl border border-border bg-card/95 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.6)] backdrop-blur-xl z-50 animate-in fade-in-0 zoom-in-95 duration-150"
+          className="absolute right-0 top-full mt-2.5 w-[calc(100vw-2rem)] sm:w-[380px] max-w-[380px] rounded-xl border border-border bg-card/95 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.6)] backdrop-blur-xl z-50 animate-in fade-in-0 zoom-in-95 duration-150"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border/80 pb-3">

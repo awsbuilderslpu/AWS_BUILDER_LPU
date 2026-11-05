@@ -75,7 +75,7 @@ export function AdminShell({ account, children }: AdminShellProps) {
         <main
           id="admin-main"
           tabIndex={-1}
-          className="min-w-0 flex-1 px-5 pt-8 pb-8 outline-none"
+          className="min-w-0 flex-1 px-3.5 sm:px-6 pt-5 sm:pt-8 pb-8 outline-none"
         >
           {children}
         </main>

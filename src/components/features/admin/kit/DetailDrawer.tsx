@@ -40,8 +40,8 @@ export function DetailDrawer({
           className
         )}
       >
-        <div className="border-b border-border px-6 py-5 pr-12">
-          <SheetTitle className="text-[22px] font-semibold leading-tight tracking-tight text-white">
+        <div className="border-b border-border px-4 sm:px-6 py-4 sm:py-5 pr-12">
+          <SheetTitle className="text-xl sm:text-[22px] font-semibold leading-tight tracking-tight text-white">
             {title}
           </SheetTitle>
           <SheetDescription className="sr-only">
@@ -49,12 +49,12 @@ export function DetailDrawer({
           </SheetDescription>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-5">
           {children}
         </div>
 
         {footer && (
-          <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-border bg-background px-6 py-4">
+          <div className="sticky bottom-0 z-10 flex items-center justify-end gap-2.5 sm:gap-3 border-t border-border bg-background px-4 sm:px-6 py-3.5 sm:py-4">
             {footer}
           </div>
         )}

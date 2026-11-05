@@ -28,10 +28,10 @@ export default async function AdminDashboardPage() {
     <div className="space-y-6">
       {/* Page Heading */}
       <div>
-        <h1 className="text-[36px] font-bold tracking-tight text-white leading-tight">
+        <h1 className="text-2xl sm:text-[36px] font-bold tracking-tight text-white leading-tight">
           {adminCopy.dashboard.title}
         </h1>
-        <p className="mt-1.5 text-[16px] text-muted-foreground">
+        <p className="mt-1 sm:mt-1.5 text-sm sm:text-[16px] text-muted-foreground">
           {adminCopy.dashboard.subtitle}
         </p>
       </div>
@@ -71,11 +71,11 @@ export default async function AdminDashboardPage() {
       )}
 
       {/* Overview Welcome Card (16a) */}
-      <div className="mt-8 rounded-2xl border border-border bg-card/60 p-6 backdrop-blur-sm md:p-8">
-        <h2 className="text-xl font-semibold text-white">
+      <div className="mt-6 sm:mt-8 rounded-2xl border border-border bg-card/60 p-4 sm:p-6 md:p-8 backdrop-blur-sm">
+        <h2 className="text-lg sm:text-xl font-semibold text-white">
           {adminCopy.dashboard.welcome(account.displayName, roleLabel)}
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+        <p className="mt-2.5 sm:mt-3 text-sm leading-relaxed text-muted-foreground">
           {adminCopy.dashboard.note}
         </p>
       </div>
