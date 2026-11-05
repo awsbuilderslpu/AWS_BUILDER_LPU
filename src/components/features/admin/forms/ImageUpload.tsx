@@ -210,6 +210,7 @@ export function ImageUpload({
       onUploaded?.(path);
       setAnnouncement(copy.uploaded);
     } catch (err) {
+      console.error("Image upload failed:", err);
       setUploadError(getErrorMessage(err, bucket));
     } finally {
       setStatus("idle");
