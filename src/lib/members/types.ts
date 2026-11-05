@@ -36,6 +36,7 @@ export interface MemberDetails extends MemberListRow {
   instagramUrl: string | null;
   youtubeUrl: string | null;
   adminNote: string | null;
+  gender?: string | null;
 }
 
 export function toMemberListRow(
@@ -115,6 +116,7 @@ export function toMemberDetails(
     instagramUrl: r.instagram_url != null ? String(r.instagram_url) : null,
     youtubeUrl: r.youtube_url != null ? String(r.youtube_url) : null,
     adminNote: r.admin_note != null ? String(r.admin_note) : null,
+    gender: r.gender != null ? String(r.gender) : null,
   };
 }
 

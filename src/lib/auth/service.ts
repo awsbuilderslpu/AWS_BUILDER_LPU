@@ -19,6 +19,7 @@ export interface OwnProfileData {
   phone: string;
   registrationNumber: string | null;
   dateOfBirth: string | null;
+  gender: string | null;
   university: string;
   programme: string;
   department: string;
@@ -48,6 +49,7 @@ export function toSignUpMetadata(input: RegisterInput): Record<string, unknown> 
     study_year: input.year,
     semester: input.semester,
     date_of_birth: input.dateOfBirth,
+    gender: input.gender,
     graduation_year: Number(input.graduationYear),
     interests: input.interests,
     terms_accepted: input.termsAccepted,
@@ -350,7 +352,7 @@ export async function loadOwnProfile(): Promise<
       supabase
         .from("profiles")
         .select(
-          "first_name, last_name, email, phone_country_code, phone_number, registration_number, date_of_birth, university, programme, department, study_year, semester, graduation_year, interests, terms_accepted_at"
+          "first_name, last_name, email, phone_country_code, phone_number, registration_number, date_of_birth, gender, university, programme, department, study_year, semester, graduation_year, interests, terms_accepted_at"
         )
         .eq("id", user.id)
         .maybeSingle(),
@@ -382,6 +384,7 @@ export async function loadOwnProfile(): Promise<
       phone: p?.phone_number || "",
       registrationNumber: p?.registration_number || null,
       dateOfBirth: p?.date_of_birth || null,
+      gender: p?.gender || null,
       university: p?.university || universities[0].value,
       programme: p?.programme || "",
       department: p?.department || "",
@@ -428,6 +431,7 @@ export async function completeRegistration(
       last_name: values.lastName,
       phone_country_code: values.countryCode,
       phone_number: values.phone,
+      gender: values.gender,
       university: values.university,
       programme: values.programme,
       department: values.department,

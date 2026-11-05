@@ -260,6 +260,9 @@ export function RegistrationDrawer({
             <DetailRow label={copy.drawer.fields.dob}>
               {formatDob(details.dateOfBirth ?? undefined) || "-"}
             </DetailRow>
+            <DetailRow label={copy.drawer.fields.gender}>
+              {details.gender || "-"}
+            </DetailRow>
             <DetailRow label={copy.drawer.fields.university}>
               {uniLabel}
             </DetailRow>

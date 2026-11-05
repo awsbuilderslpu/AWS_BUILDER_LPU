@@ -12,6 +12,7 @@ describe("profile types", () => {
       phone_number: "9876543210",
       registration_number: "12345678",
       date_of_birth: "2000-01-01",
+      gender: "Male",
       university: "Lovely Professional University",
       programme: "B.Tech",
       department: "CSE",
@@ -43,6 +44,7 @@ describe("profile types", () => {
     assert.equal(profile.phoneNumber, "9876543210");
     assert.equal(profile.registrationNumber, "12345678");
     assert.equal(profile.dateOfBirth, "2000-01-01");
+    assert.equal(profile.gender, "Male");
     assert.equal(profile.university, "Lovely Professional University");
     assert.equal(profile.programme, "B.Tech");
     assert.equal(profile.department, "CSE");

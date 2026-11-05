@@ -564,6 +564,17 @@ export function ProfileView({
                         {formatDob(profile.dateOfBirth)}
                       </span>
                     </div>
+
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[12.5px] font-medium text-muted-foreground">
+                          {profileCopy.labels.gender}
+                        </span>
+                      </div>
+                      <span className="text-xs sm:text-sm font-medium text-foreground">
+                        {profile.gender || "-"}
+                      </span>
+                    </div>
                   </div>
 
                   <p className="text-[11.5px] text-muted-foreground">

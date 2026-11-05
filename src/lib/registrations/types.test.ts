@@ -72,6 +72,7 @@ describe("registrations types helper", () => {
       phone_number: "9876543210",
       registration_number: "87654321",
       date_of_birth: "2004-05-15",
+      gender: "Male",
       university: "lpu",
       programme: "BCA",
       department: "it",
@@ -88,6 +89,7 @@ describe("registrations types helper", () => {
     assert.equal(details.phoneCountryCode, "+91");
     assert.equal(details.phoneNumber, "9876543210");
     assert.equal(details.dateOfBirth, "2004-05-15");
+    assert.equal(details.gender, "Male");
     assert.equal(details.university, "lpu");
     assert.equal(details.semester, "3rd Semester");
     assert.equal(details.graduationYear, 2027);

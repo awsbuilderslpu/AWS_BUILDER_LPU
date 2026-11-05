@@ -38,6 +38,7 @@ export interface RegistrationDetails extends RegistrationListRow {
   phoneCountryCode: string | null;
   phoneNumber: string | null;
   dateOfBirth: string | null;
+  gender: string | null;
   university: string | null;
   semester: string | null;
   graduationYear: number | null;
@@ -102,6 +103,7 @@ export function toDetails(
       r.phone_country_code != null ? String(r.phone_country_code) : null,
     phoneNumber: r.phone_number != null ? String(r.phone_number) : null,
     dateOfBirth: r.date_of_birth != null ? String(r.date_of_birth) : null,
+    gender: r.gender != null ? String(r.gender) : null,
     university: r.university != null ? String(r.university) : null,
     semester: r.semester != null ? String(r.semester) : null,
     graduationYear: gradYear,

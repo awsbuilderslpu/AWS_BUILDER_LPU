@@ -37,6 +37,12 @@ export const countryCodes = [
 ] as const;
 export type CountryCode = (typeof countryCodes)[number];
 
+export const genderOptions = [
+  { value: "Male", label: "Male" },
+  { value: "Female", label: "Female" },
+] as const;
+export type Gender = (typeof genderOptions)[number]["value"];
+
 export const universities = [
   { value: "lpu", label: `${university} (${org})` },
 ] as const;
@@ -149,6 +155,7 @@ export const registrationCopy = {
         placeholder: "Reg. number (e.g. 12001234)",
       },
       dateOfBirth: { label: "Date of Birth" },
+      gender: { label: "Gender", placeholder: "Select gender" },
       password: { label: "Password", placeholder: "At least 8 chars" },
       confirmPassword: {
         label: "Confirm Password",
@@ -216,6 +223,7 @@ export const registrationCopy = {
       registrationNumber: "Registration Number",
       phone: "Phone",
       dateOfBirth: "Date of Birth",
+      gender: "Gender",
       university: "University",
       programme: "Programme",
       year: "Current Year",
@@ -257,6 +265,7 @@ export const registrationCopy = {
     registrationNumber:
       "Please enter your registration number (digits only).",
     dateOfBirth: "Please enter a valid date of birth.",
+    gender: "Please select your gender.",
     underAge: (n: number) => `You must be at least ${n} years old to register.`,
     password: "Use at least 8 characters, including a letter and a number.",
     confirmPassword: "Passwords don't match.",

@@ -12,6 +12,7 @@ async function test() {
     phone: "8371889693",
     registrationNumber: "12313447",
     dateOfBirth: "2026-10-07",
+    gender: "Female" as const,
     password: "Password123!",
     confirmPassword: "Password123!",
     termsAccepted: true as const,

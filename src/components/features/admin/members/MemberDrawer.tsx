@@ -509,6 +509,9 @@ export function MemberDrawer({
                   {details.registrationNumber || "-"}
                 </span>
               </DetailRow>
+              <DetailRow label={copy.drawer.labels.gender}>
+                {details.gender || "-"}
+              </DetailRow>
               <DetailRow label={copy.drawer.labels.headline}>
                 {details.headline || "-"}
               </DetailRow>

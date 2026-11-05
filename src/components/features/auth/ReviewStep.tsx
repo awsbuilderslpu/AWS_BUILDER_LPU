@@ -240,12 +240,20 @@ export function ReviewStep() {
                   : "—"}
               </p>
             </div>
-            <div className="col-span-2">
+            <div>
               <span className="text-muted-foreground">
                 {registrationCopy.review.labels.dateOfBirth}
               </span>
               <p className="mt-0.5 font-medium text-foreground">
                 {formatDob(state.data.dateOfBirth) || "—"}
+              </p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">
+                {registrationCopy.review.labels.gender}
+              </span>
+              <p className="mt-0.5 font-medium text-foreground">
+                {state.data.gender || "—"}
               </p>
             </div>
           </div>

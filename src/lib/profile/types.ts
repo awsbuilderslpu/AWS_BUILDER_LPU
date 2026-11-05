@@ -10,6 +10,7 @@ export interface OwnProfile {
   phoneNumber: string | null;
   registrationNumber: string | null;
   dateOfBirth: string | null;
+  gender?: string | null;
   university: string | null;
   programme: string | null;
   department: string | null;
@@ -68,6 +69,7 @@ export function toOwnProfile(raw: Record<string, unknown> | null | undefined): O
     phoneNumber: typeof r.phone_number === "string" ? r.phone_number : null,
     registrationNumber: typeof r.registration_number === "string" ? r.registration_number : null,
     dateOfBirth: typeof r.date_of_birth === "string" ? r.date_of_birth : null,
+    gender: typeof r.gender === "string" ? r.gender : null,
     university: typeof r.university === "string" ? r.university : null,
     programme: typeof r.programme === "string" ? r.programme : null,
     department: typeof r.department === "string" ? r.department : null,

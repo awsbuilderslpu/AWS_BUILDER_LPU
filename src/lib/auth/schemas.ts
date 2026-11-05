@@ -4,6 +4,7 @@ import {
   registrationCopy,
   registrationConstants,
   countryCodes,
+  genderOptions,
   universities,
   programmes,
   departments,
@@ -100,6 +101,10 @@ const dateOfBirthField = z
       });
     }
   });
+
+const genderField = z.enum(["Male", "Female"], {
+  message: registrationCopy.errors.gender,
+});
 
 const passwordField = z
   .string()
@@ -239,6 +244,7 @@ export const basicInfoSchema = z
     phone: phoneField,
     registrationNumber: registrationNumberField,
     dateOfBirth: dateOfBirthField,
+    gender: genderField,
     password: passwordField,
     confirmPassword: z.string(),
     termsAccepted: termsAcceptedField,
@@ -263,6 +269,7 @@ export const completeBasicInfoSchema = z
     phone: phoneField,
     registrationNumber: registrationNumberField,
     dateOfBirth: dateOfBirthField,
+    gender: genderField,
     termsAccepted: termsAcceptedField,
   })
   .refine(phoneRefinement, {
@@ -308,6 +315,7 @@ export const registerSchema = z
     phone: phoneField,
     registrationNumber: registrationNumberField,
     dateOfBirth: dateOfBirthField,
+    gender: genderField,
     password: passwordField,
     termsAccepted: termsAcceptedField,
     university: universityField,
@@ -335,6 +343,7 @@ export const completeRegistrationSchema = z
     phone: phoneField,
     registrationNumber: registrationNumberField,
     dateOfBirth: dateOfBirthField,
+    gender: genderField,
     termsAccepted: termsAcceptedField,
     university: universityField,
     programme: programmeField,

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User, Mail, IdCard, CalendarDays, Lock, Info, AlertCircle } from "lucide-react";
 import { authCopy } from "@/data/auth";
-import { registrationCopy, registrationConstants, countryCodes } from "@/data/registration";
+import { registrationCopy, registrationConstants, countryCodes, genderOptions } from "@/data/registration";
 import {
   basicInfoSchema,
   completeBasicInfoSchema,
@@ -17,6 +17,7 @@ import { RegisterStepFrame } from "@/components/features/auth/RegisterStepFrame"
 import { TextField } from "@/components/ui/TextField";
 import { PasswordField } from "@/components/ui/PasswordField";
 import { PhoneField } from "@/components/ui/PhoneField";
+import { SelectField } from "@/components/ui/SelectField";
 import { CheckboxField } from "@/components/ui/CheckboxField";
 import { Button } from "@/components/ui/button";
 
@@ -55,6 +56,7 @@ export function BasicInfoStep() {
       phone: state.data.phone ?? "",
       registrationNumber: state.data.registrationNumber ?? "",
       dateOfBirth: state.data.dateOfBirth ?? "",
+      gender: (state.data.gender as "Male" | "Female") ?? undefined,
       ...(isCompleteMode
         ? {}
         : {
@@ -185,6 +187,18 @@ export function BasicInfoStep() {
             error={errors.dateOfBirth?.message}
             {...register("dateOfBirth")}
           />
+
+          {/* Gender (Male or Female only) */}
+          <div className="sm:col-span-2">
+            <SelectField
+              label={registrationCopy.basic.fields.gender.label}
+              placeholder={registrationCopy.basic.fields.gender.placeholder}
+              required
+              options={genderOptions}
+              error={"gender" in errors ? (errors.gender as { message?: string })?.message : undefined}
+              {...register("gender")}
+            />
+          </div>
 
           {/* Password & Confirm Password (hidden in complete mode) */}
           {!isCompleteMode && (

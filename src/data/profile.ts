@@ -41,6 +41,7 @@ export const profileCopy = {
     phone: "Phone",
     registrationNumber: "Registration number",
     dateOfBirth: "Date of birth",
+    gender: "Gender",
     university: "University",
     programme: "Programme",
     department: "Branch / Department",

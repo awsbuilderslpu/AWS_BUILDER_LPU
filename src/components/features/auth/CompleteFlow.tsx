@@ -112,6 +112,7 @@ export function CompleteFlow() {
     phone: profile.phone,
     registrationNumber: profile.registrationNumber ?? "",
     dateOfBirth: profile.dateOfBirth ?? "",
+    gender: (profile.gender as "Male" | "Female") ?? undefined,
     university: profile.university || universities[0].value,
     programme: profile.programme,
     department: profile.department,
