@@ -12,11 +12,18 @@ import {
   projectMembers,
   projectsCopy,
   type ProjectStatusTab,
+  type Project,
 } from "@/data/projects";
 import { ProjectCard } from "@/components/features/projects/ProjectCard";
 import { ProjectDetailsDrawer } from "@/components/features/projects/ProjectDetailsDrawer";
 
-export function ProjectsExplorer() {
+interface ProjectsExplorerProps {
+  initialProjects?: Project[];
+}
+
+export function ProjectsExplorer({ initialProjects }: ProjectsExplorerProps = {}) {
+  const allProjects = initialProjects && initialProjects.length > 0 ? initialProjects : projects;
+
   const [selectedStatusTab, setSelectedStatusTab] =
     React.useState<ProjectStatusTab>("All Projects");
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -27,7 +34,7 @@ export function ProjectsExplorer() {
 
   // Selected project for the details drawer (defaults to the first project, e.g. "TheFleetFly")
   const [selectedSlug, setSelectedSlug] = React.useState<string | null>(
-    projects[0]?.slug ?? null
+    allProjects[0]?.slug ?? null
   );
 
   // Pagination state
@@ -36,7 +43,7 @@ export function ProjectsExplorer() {
 
   // Filtered projects
   const filteredProjects = React.useMemo(() => {
-    return projects.filter((project) => {
+    return allProjects.filter((project) => {
       // 1. Status Tab filter
       if (selectedStatusTab === "Featured") {
         if (!project.featured) return false;
@@ -144,10 +151,10 @@ export function ProjectsExplorer() {
     if (!selectedSlug) return null;
     return (
       filteredProjects.find((p) => p.slug === selectedSlug) ||
-      projects.find((p) => p.slug === selectedSlug) ||
+      allProjects.find((p) => p.slug === selectedSlug) ||
       null
     );
-  }, [selectedSlug, filteredProjects]);
+  }, [selectedSlug, filteredProjects, allProjects]);
 
   // Reset all filters
   const handleResetFilters = () => {
