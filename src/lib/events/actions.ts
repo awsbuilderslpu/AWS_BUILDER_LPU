@@ -93,26 +93,39 @@ export async function createEventAction(
       .toLowerCase();
     const slug = makeSlug(values.title, suffix);
 
-    const { data, error } = await supabase
+    const rowPayload: Record<string, unknown> = {
+      slug,
+      title: values.title,
+      category: values.category,
+      description: cleanDoc,
+      location_mode: values.locationMode,
+      venue: values.venue,
+      meeting_url: values.meetingUrl,
+      starts_at: values.startsAt,
+      ends_at: values.endsAt,
+      registration_enabled: values.registrationEnabled,
+      registration_deadline: values.registrationDeadline,
+      banner_path: values.bannerPath,
+      is_published: values.isPublished,
+      capacity: values.capacity,
+    };
+
+    let { data, error } = await supabase
       .from("events")
-      .insert({
-        slug,
-        title: values.title,
-        category: values.category,
-        description: cleanDoc,
-        location_mode: values.locationMode,
-        venue: values.venue,
-        meeting_url: values.meetingUrl,
-        starts_at: values.startsAt,
-        ends_at: values.endsAt,
-        registration_enabled: values.registrationEnabled,
-        registration_deadline: values.registrationDeadline,
-        banner_path: values.bannerPath,
-        is_published: values.isPublished,
-        capacity: values.capacity,
-      })
+      .insert(rowPayload)
       .select("id")
       .maybeSingle();
+
+    if (error && error.code === "42703") {
+      delete rowPayload.capacity;
+      const retryResult = await supabase
+        .from("events")
+        .insert(rowPayload)
+        .select("id")
+        .maybeSingle();
+      data = retryResult.data;
+      error = retryResult.error;
+    }
 
     if (!error && data) {
       revalidatePath("/admin/events");
@@ -124,6 +137,7 @@ export async function createEventAction(
       continue;
     }
 
+    console.error("createEventAction error:", error);
     return { ok: false, error: mapDatabaseError(error?.code) };
   }
 
@@ -176,27 +190,41 @@ export async function updateEventAction(
 
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const updatePayload: Record<string, unknown> = {
+    title: values.title,
+    category: values.category,
+    description: cleanDoc,
+    location_mode: values.locationMode,
+    venue: values.venue,
+    meeting_url: values.meetingUrl,
+    starts_at: values.startsAt,
+    ends_at: values.endsAt,
+    registration_enabled: values.registrationEnabled,
+    registration_deadline: values.registrationDeadline,
+    banner_path: values.bannerPath,
+    is_published: values.isPublished,
+    capacity: values.capacity,
+  };
+
+  let { data, error } = await supabase
     .from("events")
-    .update({
-      title: values.title,
-      category: values.category,
-      description: cleanDoc,
-      location_mode: values.locationMode,
-      venue: values.venue,
-      meeting_url: values.meetingUrl,
-      starts_at: values.startsAt,
-      ends_at: values.endsAt,
-      registration_enabled: values.registrationEnabled,
-      registration_deadline: values.registrationDeadline,
-      banner_path: values.bannerPath,
-      is_published: values.isPublished,
-      capacity: values.capacity,
-    })
+    .update(updatePayload)
     .eq("id", eventId)
     .select("id");
 
+  if (error && error.code === "42703") {
+    delete updatePayload.capacity;
+    const retryResult = await supabase
+      .from("events")
+      .update(updatePayload)
+      .eq("id", eventId)
+      .select("id");
+    data = retryResult.data;
+    error = retryResult.error;
+  }
+
   if (error) {
+    console.error("updateEventAction error:", error);
     return { ok: false, error: mapDatabaseError(error.code) };
   }
 

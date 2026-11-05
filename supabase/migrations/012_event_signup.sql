@@ -20,6 +20,37 @@ create table if not exists public.event_registrations (
   constraint event_registrations_status_values check (status in ('registered', 'cancelled', 'attended'))
 );
 
+-- Ensure columns exist if table was previously created with an earlier schema
+alter table public.event_registrations add column if not exists cancelled_at timestamptz;
+alter table public.event_registrations add column if not exists created_at timestamptz not null default now();
+alter table public.event_registrations add column if not exists updated_at timestamptz not null default now();
+alter table public.event_registrations alter column status set default 'registered';
+
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+     where table_schema = 'public'
+       and table_name = 'event_registrations'
+       and column_name = 'registered_at'
+  ) then
+    execute 'update public.event_registrations set created_at = coalesce(registered_at, now()) where created_at is null';
+  end if;
+end $$;
+
+update public.event_registrations
+   set status = 'registered'
+ where status not in ('registered', 'cancelled', 'attended');
+
+alter table public.event_registrations drop constraint if exists check_event_reg_status;
+alter table public.event_registrations drop constraint if exists event_registrations_status_values;
+alter table public.event_registrations add constraint event_registrations_status_values
+  check (status in ('registered', 'cancelled', 'attended'));
+
+-- Drop any legacy triggers
+drop trigger if exists set_event_registrations_updated_at on public.event_registrations;
+drop trigger if exists event_registration_capacity_trigger on public.event_registrations;
+
 create index if not exists event_registrations_event_status_idx on public.event_registrations (event_id, status);
 create index if not exists event_registrations_user_idx on public.event_registrations (user_id);
 

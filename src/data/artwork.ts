@@ -113,7 +113,7 @@ export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
   },
   adminSidebarCloud: {
     label: "Admin: sidebar cloud",
-    file: "admin-sidebar-cloud.webp",
+    file: "Neon Cloud Computing Emblem.png",
     imageClass: "object-contain object-center",
   },
   adminProfileCover: {

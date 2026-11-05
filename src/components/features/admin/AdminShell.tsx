@@ -32,7 +32,7 @@ export function AdminShell({ account, children }: AdminShellProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
+    <div className="min-h-screen bg-background lg:grid lg:grid-cols-[250px_minmax(0,1fr)]">
       {/* Accessible skip to main content link */}
       <a
         href="#admin-main"
