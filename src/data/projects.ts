@@ -34,7 +34,7 @@ export interface Project {
 }
 
 export const projectsCopy = {
-  eyebrow: "AWS CLOUD CLUB / LPU",
+  eyebrow: "AWS BUILDER GROUP / LPU",
   titlePrefix: "OUR",
   titleHighlight: "PROJECTS",
   subtitle:

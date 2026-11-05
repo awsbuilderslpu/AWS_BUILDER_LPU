@@ -73,6 +73,11 @@ export const ARTWORK_REGISTRY: Record<string, ArtworkConfig> = {
     alt: "Futuristic AWS Cloud Infrastructure Network",
     objectFit: "contain",
   },
+  "Auth: campus at night": {
+    src: "/images/artwork/Neon LPU Campus Beneath Digital Globe.png",
+    alt: "Neon LPU Campus Beneath Digital Globe",
+    objectFit: "cover",
+  },
 };
 
 export interface ArtworkSlotProps extends React.HTMLAttributes<HTMLDivElement> {

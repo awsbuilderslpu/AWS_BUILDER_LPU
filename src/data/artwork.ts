@@ -108,8 +108,8 @@ export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
   },
   authCampus: {
     label: "Auth: campus at night",
-    file: "campus-night.webp",
-    imageClass: "object-cover object-bottom",
+    file: "Neon LPU Campus Beneath Digital Globe.png",
+    imageClass: "object-cover object-center",
   },
   adminSidebarCloud: {
     label: "Admin: sidebar cloud",

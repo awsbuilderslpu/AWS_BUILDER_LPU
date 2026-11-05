@@ -1,7 +1,7 @@
 import * as React from "react";
+import Image from "next/image";
 import { authCopy } from "@/data/auth";
 import { Logo } from "@/components/layout/Logo";
-import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
 import { cn } from "@/lib/utils";
 
 export interface AuthPanelProps {
@@ -44,18 +44,19 @@ export function AuthPanel({ variant, className }: AuthPanelProps) {
     >
       {/* Art layer (aria-hidden, pointer-events-none, select-none) */}
       <div
-        className="pointer-events-none absolute inset-0 select-none"
+        className="pointer-events-none absolute inset-0 select-none overflow-hidden"
         aria-hidden="true"
       >
-        <ArtworkSlot
-          name="Auth: globe + floating clouds"
-          className="absolute right-0 top-[8%] h-[40%] w-[46%] aspect-auto"
+        <Image
+          src="/images/artwork/Neon LPU Campus Beneath Digital Globe.png"
+          alt="LPU Campus Beneath Digital Globe"
+          fill
+          priority
+          sizes="(max-width: 1024px) 100vw, 450px"
+          className="object-cover object-center"
         />
-        <ArtworkSlot
-          name="Auth: campus at night"
-          className="absolute inset-x-0 bottom-0 h-[48%] w-full aspect-auto"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-card via-card/75 to-transparent" />
+        {/* Cinematic gradient overlay matching reference so text is readable while campus and globe shine through */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#020617]/90 via-[#020617]/40 to-[#020617]/75" />
       </div>
 
       {/* Content layer */}
@@ -126,7 +127,7 @@ export function AuthPanel({ variant, className }: AuthPanelProps) {
                   className={cn(
                     "block",
                     idx === authCopy.panel.signinHeading.length - 1 &&
-                      "text-primary"
+                    "text-primary"
                   )}
                 >
                   {word}

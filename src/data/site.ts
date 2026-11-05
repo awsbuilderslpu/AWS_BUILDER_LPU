@@ -36,7 +36,7 @@ export interface SocialLink {
 
 export const siteConfig: SiteConfig = {
   name: "AWS Student Builders Group",
-  shortName: "Cloud Club",
+  shortName: "AWS Builder Group",
   org: "LPU",
   university: "Lovely Professional University",
   email: "awsbuilders.lpu@gmail.com",
