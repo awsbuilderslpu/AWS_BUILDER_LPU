@@ -9,7 +9,6 @@ import { SectionEyebrow } from "@/components/ui/SectionEyebrow";
 import { PageHeading } from "@/components/ui/PageHeading";
 import { Button } from "@/components/ui/button";
 import { StatsRow } from "@/components/ui/StatsRow";
-import { Artwork } from "@/components/ui/Artwork";
 import { HeroDecor } from "@/components/features/home/HeroDecor";
 import { Reveal } from "@/components/motion/Reveal";
 
@@ -26,19 +25,35 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
       )}
       {...props}
     >
-      {/* Right Artwork (Desktop xl and up, absolute layer z-0, elevated more up) */}
-      <div className="absolute right-[5%] xl:right-[7%] 2xl:right-[8%] top-[-3%] bottom-[5%] hidden w-[52%] 2xl:w-[48%] aspect-auto z-0 xl:flex items-center justify-center">
-        {/* Ambient atmospheric glow behind the cloud servers */}
+      {/* Background Video Visual (Desktop xl and up, absolute layer z-0) */}
+      <div className="absolute right-[2%] xl:right-[4%] 2xl:right-[6%] top-[-5%] bottom-[-5%] hidden w-[56%] 2xl:w-[50%] z-0 xl:flex items-center justify-center pointer-events-none select-none">
+        {/* Ambient atmospheric glow behind the globe */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 scale-105 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-3xl"
+          className="pointer-events-none absolute inset-0 -z-10 scale-95 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-3xl"
         />
-        <Artwork
-          slot="homeCloudServers"
-          priority
-          sizes="(min-width: 1280px) 50vw, 448px"
-          className="h-full w-full aspect-auto overflow-visible motion-safe:animate-float"
-        />
+        <div
+          className="relative w-full aspect-video overflow-hidden"
+          style={{
+            maskImage:
+              "radial-gradient(ellipse closest-side at 50% 50%, black 25%, transparent 80%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse closest-side at 50% 50%, black 25%, transparent 80%)",
+          }}
+        >
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="auto"
+            poster="/images/back_ground/poster.webp"
+            className="h-full w-full object-contain pointer-events-none select-none mix-blend-screen"
+          >
+            <source src="/images/back_ground/aws_builder_lpu.mp4" type="video/mp4" />
+            <source src="/images/back_ground/aws_builder_lpu.mkv" type="video/x-matroska" />
+          </video>
+        </div>
       </div>
 
       {/* Hero Decor Layer (xl and up, z-[1]) */}
@@ -97,17 +112,34 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
           </Reveal>
         </div>
 
-        {/* Right Artwork (Below xl breakpoint, normal flow under content) */}
-        <div className="relative mt-12 mb-10 w-full max-w-md self-center xl:hidden">
+        {/* Background Video Visual (Below xl breakpoint, normal flow under content) */}
+        <div className="relative mt-12 mb-10 w-full max-w-lg self-center xl:hidden pointer-events-none select-none">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10 scale-105 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-3xl"
+            className="pointer-events-none absolute inset-0 -z-10 scale-95 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-3xl"
           />
-          <Artwork
-            slot="homeCloudServers"
-            sizes="(max-width: 1280px) 100vw, 448px"
-            className="aspect-[4/3] w-full overflow-visible motion-safe:animate-float motion-safe:[animation-delay:1.5s]"
-          />
+          <div
+            className="relative w-full aspect-video overflow-hidden"
+            style={{
+              maskImage:
+                "radial-gradient(ellipse closest-side at 50% 50%, black 25%, transparent 80%)",
+              WebkitMaskImage:
+                "radial-gradient(ellipse closest-side at 50% 50%, black 25%, transparent 80%)",
+            }}
+          >
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              poster="/images/back_ground/poster.webp"
+              className="h-full w-full object-contain pointer-events-none select-none mix-blend-screen"
+            >
+              <source src="/images/back_ground/aws_builder_lpu.mp4" type="video/mp4" />
+              <source src="/images/back_ground/aws_builder_lpu.mkv" type="video/x-matroska" />
+            </video>
+          </div>
         </div>
       </div>
     </section>
