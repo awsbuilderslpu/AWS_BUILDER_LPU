@@ -48,7 +48,7 @@ export const artworkManifest: Record<ArtworkKey, ArtworkInfo> = {
   },
   ctaCloudServers: {
     label: "CTA cloud + servers",
-    file: "Futuristic AWS Cloud Infrastructure Network.png",
+    file: "a_high_resolution_ultra_detailed_digital_3d_neo_f.png",
     imageClass: "object-contain object-center lg:object-right drop-shadow-[0_0_35px_rgba(255,153,0,0.35)]",
   },
   aboutScene: {
