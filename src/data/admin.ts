@@ -7,8 +7,6 @@ import {
   ClipboardList,
   Megaphone,
   FolderGit2,
-  ChartNoAxesColumn,
-  Settings,
 } from "lucide-react";
 import type { AppRole } from "@/lib/auth/account";
 
@@ -77,22 +75,6 @@ export const adminNav: AdminNavItem[] = [
     icon: Megaphone,
     roles: ["admin", "core"],
     ready: true,
-  },
-  {
-    key: "analytics",
-    label: "Analytics",
-    href: "/admin/analytics",
-    icon: ChartNoAxesColumn,
-    roles: ["admin"],
-    ready: false,
-  },
-  {
-    key: "settings",
-    label: "Settings",
-    href: "/admin/settings",
-    icon: Settings,
-    roles: ["admin"],
-    ready: false,
   },
 ];
 

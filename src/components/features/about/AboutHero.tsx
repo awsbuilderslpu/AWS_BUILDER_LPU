@@ -168,7 +168,7 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
           </div>
 
           {/* Right Column: Isometric 3D Cloud Network Artwork */}
-          <div className="relative flex w-full items-center justify-center lg:col-span-5 xl:col-span-5">
+          <div className="relative flex w-full items-center justify-center lg:col-span-5 xl:col-span-5 lg:-translate-x-8 xl:-translate-x-12 lg:-translate-y-8 xl:-translate-y-10">
             <div className="relative aspect-[4/3] w-full max-w-[520px] lg:max-w-none">
               {/* Ambient atmospheric glow */}
               <div

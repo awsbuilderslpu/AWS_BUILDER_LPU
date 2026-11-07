@@ -2,11 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Search, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { LogoIcon } from "@/components/layout/Logo";
 import { NotificationsBell } from "@/components/features/admin/NotificationsBell";
 import { AdminUserMenu } from "@/components/features/admin/AdminUserMenu";
-import { adminCopy } from "@/data/admin";
 import { siteConfig } from "@/data/site";
 import type { AccountSummary } from "@/lib/auth/account";
 
@@ -49,25 +48,6 @@ export function AdminTopBar({
           </div>
         </Link>
       </div>
-
-      {/* Search trigger button: Icon on phone, full search bar on sm+ */}
-      <button
-        type="button"
-        onClick={onOpenCommand}
-        aria-label="Search admin (Ctrl+K)"
-        className="flex size-10 sm:h-11 sm:w-auto sm:flex-1 sm:max-w-[660px] items-center justify-center sm:justify-start gap-3 rounded-lg sm:rounded-md border border-border bg-card/40 px-0 sm:px-3.5 text-sm text-muted-foreground transition-colors hover:border-border/80 hover:bg-card/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
-      >
-        <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-        <span className="hidden sm:inline truncate">{adminCopy.searchPlaceholder}</span>
-        <div className="ml-auto hidden items-center gap-1 sm:flex" aria-hidden="true">
-          <kbd className="rounded border border-border bg-background px-1.5 py-0.5 text-[11px] font-mono text-muted-foreground">
-            Ctrl
-          </kbd>
-          <kbd className="rounded border border-border bg-background px-1.5 py-0.5 text-[11px] font-mono text-muted-foreground">
-            K
-          </kbd>
-        </div>
-      </button>
 
       {/* Right actions: Bell & User Menu */}
       <div className="ml-auto flex items-center gap-1.5 sm:gap-4 shrink-0">
