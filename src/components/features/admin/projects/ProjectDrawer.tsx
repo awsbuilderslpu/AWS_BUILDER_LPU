@@ -409,6 +409,7 @@ export function ProjectDrawer({
           const updatedItem: ProjectItem = {
             ...project,
             ...formData,
+            stats: formData.stats ?? { likes: 0, views: "0", rating: 5.0 },
             updatedAt: new Date().toISOString(),
           };
           onSaved(updatedItem, false);
@@ -423,6 +424,7 @@ export function ProjectDrawer({
           const newItem: ProjectItem = {
             id: res.id,
             ...formData,
+            stats: formData.stats ?? { likes: 0, views: "0", rating: 5.0 },
             createdAt: new Date().toISOString(),
           };
           onSaved(newItem, true);
@@ -433,6 +435,7 @@ export function ProjectDrawer({
           const newItem: ProjectItem = {
             id: `temp-${Date.now()}`,
             ...formData,
+            stats: formData.stats ?? { likes: 0, views: "0", rating: 5.0 },
             createdAt: new Date().toISOString(),
           };
           onSaved(newItem, true);

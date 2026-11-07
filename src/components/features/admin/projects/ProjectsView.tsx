@@ -268,7 +268,7 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
       <AdminPageHeader
         title="Project Management"
         subtitle="Manage student-built cloud architectures, generative AI tools, and serverless applications."
-        action={
+        actions={
           <Button
             onClick={handleCreate}
             className="bg-[#FF9900] text-black hover:bg-[#FF9900]/90 font-semibold px-4 h-10 shadow-[0_0_15px_rgba(255,153,0,0.3)] transition-all"
@@ -882,7 +882,7 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
         description={`Are you sure you want to delete "${projectToDelete?.title}"? This will permanently remove the project from the admin portal and public portfolio.`}
         confirmText={deleteLoading ? "Deleting..." : "Delete Project"}
         onConfirm={handleConfirmDelete}
-        tone="destructive"
+        tone="danger"
       />
     </div>
   );
