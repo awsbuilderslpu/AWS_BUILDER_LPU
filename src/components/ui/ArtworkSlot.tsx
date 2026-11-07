@@ -34,6 +34,11 @@ export const ARTWORK_REGISTRY: Record<string, ArtworkConfig> = {
     objectFit: "contain",
     objectPosition: "object-left",
   },
+  "Events: cloud + cubes": {
+    src: "/images/artwork/Neon AWS Events Cloud Network.png",
+    alt: "Neon AWS Events Cloud Network",
+    objectFit: "contain",
+  },
   "Members: globe": {
     src: "/images/artwork/Neon Orbital Network Overlay.png",
     alt: "Neon Orbital Network Overlay",

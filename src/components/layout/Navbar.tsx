@@ -130,16 +130,6 @@ function NavbarContent() {
 
         {/* Right: Actions (Desktop) */}
         <div className="hidden items-center gap-3 lg:flex">
-          {account && canAccessAdmin(account.role) && (
-            <Link
-              href="/admin"
-              className="flex items-center gap-1.5 rounded-lg border border-[#FF9900]/30 bg-[#FF9900]/10 px-3 py-1.5 text-xs font-mono font-medium text-[#FF9900] shadow-[0_0_10px_rgba(255,153,0,0.15)] transition-all hover:bg-[#FF9900]/20 hover:border-[#FF9900]/50"
-            >
-              <LayoutDashboard className="size-3.5" />
-              <span>Admin Console</span>
-            </Link>
-          )}
-
           <NotificationBell />
 
           {isLoading ? (

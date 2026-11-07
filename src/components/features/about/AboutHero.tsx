@@ -149,18 +149,17 @@ export function AboutHero({ className, ...props }: AboutHeroProps) {
                 asChild
                 variant="outline"
                 size="lg"
+                withArrow
                 className="font-medium"
               >
-                <Link href="/events" className="inline-flex items-center gap-2">
-                  <span>Explore Events</span>
-                  <ArrowRight className="size-4" />
-                </Link>
+                <Link href="/events">Explore Events</Link>
               </Button>
               <Button
                 asChild
-                variant="ghost"
+                variant="outline"
                 size="lg"
-                className="font-medium text-muted-foreground hover:text-foreground"
+                withArrow
+                className="font-medium"
               >
                 <Link href="/members">Meet the Team</Link>
               </Button>
