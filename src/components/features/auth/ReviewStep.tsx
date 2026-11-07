@@ -35,7 +35,7 @@ export function ReviewStep() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { state, goToStep, markSubmitted } = useRegistration();
+  const { state, goToStep, markSubmitted, markVerified } = useRegistration();
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -124,7 +124,11 @@ export function ReviewStep() {
         setError(result.error);
         return;
       }
-      markSubmitted();
+      if (result.unconfirmed) {
+        markSubmitted();
+      } else {
+        markVerified();
+      }
     } finally {
       setIsSubmitting(false);
     }
