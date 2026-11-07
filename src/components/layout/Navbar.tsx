@@ -87,7 +87,7 @@ function NavbarContent() {
   };
 
   return (
-    <header className="sticky top-0 z-50 h-[72px] w-full border-b border-border bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 h-[72px] w-full border-b border-white/[0.08] bg-[#040814]/85 backdrop-blur-xl">
       <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left: Logo */}
         <Logo />
@@ -130,6 +130,16 @@ function NavbarContent() {
 
         {/* Right: Actions (Desktop) */}
         <div className="hidden items-center gap-3 lg:flex">
+          {account && canAccessAdmin(account.role) && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-1.5 rounded-lg border border-[#FF9900]/30 bg-[#FF9900]/10 px-3 py-1.5 text-xs font-mono font-medium text-[#FF9900] shadow-[0_0_10px_rgba(255,153,0,0.15)] transition-all hover:bg-[#FF9900]/20 hover:border-[#FF9900]/50"
+            >
+              <LayoutDashboard className="size-3.5" />
+              <span>Admin Console</span>
+            </Link>
+          )}
+
           <NotificationBell />
 
           {isLoading ? (

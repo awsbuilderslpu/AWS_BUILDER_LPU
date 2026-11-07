@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { connection } from "next/server";
 import { ClipboardList, UserCheck, Users } from "lucide-react";
 import { requireRole } from "@/lib/auth/server";
@@ -81,18 +80,6 @@ export default async function AdminDashboardPage() {
           {adminCopy.dashboard.note}
         </p>
       </div>
-
-      {/* Development-only Kit Demo Link */}
-      {process.env.NODE_ENV !== "production" && (
-        <div className="pt-2">
-          <Link
-            href="/admin/kit"
-            className="text-sm text-muted-foreground hover:text-primary transition-colors underline underline-offset-4"
-          >
-            {adminCopy.dashboard.kitLink}
-          </Link>
-        </div>
-      )}
     </div>
   );
 }

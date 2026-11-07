@@ -11,10 +11,15 @@ import type { AccountSummary } from "@/lib/auth/account";
 
 export interface AdminShellProps {
   account: AccountSummary;
+  pendingRegistrationsCount?: number;
   children: React.ReactNode;
 }
 
-export function AdminShell({ account, children }: AdminShellProps) {
+export function AdminShell({
+  account,
+  pendingRegistrationsCount,
+  children,
+}: AdminShellProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [commandOpen, setCommandOpen] = React.useState(false);
 
@@ -32,7 +37,7 @@ export function AdminShell({ account, children }: AdminShellProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background lg:grid lg:grid-cols-[250px_minmax(0,1fr)]">
+    <div className="min-h-screen bg-background lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
       {/* Accessible skip to main content link */}
       <a
         href="#admin-main"
@@ -45,6 +50,8 @@ export function AdminShell({ account, children }: AdminShellProps) {
       <div className="hidden lg:block">
         <AdminSidebar
           account={account}
+          pendingRegistrationsCount={pendingRegistrationsCount}
+          onOpenCommand={() => setCommandOpen(true)}
           className="sticky top-0 h-screen"
         />
       </div>
@@ -58,7 +65,12 @@ export function AdminShell({ account, children }: AdminShellProps) {
           <SheetTitle className="sr-only">Admin Navigation</SheetTitle>
           <AdminSidebar
             account={account}
+            pendingRegistrationsCount={pendingRegistrationsCount}
             onNavigate={() => setMobileMenuOpen(false)}
+            onOpenCommand={() => {
+              setMobileMenuOpen(false);
+              setCommandOpen(true);
+            }}
             className="w-full border-r-0"
           />
         </SheetContent>

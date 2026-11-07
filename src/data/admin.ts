@@ -17,6 +17,7 @@ export interface AdminNavItem {
   icon: LucideIcon;
   roles: AppRole[];
   ready: boolean;
+  section?: "Overview" | "Management" | "Content";
 }
 
 export const adminNav: AdminNavItem[] = [
@@ -27,38 +28,7 @@ export const adminNav: AdminNavItem[] = [
     icon: LayoutDashboard,
     roles: ["admin", "core"],
     ready: true,
-  },
-  {
-    key: "members",
-    label: "Members",
-    href: "/admin/members",
-    icon: Users,
-    roles: ["admin"],
-    ready: true,
-  },
-  {
-    key: "events",
-    label: "Events",
-    href: "/admin/events",
-    icon: CalendarDays,
-    roles: ["admin", "core"],
-    ready: true,
-  },
-  {
-    key: "blogs",
-    label: "Blogs",
-    href: "/admin/blogs",
-    icon: FileText,
-    roles: ["admin", "core"],
-    ready: true,
-  },
-  {
-    key: "projects",
-    label: "Projects",
-    href: "/admin/projects",
-    icon: FolderGit2,
-    roles: ["admin", "core"],
-    ready: true,
+    section: "Overview",
   },
   {
     key: "registrations",
@@ -67,6 +37,43 @@ export const adminNav: AdminNavItem[] = [
     icon: ClipboardList,
     roles: ["admin"],
     ready: true,
+    section: "Management",
+  },
+  {
+    key: "members",
+    label: "Members",
+    href: "/admin/members",
+    icon: Users,
+    roles: ["admin"],
+    ready: true,
+    section: "Management",
+  },
+  {
+    key: "events",
+    label: "Events",
+    href: "/admin/events",
+    icon: CalendarDays,
+    roles: ["admin", "core"],
+    ready: true,
+    section: "Content",
+  },
+  {
+    key: "blogs",
+    label: "Blogs",
+    href: "/admin/blogs",
+    icon: FileText,
+    roles: ["admin", "core"],
+    ready: true,
+    section: "Content",
+  },
+  {
+    key: "projects",
+    label: "Projects",
+    href: "/admin/projects",
+    icon: FolderGit2,
+    roles: ["admin", "core"],
+    ready: true,
+    section: "Content",
   },
   {
     key: "announcements",
@@ -75,6 +82,7 @@ export const adminNav: AdminNavItem[] = [
     icon: Megaphone,
     roles: ["admin", "core"],
     ready: true,
+    section: "Content",
   },
 ];
 
@@ -118,7 +126,6 @@ export const adminCopy = {
       total: "All registrations",
     },
     countsUnavailable: "Counts are unavailable right now.",
-    kitLink: "Open the admin kit demo",
   },
   kit: {
     export: "Export",
