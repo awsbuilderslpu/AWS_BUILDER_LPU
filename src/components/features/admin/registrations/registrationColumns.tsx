@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Check, X, Eye, Archive, RotateCcw, Undo2, type LucideIcon } from "lucide-react";
+import { Check, X, Eye, Archive, RotateCcw, Undo2, Pencil, type LucideIcon } from "lucide-react";
 import type { DataColumn } from "@/components/features/admin/kit/DataTable";
 import { UserCell } from "@/components/features/admin/kit/UserCell";
 import { RoleBadge } from "@/components/features/admin/kit/RoleBadge";
@@ -27,6 +27,7 @@ export interface RegistrationColumnsOptions {
   onReject: (row: RegistrationListRow) => void;
   onView: (row: RegistrationListRow) => void;
   onAction: (action: ReviewAction, row: RegistrationListRow) => void;
+  onEditProfile?: (row: RegistrationListRow) => void;
 }
 
 export function getRegistrationColumns({
@@ -34,6 +35,7 @@ export function getRegistrationColumns({
   onReject,
   onView,
   onAction,
+  onEditProfile,
 }: RegistrationColumnsOptions): DataColumn<RegistrationListRow>[] {
   const copy = adminCopy.registrations;
 
@@ -118,6 +120,15 @@ export function getRegistrationColumns({
             icon: Eye,
             onSelect: () => onView(row),
           },
+          ...(onEditProfile
+            ? [
+                {
+                  label: "Edit Profile",
+                  icon: Pencil,
+                  onSelect: () => onEditProfile(row),
+                },
+              ]
+            : []),
           ...actions.map((act) => ({
             label: copy.actions[act],
             icon: actionIcons[act],

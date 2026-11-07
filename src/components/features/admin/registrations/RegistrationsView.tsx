@@ -44,6 +44,7 @@ import {
 import { getRegistrationColumns } from "./registrationColumns";
 import { RegistrationDrawer } from "./RegistrationDrawer";
 import { ReviewDialog } from "./ReviewDialog";
+import { AdminEditProfileDialog } from "@/components/features/admin/profile/AdminEditProfileDialog";
 
 export interface RegistrationsCounts {
   total: number;
@@ -100,6 +101,7 @@ export function RegistrationsView({
 
   // Active dialog state
   const [dialogState, setDialogState] = React.useState<DialogState>(null);
+  const [editProfileUser, setEditProfileUser] = React.useState<RegistrationListRow | null>(null);
 
   // Clear selection on params change
   React.useEffect(() => {
@@ -197,6 +199,7 @@ export function RegistrationsView({
       onReject: (row) =>
         setDialogState({ kind: "review", action: "reject", rows: [row] }),
       onView: (row) => setDialogState({ kind: "drawer", id: row.id }),
+      onEditProfile: (row) => setEditProfileUser(row),
       onAction: (action, row) => {
         if (action === "approve" || action === "reject") {
           setDialogState({ kind: "review", action, rows: [row] });
@@ -626,6 +629,28 @@ export function RegistrationsView({
           }
         }}
         onNoteUpdated={() => router.refresh()}
+      />
+
+      {/* Edit Profile Dialog */}
+      <AdminEditProfileDialog
+        open={Boolean(editProfileUser)}
+        onOpenChange={(open) => {
+          if (!open) setEditProfileUser(null);
+        }}
+        userId={editProfileUser?.userId ?? null}
+        initialData={
+          editProfileUser
+            ? {
+                firstName: editProfileUser.firstName || "",
+                lastName: editProfileUser.lastName || "",
+                registrationNumber: editProfileUser.registrationNumber || "",
+                programme: editProfileUser.programme || "",
+                department: editProfileUser.department || "",
+                studyYear: editProfileUser.studyYear || "",
+              }
+            : null
+        }
+        onSaved={() => router.refresh()}
       />
     </div>
   );

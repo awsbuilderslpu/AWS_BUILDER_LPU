@@ -12,8 +12,10 @@ import {
   ClipboardList,
   LoaderCircle,
   Save,
+  Pencil,
 } from "lucide-react";
 import { FaLinkedin, FaGithub, FaInstagram, FaYoutube } from "react-icons/fa6";
+import { AdminEditProfileDialog } from "@/components/features/admin/profile/AdminEditProfileDialog";
 import { DetailDrawer } from "@/components/features/admin/kit/DetailDrawer";
 import { DrawerSection } from "@/components/features/admin/kit/DrawerSection";
 import { DetailRow } from "@/components/features/admin/kit/DetailRow";
@@ -94,6 +96,7 @@ export function MemberDrawer({
   const [publicTitleInput, setPublicTitleInput] = React.useState("");
   const [savingPublicTitle, setSavingPublicTitle] = React.useState(false);
   const [publicTitleError, setPublicTitleError] = React.useState<string | null>(null);
+  const [editProfileOpen, setEditProfileOpen] = React.useState(false);
 
   const fetchDetails = React.useCallback(async (id: string) => {
     setLoading(true);
@@ -468,6 +471,16 @@ export function MemberDrawer({
                     {details.email}
                   </p>
                 </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditProfileOpen(true)}
+                  className="h-8 px-2.5 text-xs font-medium cursor-pointer border-border hover:bg-card/80 shrink-0 flex items-center gap-1.5"
+                >
+                  <Pencil className="size-3.5" />
+                  <span>Edit Profile</span>
+                </Button>
               </div>
 
               <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -914,6 +927,47 @@ export function MemberDrawer({
         tone="danger"
         onConfirm={handleConfirmRemove}
       />
+
+      {/* Edit Profile Dialog */}
+      {details && (
+        <AdminEditProfileDialog
+          open={editProfileOpen}
+          onOpenChange={setEditProfileOpen}
+          userId={details.userId}
+          initialData={{
+            firstName: details.firstName || "",
+            lastName: details.lastName || "",
+            phoneCountryCode: details.phoneCountryCode || "+91",
+            phoneNumber: details.phoneNumber || "",
+            registrationNumber: details.registrationNumber || "",
+            university: details.university || "",
+            programme: details.programme || "",
+            department: details.department || "",
+            studyYear: details.studyYear || "",
+            semester: details.semester || "",
+            graduationYear: details.graduationYear,
+            headline: details.headline || "",
+            bio: details.bio || "",
+            location: details.location || "",
+            interests: details.interests || [],
+            skills: details.skills || [],
+            linkedinUrl: details.linkedinUrl || "",
+            githubUrl: details.githubUrl || "",
+            websiteUrl: details.websiteUrl || "",
+            instagramUrl: details.instagramUrl || "",
+            youtubeUrl: details.youtubeUrl || "",
+            gender: (details.gender as "Male" | "Female") || null,
+            isPublicProfile: publicTitleInfo?.isPublicProfile,
+            publicTitle: publicTitleInfo?.publicTitle,
+          }}
+          onSaved={async () => {
+            if (userId) {
+              await fetchDetails(userId);
+            }
+            onChanged();
+          }}
+        />
+      )}
     </>
   );
 }

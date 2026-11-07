@@ -50,6 +50,9 @@ export interface ProfileRow {
   youtube_url: string | null;
   avatar_path: string | null;
   cover_path: string | null;
+  gender?: string | null;
+  is_public_profile?: boolean;
+  public_title?: string | null;
   terms_accepted_at: string | null;
   created_at: string;
   updated_at: string;

@@ -6,7 +6,12 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentAccount, getAdminAccount } from "@/lib/auth/server";
-import { profileFormSchema, type ProfileFormValues } from "./validate";
+import {
+  profileFormSchema,
+  adminProfileFormSchema,
+  type ProfileFormValues,
+  type AdminProfileFormValues,
+} from "./validate";
 
 export type ProfileErrorCode =
   | "forbidden"
@@ -305,6 +310,109 @@ export async function setOwnPublicProfileAction(input: {
 
     revalidatePath("/profile");
     revalidatePath("/members");
+
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: mapErrorCode(err) };
+  }
+}
+
+export async function getAdminUserProfile(
+  userId: string
+): Promise<Record<string, unknown> | null> {
+  const admin = await getAdminAccount();
+  if (!admin) {
+    return null;
+  }
+
+  const parsed = z.string().uuid().safeParse(userId);
+  if (!parsed.success) {
+    return null;
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", parsed.data)
+      .maybeSingle();
+
+    if (error || !data) {
+      return null;
+    }
+
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+export async function adminUpdateUserProfileAction(
+  form: unknown
+): Promise<ProfileActionResult> {
+  const admin = await getAdminAccount();
+  if (!admin) {
+    return { ok: false, error: "forbidden" };
+  }
+
+  const parseResult = adminProfileFormSchema.safeParse(form);
+  if (!parseResult.success) {
+    return { ok: false, error: "invalid_input" };
+  }
+
+  try {
+    const supabase = await createClient();
+    const values: AdminProfileFormValues = parseResult.data;
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({
+        first_name: values.firstName,
+        last_name: values.lastName,
+        phone_country_code: values.phoneCountryCode || null,
+        phone_number: values.phoneNumber || null,
+        registration_number: values.registrationNumber || null,
+        date_of_birth: values.dateOfBirth || null,
+        gender: values.gender || null,
+        university: values.university || null,
+        programme: values.programme || null,
+        department: values.department || null,
+        study_year: values.studyYear || null,
+        semester: values.semester || null,
+        graduation_year: values.graduationYear || null,
+        headline: values.headline || null,
+        bio: values.bio || null,
+        location: values.location || null,
+        interests: values.interests || [],
+        skills: values.skills || [],
+        linkedin_url: values.linkedinUrl || null,
+        github_url: values.githubUrl || null,
+        website_url: values.websiteUrl || null,
+        instagram_url: values.instagramUrl || null,
+        youtube_url: values.youtubeUrl || null,
+        ...(values.isPublicProfile !== undefined
+          ? { is_public_profile: values.isPublicProfile }
+          : {}),
+        ...(values.publicTitle !== undefined
+          ? { public_title: values.publicTitle }
+          : {}),
+      })
+      .eq("id", values.userId)
+      .select("id");
+
+    if (error) {
+      return { ok: false, error: mapErrorCode(error) };
+    }
+
+    if (!data || data.length === 0) {
+      return { ok: false, error: "failed" };
+    }
+
+    revalidatePath("/admin/registrations");
+    revalidatePath("/admin/members");
+    revalidatePath("/members");
+    revalidatePath("/profile");
 
     return { ok: true };
   } catch (err) {

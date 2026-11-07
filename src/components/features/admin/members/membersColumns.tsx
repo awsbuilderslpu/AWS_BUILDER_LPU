@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Eye, UserCog, UserCheck, UserX, UserMinus } from "lucide-react";
+import { Eye, UserCog, UserCheck, UserX, UserMinus, Pencil } from "lucide-react";
 import type { DataColumn } from "@/components/features/admin/kit/DataTable";
 import { UserCell } from "@/components/features/admin/kit/UserCell";
 import { RoleBadge } from "@/components/features/admin/kit/RoleBadge";
@@ -25,6 +25,7 @@ export interface MembersColumnsOptions {
   onChangeRole: (row: MemberListRow) => void;
   onToggleActive: (row: MemberListRow, active: boolean) => void;
   onRemove: (row: MemberListRow) => void;
+  onEditProfile?: (row: MemberListRow) => void;
 }
 
 export function getMembersColumns({
@@ -35,6 +36,7 @@ export function getMembersColumns({
   onChangeRole,
   onToggleActive,
   onRemove,
+  onEditProfile,
 }: MembersColumnsOptions): DataColumn<MemberListRow>[] {
   const copy = adminCopy.members;
 
@@ -142,6 +144,15 @@ export function getMembersColumns({
                 icon: Eye,
                 onSelect: () => onViewDetails(row),
               },
+              ...(onEditProfile
+                ? [
+                    {
+                      label: "Edit Profile",
+                      icon: Pencil,
+                      onSelect: () => onEditProfile(row),
+                    },
+                  ]
+                : []),
             ]
           : [
               {
@@ -149,6 +160,15 @@ export function getMembersColumns({
                 icon: Eye,
                 onSelect: () => onViewDetails(row),
               },
+              ...(onEditProfile
+                ? [
+                    {
+                      label: "Edit Profile",
+                      icon: Pencil,
+                      onSelect: () => onEditProfile(row),
+                    },
+                  ]
+                : []),
               {
                 label: copy.actions.changeRole,
                 icon: UserCog,

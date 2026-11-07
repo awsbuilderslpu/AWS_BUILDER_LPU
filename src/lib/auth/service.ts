@@ -167,15 +167,29 @@ export async function registerAccount(
 
     if (error) {
       if (process.env.NODE_ENV !== "production") {
-        console.warn("[auth] Sign up error:", error.code);
+        console.warn("[auth] Sign up error:", error.code ?? error.message ?? error);
       }
+
+      const msg = (error.message || "").toLowerCase();
 
       if (
         error.code === "over_request_rate_limit" ||
         error.code === "over_email_send_rate_limit" ||
-        error.status === 429
+        error.status === 429 ||
+        msg.includes("rate limit")
       ) {
         return { ok: false, error: authCopy.errors.rateLimited };
+      }
+
+      if (
+        msg.includes("error sending confirmation mail") ||
+        msg.includes("error sending confirmation email")
+      ) {
+        return {
+          ok: false,
+          error:
+            "Your registration was received, but the confirmation email could not be sent. Please check back later or contact an administrator.",
+        };
       }
 
       return { ok: false, error: registrationCopy.errors.registerFailed };

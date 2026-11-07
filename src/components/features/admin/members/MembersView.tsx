@@ -52,6 +52,7 @@ import {
 import { getMembersColumns } from "./membersColumns";
 import { ChangeRoleDialog } from "./ChangeRoleDialog";
 import { MemberDrawer } from "./MemberDrawer";
+import { AdminEditProfileDialog } from "@/components/features/admin/profile/AdminEditProfileDialog";
 
 export interface MemberCounts {
   total: number;
@@ -113,6 +114,7 @@ export function MembersView({
 
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [dialogState, setDialogState] = React.useState<DialogState>(null);
+  const [editProfileUser, setEditProfileUser] = React.useState<MemberListRow | null>(null);
 
   // Clear page selection on any URL / filter change
   const [prevParamsKey, setPrevParamsKey] = React.useState("");
@@ -240,6 +242,7 @@ export function MembersView({
         setDialogState({ kind: "active", rows: [row], active }),
       onRemove: (row) =>
         setDialogState({ kind: "remove", row }),
+      onEditProfile: (row) => setEditProfileUser(row),
     });
   }, [currentUserId, params.page, params.pageSize]);
 
@@ -593,6 +596,28 @@ export function MembersView({
         currentUserId={currentUserId}
         onClose={() => setDialogState(null)}
         onChanged={handleActionSuccess}
+      />
+
+      {/* Edit Profile Dialog */}
+      <AdminEditProfileDialog
+        open={Boolean(editProfileUser)}
+        onOpenChange={(open) => {
+          if (!open) setEditProfileUser(null);
+        }}
+        userId={editProfileUser?.userId ?? null}
+        initialData={
+          editProfileUser
+            ? {
+                firstName: editProfileUser.firstName || "",
+                lastName: editProfileUser.lastName || "",
+                registrationNumber: editProfileUser.registrationNumber || "",
+                programme: editProfileUser.programme || "",
+                department: editProfileUser.department || "",
+                studyYear: editProfileUser.studyYear || "",
+              }
+            : null
+        }
+        onSaved={handleActionSuccess}
       />
     </div>
   );

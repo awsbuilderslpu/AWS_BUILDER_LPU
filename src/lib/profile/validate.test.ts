@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { profileFormSchema } from "./validate";
+import { profileFormSchema, adminProfileFormSchema } from "./validate";
 
 describe("profile validate", () => {
   const currentYear = new Date().getFullYear();
@@ -91,6 +91,84 @@ describe("profile validate", () => {
     const okBio = { ...validForm, bio: "b".repeat(1000) };
     const parsed = profileFormSchema.parse(okBio);
     assert.equal(parsed.bio, "b".repeat(1000));
+  });
+
+  describe("adminProfileFormSchema", () => {
+    const validAdminPayload = {
+      userId: "12345678-1234-4234-8234-123456789abc",
+      firstName: "Paramjit",
+      lastName: "Singh",
+      phoneCountryCode: "+91",
+      phoneNumber: "9501085313",
+      registrationNumber: "12001234",
+      dateOfBirth: "2003-04-12",
+      gender: "Male" as const,
+      university: "lpu",
+      programme: "B.Tech",
+      department: "cse",
+      studyYear: "3rd Year",
+      semester: "5th Semester",
+      graduationYear: "2026",
+      headline: "Cloud & DevOps Enthusiast",
+      bio: "Learning AWS and Next.js",
+      location: "Punjab, India",
+      skills: ["AWS", "Docker", "Next.js"],
+      interests: ["Web Development", "Cloud Computing"],
+      linkedinUrl: "https://linkedin.com/in/paramjit",
+      githubUrl: "https://github.com/paramjit",
+      isPublicProfile: true,
+      publicTitle: "Student Ambassador",
+    };
+
+    it("valid admin payload parses successfully", () => {
+      const parsed = adminProfileFormSchema.parse(validAdminPayload);
+      assert.equal(parsed.userId, "12345678-1234-4234-8234-123456789abc");
+      assert.equal(parsed.firstName, "Paramjit");
+      assert.equal(parsed.lastName, "Singh");
+      assert.equal(parsed.gender, "Male");
+      assert.equal(parsed.graduationYear, 2026);
+      assert.equal(parsed.publicTitle, "Student Ambassador");
+    });
+
+    it("requires a valid userId uuid", () => {
+      const invalid = { ...validAdminPayload, userId: "not-a-uuid" };
+      assert.throws(() => adminProfileFormSchema.parse(invalid));
+    });
+
+    it("requires non-empty firstName and lastName", () => {
+      const invalidFirst = { ...validAdminPayload, firstName: "   " };
+      assert.throws(() => adminProfileFormSchema.parse(invalidFirst));
+
+      const invalidLast = { ...validAdminPayload, lastName: "" };
+      assert.throws(() => adminProfileFormSchema.parse(invalidLast));
+    });
+
+    it("handles optional fields when null or empty", () => {
+      const minimalPayload = {
+        userId: "12345678-1234-4234-8234-123456789abc",
+        firstName: "Paramjit",
+        lastName: "Singh",
+        phoneNumber: "",
+        dateOfBirth: "",
+        gender: "",
+        graduationYear: "",
+        registrationNumber: null,
+      };
+      const parsed = adminProfileFormSchema.parse(minimalPayload);
+      assert.equal(parsed.phoneNumber, null);
+      assert.equal(parsed.dateOfBirth, null);
+      assert.equal(parsed.gender, null);
+      assert.equal(parsed.graduationYear, null);
+    });
+
+    it("validates phoneNumber only if provided", () => {
+      const badPhone = {
+        ...validAdminPayload,
+        phoneCountryCode: "+91",
+        phoneNumber: "123", // too short for Indian phone
+      };
+      assert.throws(() => adminProfileFormSchema.parse(badPhone));
+    });
   });
 });
 

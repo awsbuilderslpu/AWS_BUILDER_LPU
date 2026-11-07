@@ -229,3 +229,105 @@ export const profileFormSchema = z
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
 export type ProfileFormInput = z.input<typeof profileFormSchema>;
 
+export const adminProfileFormSchema = z
+  .object({
+    userId: z.string().uuid(),
+    firstName: firstNameField,
+    lastName: lastNameField,
+    phoneCountryCode: countryCodeField.optional().nullable(),
+    phoneNumber: z
+      .string()
+      .trim()
+      .transform((v) => {
+        const cleaned = v.replace(/[\s-]/g, "");
+        return cleaned.length > 0 ? cleaned : null;
+      })
+      .optional()
+      .nullable(),
+    registrationNumber: nullableString(200, "Registration number is too long").optional(),
+    dateOfBirth: z
+      .string()
+      .trim()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (YYYY-MM-DD)")
+      .optional()
+      .nullable()
+      .or(z.literal(""))
+      .transform((v) => (v && v.trim() !== "" ? v.trim() : null)),
+    gender: z
+      .enum(["Male", "Female"])
+      .optional()
+      .nullable()
+      .or(z.literal(""))
+      .transform((v) => (v === "Male" || v === "Female" ? v : null)),
+    university: z
+      .string()
+      .trim()
+      .optional()
+      .nullable()
+      .or(z.literal(""))
+      .transform((v) => (v && v.trim() !== "" ? v.trim() : null)),
+    programme: z
+      .string()
+      .trim()
+      .optional()
+      .nullable()
+      .or(z.literal(""))
+      .transform((v) => (v && v.trim() !== "" ? v.trim() : null)),
+    department: z
+      .string()
+      .trim()
+      .optional()
+      .nullable()
+      .or(z.literal(""))
+      .transform((v) => (v && v.trim() !== "" ? v.trim() : null)),
+    studyYear: z
+      .string()
+      .trim()
+      .optional()
+      .nullable()
+      .or(z.literal(""))
+      .transform((v) => (v && v.trim() !== "" ? v.trim() : null)),
+    semester: z
+      .string()
+      .trim()
+      .optional()
+      .nullable()
+      .or(z.literal(""))
+      .transform((v) => (v && v.trim() !== "" ? v.trim() : null)),
+    graduationYear: z
+      .union([z.number(), z.string()])
+      .optional()
+      .nullable()
+      .transform((val) => {
+        if (val === null || val === undefined || val === "") return null;
+        const num = Number(val);
+        return isNaN(num) ? null : num;
+      }),
+    headline: nullableString(120, profileCopy.errors.headline).optional(),
+    bio: nullableString(1000, profileCopy.errors.bio).optional(),
+    location: nullableString(120, profileCopy.errors.location).optional(),
+    linkedinUrl: linkField.optional(),
+    githubUrl: linkField.optional(),
+    websiteUrl: linkField.optional(),
+    instagramUrl: linkField.optional(),
+    youtubeUrl: linkField.optional(),
+    skills: skillsField.optional().default([]),
+    interests: z.array(z.string()).optional().default([]),
+    isPublicProfile: z.boolean().optional(),
+    publicTitle: nullableString(80, "Public title must be at most 80 characters").optional(),
+  })
+  .refine(
+    (data) => {
+      if (!data.phoneNumber) return true;
+      return isValidPhoneNumber(data.phoneCountryCode || "+91", data.phoneNumber);
+    },
+    {
+      message: profileCopy.errors.phone,
+      path: ["phoneNumber"],
+    }
+  );
+
+export type AdminProfileFormValues = z.infer<typeof adminProfileFormSchema>;
+export type AdminProfileFormInput = z.input<typeof adminProfileFormSchema>;
+
+

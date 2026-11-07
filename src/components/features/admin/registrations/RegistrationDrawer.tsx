@@ -10,7 +10,9 @@ import {
   ShieldCheck,
   LoaderCircle,
   Save,
+  Pencil,
 } from "lucide-react";
+import { AdminEditProfileDialog } from "@/components/features/admin/profile/AdminEditProfileDialog";
 import { DetailDrawer } from "@/components/features/admin/kit/DetailDrawer";
 import { DrawerSection } from "@/components/features/admin/kit/DrawerSection";
 import { DetailRow } from "@/components/features/admin/kit/DetailRow";
@@ -58,6 +60,7 @@ export function RegistrationDrawer({
   const [loading, setLoading] = React.useState(false);
   const [note, setNote] = React.useState("");
   const [savingNote, setSavingNote] = React.useState(false);
+  const [editProfileOpen, setEditProfileOpen] = React.useState(false);
 
   // Fetch details on open
   React.useEffect(() => {
@@ -138,7 +141,8 @@ export function RegistrationDrawer({
   const actions = details ? allowedActions(details.status) : [];
 
   return (
-    <DetailDrawer
+    <>
+      <DetailDrawer
       open={open}
       onOpenChange={onOpenChange}
       title={copy.drawer.title}
@@ -230,6 +234,16 @@ export function RegistrationDrawer({
                   {details.email}
                 </p>
               </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setEditProfileOpen(true)}
+                className="h-8 px-2.5 text-xs font-medium cursor-pointer border-border hover:bg-card/80 shrink-0 flex items-center gap-1.5"
+              >
+                <Pencil className="size-3.5" />
+                <span>Edit Profile</span>
+              </Button>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -378,6 +392,38 @@ export function RegistrationDrawer({
         </div>
       )}
     </DetailDrawer>
+
+    {details && (
+      <AdminEditProfileDialog
+        open={editProfileOpen}
+        onOpenChange={setEditProfileOpen}
+        userId={details.userId}
+        initialData={{
+          firstName: details.firstName || "",
+          lastName: details.lastName || "",
+          phoneCountryCode: details.phoneCountryCode || "+91",
+          phoneNumber: details.phoneNumber || "",
+          registrationNumber: details.registrationNumber || "",
+          dateOfBirth: details.dateOfBirth || "",
+          gender: (details.gender as "Male" | "Female") || null,
+          university: details.university || "",
+          programme: details.programme || "",
+          department: details.department || "",
+          studyYear: details.studyYear || "",
+          semester: details.semester || "",
+          graduationYear: details.graduationYear,
+          interests: details.interests || [],
+        }}
+        onSaved={async () => {
+          if (id) {
+            const updated = await getRegistrationDetailsAction(id);
+            if (updated) setDetails(updated);
+          }
+          onNoteUpdated?.();
+        }}
+      />
+    )}
+  </>
   );
 }
 
