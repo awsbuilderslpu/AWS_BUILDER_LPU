@@ -69,20 +69,20 @@ export function ImportAwsArticleDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md border-border/80 bg-card/95 backdrop-blur-md">
-        <form onSubmit={handleImport}>
-          <DialogHeader>
-            <div className="flex items-center gap-2 mb-1">
-              <div className="flex size-7 items-center justify-center rounded-md bg-[#FF9900] text-black">
-                <FaAws className="size-4" />
+      <DialogContent className="sm:max-w-xl border-border/80 bg-card/95 backdrop-blur-md p-6 sm:p-7">
+        <form onSubmit={handleImport} className="space-y-4">
+          <DialogHeader className="space-y-2">
+            <div className="flex items-center gap-2.5">
+              <div className="flex size-8 items-center justify-center rounded-md bg-[#FF9900] text-black shadow-sm">
+                <FaAws className="size-5" />
               </div>
-              <DialogTitle className="text-base font-semibold text-white">
+              <DialogTitle className="text-lg font-semibold text-white">
                 Import from AWS Builder
               </DialogTitle>
             </div>
-            <DialogDescription className="text-xs text-muted-foreground">
+            <DialogDescription className="text-sm leading-relaxed text-muted-foreground">
               Paste the public link of your published article on{" "}
-              <code className="text-primary font-mono text-[11px]">
+              <code className="text-primary font-mono text-xs">
                 builder.aws.com
               </code>
               . We will automatically extract the title, summary, tags, publication
@@ -90,7 +90,7 @@ export function ImportAwsArticleDialog({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="py-4 space-y-3">
+          <div className="py-2 space-y-2.5">
             <TextField
               label="AWS Builder Article URL"
               value={url}
@@ -100,39 +100,41 @@ export function ImportAwsArticleDialog({
               placeholder="https://builder.aws.com/content/3Kq.../article-title"
               disabled={isImporting}
               required
+              className="h-11 text-sm placeholder:text-xs"
             />
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Tip: Go to your profile at{" "}
               <span className="text-foreground">builder.aws.com/profile</span>,
               open your article, and copy the browser URL.
             </p>
           </div>
 
-          <DialogFooter className="gap-2 sm:gap-0">
+          <DialogFooter className="gap-2 sm:gap-3 pt-2">
             <Button
               type="button"
               variant="outline"
-              size="sm"
+              size="default"
               onClick={() => onOpenChange(false)}
               disabled={isImporting}
+              className="h-10 px-5 text-sm"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              size="sm"
+              size="default"
               disabled={isImporting || !url.trim()}
-              className="gap-1.5 bg-[#FF9900] text-black hover:bg-[#FF9900]/90 font-medium"
+              className="h-10 px-5 gap-2 bg-[#FF9900] text-black hover:bg-[#FF9900]/90 font-medium text-sm"
             >
               {isImporting ? (
                 <>
-                  <Loader2 className="size-3.5 animate-spin" />
+                  <Loader2 className="size-4 animate-spin" />
                   <span>Syncing...</span>
                 </>
               ) : (
                 <>
                   <span>Import Article</span>
-                  <ArrowRight className="size-3.5" />
+                  <ArrowRight className="size-4" />
                 </>
               )}
             </Button>
