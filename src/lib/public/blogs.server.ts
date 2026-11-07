@@ -16,6 +16,9 @@ export interface PublicBlogListRow {
   status: string;
   publish_at: string | null;
   is_featured: boolean;
+  source_url?: string | null;
+  source_platform?: string | null;
+  external_image_url?: string | null;
 }
 
 export interface PublicBlogDetailRow extends PublicBlogListRow {
@@ -27,10 +30,10 @@ export interface PublicBlogDetailRow extends PublicBlogListRow {
 const SLUG_REGEX = /^[a-z0-9][a-z0-9-]{2,79}$/;
 
 const PUBLIC_BLOG_LIST_COLUMNS =
-  "id, slug, title, excerpt, category, tags, read_minutes, featured_image_path, author_name, status, publish_at, is_featured";
+  "id, slug, title, excerpt, category, tags, read_minutes, featured_image_path, author_name, status, publish_at, is_featured, source_url, source_platform, external_image_url";
 
 const PUBLIC_BLOG_DETAIL_COLUMNS =
-  "id, slug, title, excerpt, category, tags, read_minutes, featured_image_path, author_name, status, publish_at, is_featured, body, meta_title, meta_description";
+  "id, slug, title, excerpt, category, tags, read_minutes, featured_image_path, author_name, status, publish_at, is_featured, body, meta_title, meta_description, source_url, source_platform, external_image_url";
 
 /**
  * Lists published blogs whose publish_at is at or before nowIso,

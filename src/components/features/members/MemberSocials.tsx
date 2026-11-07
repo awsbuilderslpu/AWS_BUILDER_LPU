@@ -1,5 +1,5 @@
 import * as React from "react";
-import { FaLinkedin, FaGithub, FaInstagram, FaYoutube } from "react-icons/fa6";
+import { FaAws, FaLinkedin, FaGithub, FaInstagram, FaYoutube } from "react-icons/fa6";
 import { Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MemberSocials as MemberSocialsType } from "@/data/members";
@@ -12,6 +12,14 @@ export interface MemberSocialsProps {
 
 export function MemberSocials({ name, socials, className }: MemberSocialsProps) {
   const items: { label: string; href: string; icon: React.ReactNode }[] = [];
+
+  if (socials.awsBuilder) {
+    items.push({
+      label: `${name} on AWS Builder Center`,
+      href: socials.awsBuilder,
+      icon: <FaAws className="size-4 shrink-0 text-[#FF9900]" aria-hidden="true" />,
+    });
+  }
 
   if (socials.linkedin) {
     items.push({

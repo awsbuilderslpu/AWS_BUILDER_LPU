@@ -83,6 +83,7 @@ export function AdminEditProfileDialog({
   const [location, setLocation] = React.useState("");
   const [skills, setSkills] = React.useState<string[]>([]);
   const [interests, setInterests] = React.useState<string[]>([]);
+  const [awsBuilderUrl, setAwsBuilderUrl] = React.useState("");
   const [linkedinUrl, setLinkedinUrl] = React.useState("");
   const [githubUrl, setGithubUrl] = React.useState("");
   const [websiteUrl, setWebsiteUrl] = React.useState("");
@@ -119,6 +120,7 @@ export function AdminEditProfileDialog({
       if (typeof initialData.location === "string") setLocation(initialData.location);
       if (Array.isArray(initialData.skills)) setSkills(initialData.skills as string[]);
       if (Array.isArray(initialData.interests)) setInterests(initialData.interests as string[]);
+      if (typeof initialData.awsBuilderUrl === "string") setAwsBuilderUrl(initialData.awsBuilderUrl);
       if (typeof initialData.linkedinUrl === "string") setLinkedinUrl(initialData.linkedinUrl);
       if (typeof initialData.githubUrl === "string") setGithubUrl(initialData.githubUrl);
       if (typeof initialData.websiteUrl === "string") setWebsiteUrl(initialData.websiteUrl);
@@ -153,6 +155,7 @@ export function AdminEditProfileDialog({
         setLocation(String(data.location || ""));
         setSkills(Array.isArray(data.skills) ? (data.skills as string[]) : []);
         setInterests(Array.isArray(data.interests) ? (data.interests as string[]) : []);
+        setAwsBuilderUrl(String(data.aws_builder_url || ""));
         setLinkedinUrl(String(data.linkedin_url || ""));
         setGithubUrl(String(data.github_url || ""));
         setWebsiteUrl(String(data.website_url || ""));
@@ -218,6 +221,7 @@ export function AdminEditProfileDialog({
         location: location.trim() || null,
         skills,
         interests,
+        awsBuilderUrl: awsBuilderUrl.trim() || null,
         linkedinUrl: linkedinUrl.trim() || null,
         githubUrl: githubUrl.trim() || null,
         websiteUrl: websiteUrl.trim() || null,
@@ -559,20 +563,29 @@ export function AdminEditProfileDialog({
                 <span>Social Links & Directory Settings</span>
               </h4>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-4">
                 <TextField
-                  label="LinkedIn URL"
-                  value={linkedinUrl}
-                  onChange={(e) => setLinkedinUrl(e.target.value)}
-                  placeholder="https://linkedin.com/in/username"
+                  label="AWS Builder Profile"
+                  value={awsBuilderUrl}
+                  onChange={(e) => setAwsBuilderUrl(e.target.value)}
+                  placeholder="https://builder.aws.com/community/username"
                 />
 
-                <TextField
-                  label="GitHub URL"
-                  value={githubUrl}
-                  onChange={(e) => setGithubUrl(e.target.value)}
-                  placeholder="https://github.com/username"
-                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <TextField
+                    label="LinkedIn URL"
+                    value={linkedinUrl}
+                    onChange={(e) => setLinkedinUrl(e.target.value)}
+                    placeholder="https://linkedin.com/in/username"
+                  />
+
+                  <TextField
+                    label="GitHub URL"
+                    value={githubUrl}
+                    onChange={(e) => setGithubUrl(e.target.value)}
+                    placeholder="https://github.com/username"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

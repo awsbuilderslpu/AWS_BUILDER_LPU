@@ -23,6 +23,9 @@ export interface BlogCardRowInput {
   publish_at: string | null;
   is_featured?: boolean | null;
   author_image?: string | null;
+  source_url?: string | null;
+  source_platform?: string | null;
+  external_image_url?: string | null;
 }
 
 /**
@@ -108,7 +111,7 @@ export function toBlogPost(
 
   const date = ist.date;
   const topics = topicsFor(row.category, row.tags);
-  const image = imageUrl ? imageUrl : undefined;
+  const image = row.external_image_url || (imageUrl ? imageUrl : undefined);
   const featured = Boolean(row.is_featured);
   const href = `/blogs/${row.slug}`;
   const readMinutes =
@@ -129,6 +132,9 @@ export function toBlogPost(
     ...(image ? { image } : {}),
     featured,
     href,
+    sourceUrl: row.source_url ?? null,
+    sourcePlatform: row.source_platform ?? null,
+    externalImageUrl: row.external_image_url ?? null,
   };
 }
 

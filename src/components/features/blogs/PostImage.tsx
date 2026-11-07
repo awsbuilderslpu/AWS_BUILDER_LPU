@@ -17,12 +17,19 @@ export function PostImage({
   ...props
 }: PostImageProps) {
   if (src) {
+    const isExternal = src.startsWith("http://") || src.startsWith("https://");
+    const isSupabase =
+      Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+      src.startsWith(process.env.NEXT_PUBLIC_SUPABASE_URL!);
+    const unoptimized = isExternal && !isSupabase;
+
     return (
       <Image
         src={src}
         alt=""
         fill
         sizes={sizes}
+        unoptimized={unoptimized}
         className={cn("object-cover", className)}
       />
     );

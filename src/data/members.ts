@@ -5,6 +5,7 @@ import type { HeadingLine } from "@/components/ui/PageHeading";
 export type MemberGroup = "core" | "lead" | "mentor" | "community" | "alumni" | "speaker";
 
 export interface MemberSocials {
+  awsBuilder?: string;
   linkedin?: string;
   github?: string;
   website?: string;

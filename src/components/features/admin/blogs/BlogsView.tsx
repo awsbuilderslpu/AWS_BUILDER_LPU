@@ -45,8 +45,10 @@ import {
   type BlogAction,
 } from "@/lib/blogs/view-logic";
 import { labelToTab, tabToLabel } from "@/lib/registrations/view-logic";
+import { FaAws } from "react-icons/fa6";
 import { getBlogColumns } from "./blogColumns";
 import { BlogDrawer } from "./BlogDrawer";
+import { ImportAwsArticleDialog } from "./ImportAwsArticleDialog";
 
 export interface BlogCounts {
   total: number;
@@ -101,6 +103,7 @@ export function BlogsView({
 
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set());
   const [openState, setOpenState] = React.useState<OpenState>(null);
+  const [importAwsOpen, setImportAwsOpen] = React.useState(false);
 
   // Clear page selection on any URL / filter change
   const [prevParamsKey, setPrevParamsKey] = React.useState("");
@@ -282,6 +285,15 @@ export function BlogsView({
                 return res.rows;
               }}
             />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setImportAwsOpen(true)}
+              className="h-10 gap-2 px-3.5 text-[13px] font-medium border-[#FF9900]/40 text-foreground hover:bg-[#FF9900]/10 hover:text-white hover:border-[#FF9900] cursor-pointer"
+            >
+              <FaAws className="size-4 text-[#FF9900]" />
+              <span>Import AWS Article</span>
+            </Button>
             <Button
               type="button"
               onClick={() => setOpenState({ kind: "form", id: null })}
@@ -480,6 +492,13 @@ export function BlogsView({
         confirmLabel={copy.confirm.confirmArchive}
         tone="danger"
         onConfirm={handleConfirmArchive}
+      />
+
+      {/* 10. Import from AWS Builder Dialog */}
+      <ImportAwsArticleDialog
+        open={importAwsOpen}
+        onOpenChange={setImportAwsOpen}
+        onSuccess={handleActionSuccess}
       />
     </div>
   );

@@ -52,6 +52,7 @@ export const profileCopy = {
     bio: "About you",
     location: "Location",
     links: "Links",
+    awsBuilder: "AWS Builder Profile",
     linkedin: "LinkedIn",
     github: "GitHub",
     website: "Website",

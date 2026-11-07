@@ -16,6 +16,9 @@ export interface BlogAdminRow {
   publishAt: string | null;
   isFeatured: boolean;
   updatedAt: string;
+  sourceUrl?: string | null;
+  sourcePlatform?: string | null;
+  externalImageUrl?: string | null;
 }
 
 export interface BlogDetails extends BlogAdminRow {
@@ -53,6 +56,9 @@ export function toBlogAdminRow(raw: unknown): BlogAdminRow {
     publishAt: typeof r.publish_at === "string" ? r.publish_at : null,
     isFeatured: Boolean(r.is_featured),
     updatedAt: typeof r.updated_at === "string" ? r.updated_at : "",
+    sourceUrl: typeof r.source_url === "string" ? r.source_url : null,
+    sourcePlatform: typeof r.source_platform === "string" ? r.source_platform : "internal",
+    externalImageUrl: typeof r.external_image_url === "string" ? r.external_image_url : null,
   };
 }
 

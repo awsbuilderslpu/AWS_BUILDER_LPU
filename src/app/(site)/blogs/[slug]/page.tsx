@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 import { getPublicBlog } from "@/lib/public/blogs.server";
 import { publicObjectUrl } from "@/lib/storage/urls";
@@ -13,6 +14,7 @@ interface BlogPageProps {
 export async function generateMetadata({
   params,
 }: BlogPageProps): Promise<Metadata> {
+  await connection();
   const { slug } = await params;
   const blog = await getPublicBlog(slug);
 
@@ -32,10 +34,12 @@ export async function generateMetadata({
   return {
     title,
     ...(description ? { description } : {}),
+    ...(blog.source_url ? { alternates: { canonical: blog.source_url } } : {}),
   };
 }
 
 export default async function BlogPage({ params }: BlogPageProps) {
+  await connection();
   const { slug } = await params;
   const post = await getPublicBlog(slug);
 

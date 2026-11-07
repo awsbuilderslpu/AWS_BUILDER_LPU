@@ -20,6 +20,7 @@ export interface OwnProfile {
   headline: string | null;
   bio: string | null;
   location: string | null;
+  awsBuilderUrl: string | null;
   linkedinUrl: string | null;
   githubUrl: string | null;
   websiteUrl: string | null;
@@ -51,6 +52,7 @@ export interface DirectoryMember {
   location: string | null;
   skills: string[];
   links: {
+    awsBuilder?: string;
     linkedin?: string;
     github?: string;
     website?: string;
@@ -79,6 +81,7 @@ export function toOwnProfile(raw: Record<string, unknown> | null | undefined): O
     headline: typeof r.headline === "string" ? r.headline : null,
     bio: typeof r.bio === "string" ? r.bio : null,
     location: typeof r.location === "string" ? r.location : null,
+    awsBuilderUrl: typeof r.aws_builder_url === "string" ? r.aws_builder_url : null,
     linkedinUrl: typeof r.linkedin_url === "string" ? r.linkedin_url : null,
     githubUrl: typeof r.github_url === "string" ? r.github_url : null,
     websiteUrl: typeof r.website_url === "string" ? r.website_url : null,
@@ -105,6 +108,9 @@ export function toDirectoryMember(raw: Record<string, unknown> | null | undefine
     roleText && FIVE_ROLES.has(roleText) ? (roleText as AppRole) : null;
 
   const links: DirectoryMember["links"] = {};
+  if (typeof r.aws_builder_url === "string" && r.aws_builder_url) {
+    links.awsBuilder = r.aws_builder_url;
+  }
   if (typeof r.linkedin_url === "string" && r.linkedin_url) {
     links.linkedin = r.linkedin_url;
   }

@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { BlogsSection } from "@/components/features/blogs/BlogsSection";
 import { listPublicBlogs } from "@/lib/public/blogs.server";
 import { toBlogPost, popularTopicCounts } from "@/lib/public/blog-cards";
@@ -11,6 +12,7 @@ interface BlogsPageProps {
 }
 
 async function BlogsContent({ searchParams }: BlogsPageProps) {
+  await connection();
   const resolvedParams = await searchParams;
   const rawTopic =
     typeof resolvedParams.topic === "string" ? resolvedParams.topic : undefined;

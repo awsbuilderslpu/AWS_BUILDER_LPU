@@ -1,5 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
+import { FaAws } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
 import { CategoryBadge } from "@/components/features/blogs/CategoryBadge";
 import { PostImage } from "@/components/features/blogs/PostImage";
@@ -32,8 +33,14 @@ export function RecentArticleCard({
           label="Post image"
           sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
         />
-        <div className="absolute bottom-2 left-3.5 z-10">
+        <div className="absolute bottom-2 left-3.5 z-10 flex items-center gap-1.5">
           <CategoryBadge tone="blue">{post.category}</CategoryBadge>
+          {post.sourcePlatform === "aws_builder" && (
+            <span className="inline-flex items-center gap-1 rounded bg-[#FF9900] px-1.5 py-0.5 text-[10px] font-bold text-black uppercase tracking-wider shadow">
+              <FaAws className="size-3" />
+              AWS Builder
+            </span>
+          )}
         </div>
       </div>
 

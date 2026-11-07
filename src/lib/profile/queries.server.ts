@@ -28,6 +28,7 @@ const OWN_PROFILE_COLUMNS = [
   "headline",
   "bio",
   "location",
+  "aws_builder_url",
   "linkedin_url",
   "github_url",
   "website_url",

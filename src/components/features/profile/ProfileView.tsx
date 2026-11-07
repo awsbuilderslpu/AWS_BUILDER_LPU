@@ -45,6 +45,7 @@ import {
   Copy,
 } from "lucide-react";
 import {
+  FaAws,
   FaGithub,
   FaLinkedin,
   FaInstagram,
@@ -186,7 +187,7 @@ export function ProfileView({
       { id: "skills", label: "Skills (at least 1)", done: Boolean(profile.skills && profile.skills.length > 0), weight: 20 },
       { id: "academics", label: "Academic Info", done: Boolean(profile.university && profile.programme && profile.department), weight: 15 },
       { id: "location", label: "Location", done: Boolean(profile.location && profile.location.trim().length > 0), weight: 5 },
-      { id: "social", label: "Social profile link", done: Boolean(profile.githubUrl || profile.linkedinUrl || profile.websiteUrl), weight: 10 },
+      { id: "social", label: "Social profile link", done: Boolean(profile.awsBuilderUrl || profile.githubUrl || profile.linkedinUrl || profile.websiteUrl), weight: 10 },
     ];
     const score = checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0);
     const nextItem = checks.find((item) => !item.done);
@@ -912,6 +913,14 @@ export function ProfileView({
       {isEditing ? (
         <div className="space-y-3">
           <TextField
+            id="profile-aws-builder"
+            label={profileCopy.labels.awsBuilder}
+            inputMode="url"
+            placeholder="https://builder.aws.com/community/..."
+            error={errors.awsBuilderUrl?.message}
+            {...register("awsBuilderUrl")}
+          />
+          <TextField
             id="profile-github"
             label={profileCopy.labels.github}
             inputMode="url"
@@ -954,8 +963,22 @@ export function ProfileView({
         </div>
       ) : (
         <div className="space-y-2 text-xs sm:text-sm">
-          {profile.githubUrl || profile.linkedinUrl || profile.websiteUrl || profile.instagramUrl || profile.youtubeUrl ? (
+          {profile.awsBuilderUrl || profile.githubUrl || profile.linkedinUrl || profile.websiteUrl || profile.instagramUrl || profile.youtubeUrl ? (
             <div className="grid grid-cols-1 gap-2">
+              {profile.awsBuilderUrl && (
+                <a
+                  href={profile.awsBuilderUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-white hover:border-[#FF9900]/50 transition-all group"
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <FaAws className="size-4 shrink-0 text-[#FF9900]" />
+                    <span className="truncate text-xs font-semibold">{profile.awsBuilderUrl}</span>
+                  </div>
+                  <ExternalLink className="size-3 text-muted-foreground group-hover:text-[#FF9900] shrink-0" />
+                </a>
+              )}
               {profile.githubUrl && (
                 <a
                   href={profile.githubUrl}

@@ -22,6 +22,7 @@ describe("profile view-logic", () => {
       headline: "Cloud & DevOps enthusiast",
       bio: "Passionate about distributed systems and cloud architecture.",
       location: "Punjab, India",
+      awsBuilderUrl: "https://builder.aws.com/community/janedoe",
       linkedinUrl: "https://linkedin.com/in/janedoe",
       githubUrl: "https://github.com/janedoe",
       websiteUrl: "https://janedoe.dev",
@@ -51,6 +52,7 @@ describe("profile view-logic", () => {
     assert.equal(values.headline, "Cloud & DevOps enthusiast");
     assert.equal(values.bio, "Passionate about distributed systems and cloud architecture.");
     assert.equal(values.location, "Punjab, India");
+    assert.equal(values.awsBuilderUrl, "https://builder.aws.com/community/janedoe");
     assert.equal(values.linkedinUrl, "https://linkedin.com/in/janedoe");
     assert.equal(values.githubUrl, "https://github.com/janedoe");
     assert.equal(values.websiteUrl, "https://janedoe.dev");
@@ -79,6 +81,7 @@ describe("profile view-logic", () => {
       headline: null,
       bio: null,
       location: null,
+      awsBuilderUrl: null,
       linkedinUrl: null,
       githubUrl: null,
       websiteUrl: null,
@@ -102,6 +105,7 @@ describe("profile view-logic", () => {
     assert.equal(values.headline, null);
     assert.equal(values.bio, null);
     assert.equal(values.location, null);
+    assert.equal(values.awsBuilderUrl, null);
     assert.equal(values.linkedinUrl, null);
     assert.equal(values.githubUrl, null);
     assert.equal(values.websiteUrl, null);

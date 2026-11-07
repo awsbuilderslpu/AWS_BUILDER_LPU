@@ -18,6 +18,9 @@ describe("blog types", () => {
       publish_at: "2026-10-01T10:00:00Z",
       is_featured: true,
       updated_at: "2026-10-15T12:00:00Z",
+      source_url: "https://builder.aws.com/content/123",
+      source_platform: "aws_builder",
+      external_image_url: "https://example.com/banner.png",
     };
     const row = toBlogAdminRow(raw);
     assert.equal(row.id, "abc-123");
@@ -33,6 +36,9 @@ describe("blog types", () => {
     assert.equal(row.publishAt, "2026-10-01T10:00:00Z");
     assert.equal(row.isFeatured, true);
     assert.equal(row.updatedAt, "2026-10-15T12:00:00Z");
+    assert.equal(row.sourceUrl, "https://builder.aws.com/content/123");
+    assert.equal(row.sourcePlatform, "aws_builder");
+    assert.equal(row.externalImageUrl, "https://example.com/banner.png");
   });
 
   it("returns safe defaults for a fully null row", () => {
@@ -64,6 +70,9 @@ describe("blog types", () => {
     assert.equal(row.publishAt, null);
     assert.equal(row.isFeatured, false);
     assert.equal(row.updatedAt, "");
+    assert.equal(row.sourceUrl, null);
+    assert.equal(row.sourcePlatform, "internal");
+    assert.equal(row.externalImageUrl, null);
   });
 
   it("converts null tags to []", () => {

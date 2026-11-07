@@ -20,6 +20,40 @@ if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
   }
 }
 
+// AWS Builder and associated asset hosts
+remotePatterns.push(
+  {
+    protocol: "https",
+    hostname: "prod-assets.cosmic.aws.dev",
+    pathname: "/**",
+  },
+  {
+    protocol: "https",
+    hostname: "**.cosmic.aws.dev",
+    pathname: "/**",
+  },
+  {
+    protocol: "https",
+    hostname: "builder.aws.com",
+    pathname: "/**",
+  },
+  {
+    protocol: "https",
+    hostname: "**.builder.aws.com",
+    pathname: "/**",
+  },
+  {
+    protocol: "https",
+    hostname: "**.amazonaws.com",
+    pathname: "/**",
+  },
+  {
+    protocol: "https",
+    hostname: "**.cloudfront.net",
+    pathname: "/**",
+  }
+);
+
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,

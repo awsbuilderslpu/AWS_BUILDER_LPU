@@ -1,7 +1,8 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ExternalLink } from "lucide-react";
+import { FaAws } from "react-icons/fa6";
 
 import { cn } from "@/lib/utils";
 import { publicCopy } from "@/data/public";
@@ -26,6 +27,7 @@ export function BlogDetail({
   const dateFormatted = post.publish_at
     ? formatIst(post.publish_at, { withTime: false })
     : "";
+  const effectiveImage = imageUrl || post.external_image_url || null;
 
   return (
     <article
@@ -78,18 +80,47 @@ export function BlogDetail({
           </span>
           <span>{publicCopy.blogs.readTime(post.read_minutes)}</span>
         </div>
+
+        {post.source_url && (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 rounded-xl border border-[#FF9900]/40 bg-[#FF9900]/10 p-4 mt-6">
+            <div className="flex items-center gap-3">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#FF9900] text-black">
+                <FaAws className="size-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Published on AWS Builder Center</p>
+                <p className="text-xs text-muted-foreground">Original article by {post.author_name}</p>
+              </div>
+            </div>
+            <a
+              href={post.source_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#FF9900] px-3.5 py-1.5 text-xs font-semibold text-black transition-opacity hover:opacity-90 shrink-0"
+            >
+              <span>Read on AWS Builder</span>
+              <ExternalLink className="size-3.5" />
+            </a>
+          </div>
+        )}
       </header>
 
       {/* Featured image */}
-      {imageUrl && (
+      {effectiveImage && (
         <div className="relative mt-8 aspect-[1200/630] w-full overflow-hidden rounded-lg border border-border">
           <Image
-            src={imageUrl}
+            src={effectiveImage}
             alt=""
             fill
             priority
             sizes="(min-width: 1024px) 896px, 100vw"
             className="object-cover"
+            unoptimized={
+              (effectiveImage.startsWith("http://") ||
+                effectiveImage.startsWith("https://")) &&
+              (!process.env.NEXT_PUBLIC_SUPABASE_URL ||
+                !effectiveImage.startsWith(process.env.NEXT_PUBLIC_SUPABASE_URL))
+            }
           />
         </div>
       )}

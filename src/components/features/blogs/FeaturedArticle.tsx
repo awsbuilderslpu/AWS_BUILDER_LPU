@@ -1,6 +1,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { FaAws } from "react-icons/fa6";
 
 import { cn } from "@/lib/utils";
 import { CategoryBadge } from "@/components/features/blogs/CategoryBadge";
@@ -42,9 +43,17 @@ export function FeaturedArticle({
 
       {/* Text column: relative z-10, flex flex-col, px-6 pb-5 pt-[18px], sm:w-[50%] */}
       <div className="relative z-10 flex flex-col px-6 pb-5 pt-[18px] sm:w-[50%]">
-        <CategoryBadge tone="solid" className="self-start">
-          {post.category}
-        </CategoryBadge>
+        <div className="flex items-center gap-2">
+          <CategoryBadge tone="solid" className="self-start">
+            {post.category}
+          </CategoryBadge>
+          {post.sourcePlatform === "aws_builder" && (
+            <span className="inline-flex items-center gap-1 rounded bg-[#FF9900] px-2 py-0.5 text-xs font-bold text-black uppercase tracking-wider shadow">
+              <FaAws className="size-3.5" />
+              AWS Builder
+            </span>
+          )}
+        </div>
 
         <h3 className="mt-3 text-2xl font-semibold leading-[1.17] text-foreground">
           <Link

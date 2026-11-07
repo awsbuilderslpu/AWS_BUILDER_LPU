@@ -24,6 +24,9 @@ export interface BlogPost {
   image?: string;
   featured?: boolean;
   href: string;
+  sourceUrl?: string | null;
+  sourcePlatform?: string | null;
+  externalImageUrl?: string | null;
 }
 
 export interface PopularTopic {

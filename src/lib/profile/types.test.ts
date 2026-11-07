@@ -22,6 +22,7 @@ describe("profile types", () => {
       headline: "Full-stack developer",
       bio: "Passionate about open source",
       location: "Punjab, India",
+      aws_builder_url: "https://builder.aws.com/community/johndoe",
       linkedin_url: "https://linkedin.com/in/johndoe",
       github_url: "https://github.com/johndoe",
       website_url: "https://example.com",
@@ -54,6 +55,7 @@ describe("profile types", () => {
     assert.equal(profile.headline, "Full-stack developer");
     assert.equal(profile.bio, "Passionate about open source");
     assert.equal(profile.location, "Punjab, India");
+    assert.equal(profile.awsBuilderUrl, "https://builder.aws.com/community/johndoe");
     assert.equal(profile.linkedinUrl, "https://linkedin.com/in/johndoe");
     assert.equal(profile.githubUrl, "https://github.com/johndoe");
     assert.equal(profile.websiteUrl, "https://example.com");
@@ -121,6 +123,7 @@ describe("profile types", () => {
       headline: "DevOps Engineer",
       location: "Remote",
       skills: ["AWS", "Docker"],
+      aws_builder_url: "https://builder.aws.com/community/janesmith",
       linkedin_url: "https://linkedin.com/in/janesmith",
     });
 
@@ -129,6 +132,7 @@ describe("profile types", () => {
     assert.equal(valid.publicTitle, "Advisor");
     assert.equal(valid.accessRole, "core");
     assert.deepEqual(valid.skills, ["AWS", "Docker"]);
+    assert.equal(valid.links.awsBuilder, "https://builder.aws.com/community/janesmith");
     assert.equal(valid.links.linkedin, "https://linkedin.com/in/janesmith");
     assert.equal(valid.links.github, undefined);
 

@@ -16,6 +16,7 @@ export function formFromOwnProfile(profile: OwnProfile): ProfileFormValues {
     headline: profile.headline ?? null,
     bio: profile.bio ?? null,
     location: profile.location ?? null,
+    awsBuilderUrl: profile.awsBuilderUrl ?? null,
     linkedinUrl: profile.linkedinUrl ?? null,
     githubUrl: profile.githubUrl ?? null,
     websiteUrl: profile.websiteUrl ?? null,

@@ -18,6 +18,7 @@ describe("profile validate", () => {
     headline: "Building cloud applications",
     bio: "Curious student learning cloud computing",
     location: "Jalandhar, Punjab",
+    awsBuilderUrl: "https://builder.aws.com/community/aarav",
     linkedinUrl: "https://linkedin.com/in/aarav",
     githubUrl: "https://github.com/aarav",
     websiteUrl: "https://aarav.dev",
