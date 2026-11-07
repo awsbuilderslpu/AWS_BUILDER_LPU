@@ -880,7 +880,8 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
         onOpenChange={setDeleteConfirmOpen}
         title="Delete Project?"
         description={`Are you sure you want to delete "${projectToDelete?.title}"? This will permanently remove the project from the admin portal and public portfolio.`}
-        confirmText={deleteLoading ? "Deleting..." : "Delete Project"}
+        confirmLabel={deleteLoading ? "Deleting..." : "Delete Project"}
+        pending={deleteLoading}
         onConfirm={handleConfirmDelete}
         tone="danger"
       />
