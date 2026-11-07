@@ -66,8 +66,7 @@ export function AnnouncementDrawer({
     }
   }, [announcement, open]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSaveWithStatus = async (targetPublishState: boolean) => {
     if (!title.trim() || !description.trim()) {
       toast.error("Please fill in both title and message.");
       return;
@@ -77,17 +76,21 @@ export function AnnouncementDrawer({
     try {
       if (isEditing && announcement) {
         const res = await updateAnnouncementAction(announcement.id, {
-          title,
-          description,
+          title: title.trim(),
+          description: description.trim(),
           type,
           priority,
           target_audience: targetAudience,
-          href: href || undefined,
-          is_published: isPublished,
+          href: href.trim() || undefined,
+          is_published: targetPublishState,
         });
 
         if (res.ok) {
-          toast.success("Notification updated successfully!");
+          toast.success(
+            targetPublishState
+              ? "Notification updated & published!"
+              : "Notification updated as draft."
+          );
           onSaved();
           onOpenChange(false);
         } else {
@@ -95,17 +98,21 @@ export function AnnouncementDrawer({
         }
       } else {
         const res = await createAnnouncementAction({
-          title,
-          description,
+          title: title.trim(),
+          description: description.trim(),
           type,
           priority,
           target_audience: targetAudience,
-          href: href || undefined,
-          is_published: isPublished,
+          href: href.trim() || undefined,
+          is_published: targetPublishState,
         });
 
         if (res.ok) {
-          toast.success("Notification broadcast created successfully!");
+          toast.success(
+            targetPublishState
+              ? "Notification broadcast created & published!"
+              : "Notification saved as draft."
+          );
           onSaved();
           onOpenChange(false);
         } else {
@@ -117,6 +124,11 @@ export function AnnouncementDrawer({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSaveWithStatus(isPublished);
   };
 
   return (
@@ -228,26 +240,52 @@ export function AnnouncementDrawer({
               />
             </div>
 
-            <div className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/40 p-3.5">
-              <input
-                type="checkbox"
-                id="is_published"
-                checked={isPublished}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIsPublished(e.target.checked)}
-                className="size-4 rounded border-slate-700 text-[#FF9900] focus:ring-[#FF9900] cursor-pointer"
-              />
-              <div className="flex flex-col">
-                <label htmlFor="is_published" className="text-sm font-medium text-white cursor-pointer">
-                  Publish immediately
-                </label>
-                <span className="text-xs text-slate-400">
-                  Visible to users in notification bells and lists right away.
-                </span>
+            {/* Publication Status Selector */}
+            <div className="flex flex-col gap-2 rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                Publication Status
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsPublished(true)}
+                  className={`flex flex-col items-center justify-center rounded-lg border p-3 text-center transition-all cursor-pointer ${
+                    isPublished
+                      ? "border-emerald-500/60 bg-emerald-500/15 text-white shadow-[0_0_12px_rgba(16,185,129,0.2)]"
+                      : "border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                  }`}
+                >
+                  <span className="text-sm font-semibold flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Published
+                  </span>
+                  <span className="text-[11px] text-slate-400 mt-0.5">
+                    Live in notification bell & feeds
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsPublished(false)}
+                  className={`flex flex-col items-center justify-center rounded-lg border p-3 text-center transition-all cursor-pointer ${
+                    !isPublished
+                      ? "border-amber-500/60 bg-amber-500/15 text-white shadow-[0_0_12px_rgba(245,158,11,0.2)]"
+                      : "border-slate-800 bg-slate-900/60 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                  }`}
+                >
+                  <span className="text-sm font-semibold flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-amber-400" />
+                    Draft
+                  </span>
+                  <span className="text-[11px] text-slate-400 mt-0.5">
+                    Saved in admin only (hidden)
+                  </span>
+                </button>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 p-4 sm:p-5 border-t border-slate-800/80 bg-[#0B101C]/90 shrink-0">
+          <div className="flex items-center justify-between gap-2 p-4 sm:p-5 border-t border-slate-800/80 bg-[#0B101C]/90 shrink-0">
             <Button
               type="button"
               variant="outline"
@@ -257,13 +295,31 @@ export function AnnouncementDrawer({
             >
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="bg-[#FF9900] text-black font-semibold hover:bg-[#FF9900]/90 cursor-pointer text-xs shadow-[0_0_15px_rgba(255,153,0,0.25)]"
-            >
-              {loading ? "Saving..." : isEditing ? "Save Changes" : "Create Notification"}
-            </Button>
+
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                disabled={loading}
+                onClick={() => handleSaveWithStatus(false)}
+                className="border-slate-700 bg-slate-800/80 text-slate-200 hover:bg-slate-700 hover:text-white cursor-pointer text-xs"
+              >
+                {loading ? "Saving..." : "Save as Draft"}
+              </Button>
+
+              <Button
+                type="button"
+                disabled={loading}
+                onClick={() => handleSaveWithStatus(true)}
+                className="bg-emerald-500 hover:bg-emerald-600 text-black font-semibold cursor-pointer text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+              >
+                {loading
+                  ? "Saving..."
+                  : isEditing
+                  ? "Publish & Save"
+                  : "Publish Now"}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>

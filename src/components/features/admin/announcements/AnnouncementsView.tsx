@@ -69,6 +69,7 @@ export function AnnouncementsView({
 
   const handleTogglePublish = async (item: AnnouncementItem) => {
     const nextState = !item.is_published;
+    // Optimistic update
     setItems((prev) =>
       prev.map((i) => (i.id === item.id ? { ...i, is_published: nextState } : i))
     );
@@ -76,25 +77,38 @@ export function AnnouncementsView({
       const res = await togglePublishAnnouncementAction(item.id, nextState);
       if (res.ok) {
         toast.success(nextState ? "Published notification." : "Unpublished notification.");
+        window.dispatchEvent(new CustomEvent("announcements-updated"));
       } else {
-        toast.error("Failed to update status.");
+        // Rollback
+        setItems((prev) =>
+          prev.map((i) => (i.id === item.id ? { ...i, is_published: item.is_published } : i))
+        );
+        toast.error(res.error || "Failed to update status.");
       }
     } catch {
+      // Rollback
+      setItems((prev) =>
+        prev.map((i) => (i.id === item.id ? { ...i, is_published: item.is_published } : i))
+      );
       toast.error("Failed to update status.");
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this notification?")) return;
+    const previous = items;
     setItems((prev) => prev.filter((i) => i.id !== id));
     try {
       const res = await deleteAnnouncementAction(id);
       if (res.ok) {
         toast.success("Notification deleted.");
+        window.dispatchEvent(new CustomEvent("announcements-updated"));
       } else {
-        toast.error("Failed to delete notification.");
+        setItems(previous);
+        toast.error(res.error || "Failed to delete notification.");
       }
     } catch {
+      setItems(previous);
       toast.error("Failed to delete notification.");
     }
   };
@@ -323,13 +337,17 @@ export function AnnouncementsView({
                 </div>
 
                 {/* Right: Status & Actions */}
-                <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
-                  <span
+                <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-center">
+                  {/* Clickable Status Badge */}
+                  <button
+                    type="button"
+                    onClick={() => handleTogglePublish(item)}
+                    title={item.is_published ? "Click to unpublish" : "Click to publish"}
                     className={cn(
-                      "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium",
+                      "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium cursor-pointer transition-all duration-150",
                       item.is_published
-                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                        : "bg-slate-500/10 text-slate-400 border border-slate-500/20"
+                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20"
+                        : "bg-slate-500/10 text-slate-300 border border-slate-500/30 hover:bg-slate-500/20 hover:text-white"
                     )}
                   >
                     <span
@@ -339,7 +357,32 @@ export function AnnouncementsView({
                       )}
                     />
                     {item.is_published ? "Published" : "Draft"}
-                  </span>
+                  </button>
+
+                  {/* Quick Action Toggle Button */}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleTogglePublish(item)}
+                    className={cn(
+                      "h-8 px-2.5 text-xs font-semibold cursor-pointer border hidden sm:inline-flex items-center",
+                      item.is_published
+                        ? "border-slate-700 bg-slate-900/60 text-slate-300 hover:bg-slate-800 hover:text-white"
+                        : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.15)]"
+                    )}
+                  >
+                    {item.is_published ? (
+                      <>
+                        <EyeOff className="size-3.5 mr-1" />
+                        Unpublish
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="size-3.5 mr-1" />
+                        Publish
+                      </>
+                    )}
+                  </Button>
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -403,6 +446,7 @@ export function AnnouncementsView({
           const { fetchAnnouncementsAction } = await import("@/lib/notifications/actions");
           const fresh = await fetchAnnouncementsAction();
           setItems(fresh);
+          window.dispatchEvent(new CustomEvent("announcements-updated"));
         }}
       />
     </div>

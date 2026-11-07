@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { fetchPublicNotificationsAction } from "@/lib/notifications/actions";
+import { createClient } from "@/lib/supabase/client";
 import type { AnnouncementItem, NotificationType } from "@/lib/notifications/types";
 
 export function NotificationsBell() {
@@ -40,16 +41,66 @@ export function NotificationsBell() {
     }
   }, []);
 
-  // Fetch live notifications
+  const refreshNotifications = React.useCallback(async () => {
+    try {
+      const data = await fetchPublicNotificationsAction();
+      if (Array.isArray(data)) {
+        setNotifications(data);
+      }
+    } catch {
+      // ignore fetch error and retain state
+    }
+  }, []);
+
+  // Fetch live notifications on mount and when popover opens
   React.useEffect(() => {
-    fetchPublicNotificationsAction().then((data) => {
-      setNotifications(data);
-    });
-  }, [open]);
+    refreshNotifications();
+  }, [refreshNotifications, open]);
+
+  // Refetch when window regains focus (e.g. switching back from editing)
+  React.useEffect(() => {
+    const handleFocus = () => {
+      refreshNotifications();
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
+  }, [refreshNotifications]);
+
+  // Listen to custom cross-component update event
+  React.useEffect(() => {
+    const handleCustomUpdate = () => {
+      refreshNotifications();
+    };
+    window.addEventListener("announcements-updated", handleCustomUpdate);
+    return () => window.removeEventListener("announcements-updated", handleCustomUpdate);
+  }, [refreshNotifications]);
+
+  // Realtime subscription to public.announcements
+  React.useEffect(() => {
+    try {
+      const supabase = createClient();
+      const channel = supabase
+        .channel("admin-announcements-bell")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "announcements" },
+          () => {
+            refreshNotifications();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } catch {
+      // Realtime fallback to polling/events
+    }
+  }, [refreshNotifications]);
 
   const unreadItems = notifications.filter((n) => !readIds.includes(n.id));
   const unreadCount = unreadItems.length;
-  const displayCount = unreadCount > 9 ? "9+" : unreadCount > 0 ? String(unreadCount) : null;
+  const displayCount = mounted && unreadCount > 9 ? "9+" : mounted && unreadCount > 0 ? String(unreadCount) : null;
 
   const markAllAsRead = () => {
     const allIds = notifications.map((n) => n.id);

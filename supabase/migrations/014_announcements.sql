@@ -60,6 +60,19 @@ create policy announcements_staff_all on public.announcements
 grant select on public.announcements to anon, authenticated;
 grant insert, update, delete on public.announcements to authenticated;
 
+-- Enable Realtime for announcements if publication exists
+do $$
+begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    if not exists (
+      select 1 from pg_publication_tables 
+      where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'announcements'
+    ) then
+      alter publication supabase_realtime add table public.announcements;
+    end if;
+  end if;
+end $$;
+
 -- Seed initial announcements if table is newly created and empty
 insert into public.announcements (title, description, type, href, target_audience, priority, is_published, author_name)
 select

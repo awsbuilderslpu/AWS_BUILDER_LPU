@@ -13,15 +13,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { fetchPublicNotificationsAction } from "@/lib/notifications/actions";
+import { createClient } from "@/lib/supabase/client";
 import type { AnnouncementItem, NotificationType } from "@/lib/notifications/types";
-import { defaultAnnouncements } from "@/lib/notifications/defaults";
 
 export type { AnnouncementItem as NotificationItem };
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = React.useState(false);
-  const [notifications, setNotifications] =
-    React.useState<AnnouncementItem[]>(defaultAnnouncements.filter((a) => a.is_published));
+  const [notifications, setNotifications] = React.useState<AnnouncementItem[]>([]);
   const [readIds, setReadIds] = React.useState<string[]>([]);
   const [mounted, setMounted] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -65,6 +64,38 @@ export function NotificationBell() {
     return () => window.removeEventListener("focus", handleFocus);
   }, [refreshNotifications]);
 
+  // Listen to custom cross-component update event
+  React.useEffect(() => {
+    const handleCustomUpdate = () => {
+      refreshNotifications();
+    };
+    window.addEventListener("announcements-updated", handleCustomUpdate);
+    return () => window.removeEventListener("announcements-updated", handleCustomUpdate);
+  }, [refreshNotifications]);
+
+  // Realtime subscription to public.announcements
+  React.useEffect(() => {
+    try {
+      const supabase = createClient();
+      const channel = supabase
+        .channel("public-announcements-bell")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "announcements" },
+          () => {
+            refreshNotifications();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } catch {
+      // Realtime fallback to polling/events
+    }
+  }, [refreshNotifications]);
+
   // Handle click outside to close dropdown
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -98,7 +129,7 @@ export function NotificationBell() {
 
   const unreadItems = notifications.filter((n) => !readIds.includes(n.id));
   const unreadCount = unreadItems.length;
-  const displayCount = unreadCount > 9 ? "9+" : unreadCount > 0 ? String(unreadCount) : null;
+  const displayCount = mounted && unreadCount > 9 ? "9+" : mounted && unreadCount > 0 ? String(unreadCount) : null;
 
   const markAllAsRead = () => {
     const allIds = notifications.map((n) => n.id);
