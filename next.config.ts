@@ -13,7 +13,7 @@ if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     remotePatterns.push({
       protocol: "https",
       hostname: parsed.hostname,
-      pathname: "/storage/v1/object/public/**",
+      pathname: "/storage/v1/object/**",
     });
   } catch {
     // Falls back to no pattern if URL is invalid
