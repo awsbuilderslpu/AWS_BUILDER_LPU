@@ -26,7 +26,7 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
       {...props}
     >
       {/* Background Video Visual (Desktop xl and up, absolute layer z-0) */}
-      <div className="absolute right-[2%] xl:right-[4%] 2xl:right-[6%] top-[-5%] bottom-[-5%] hidden w-[56%] 2xl:w-[50%] z-0 xl:flex items-center justify-center pointer-events-none select-none">
+      <div className="absolute right-[2%] xl:right-[4%] 2xl:right-[6%] top-0 bottom-[4%] hidden w-[56%] 2xl:w-[50%] z-0 xl:flex items-center justify-center pointer-events-none select-none">
         {/* Ambient atmospheric glow behind the globe */}
         <div
           aria-hidden="true"
@@ -36,9 +36,9 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
           className="relative w-full aspect-video overflow-hidden"
           style={{
             maskImage:
-              "radial-gradient(ellipse closest-side at 50% 50%, black 25%, transparent 80%)",
+              "radial-gradient(ellipse 48% 42% at 50% 50%, black 20%, transparent 72%)",
             WebkitMaskImage:
-              "radial-gradient(ellipse closest-side at 50% 50%, black 25%, transparent 80%)",
+              "radial-gradient(ellipse 48% 42% at 50% 50%, black 20%, transparent 72%)",
           }}
         >
           <video
@@ -60,7 +60,7 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
       <HeroDecor />
 
       {/* Main Content Wrapper (z-10) */}
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-6 pt-10 pb-2 xl:mx-0 xl:max-w-none xl:px-0 xl:pl-[10%] xl:pt-14 xl:pb-2">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center px-6 pt-10 pb-2 xl:mx-0 xl:max-w-none xl:px-0 xl:pl-[13%] 2xl:pl-[15%] xl:pt-14 xl:pb-2">
         <div className="flex w-full max-w-[580px] flex-col items-start origin-left scale-90 translate-y-3">
           {/* Eyebrow */}
           <Reveal delay={0}>
@@ -122,9 +122,9 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
             className="relative w-full aspect-video overflow-hidden"
             style={{
               maskImage:
-                "radial-gradient(ellipse closest-side at 50% 50%, black 25%, transparent 80%)",
+                "radial-gradient(ellipse 48% 42% at 50% 50%, black 20%, transparent 72%)",
               WebkitMaskImage:
-                "radial-gradient(ellipse closest-side at 50% 50%, black 25%, transparent 80%)",
+                "radial-gradient(ellipse 48% 42% at 50% 50%, black 20%, transparent 72%)",
             }}
           >
             <video

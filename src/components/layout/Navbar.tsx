@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogIn, Menu, Search, UserRound } from "lucide-react";
+import { LayoutDashboard, LogIn, Menu, UserRound } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { siteConfig, navLinks } from "@/data/site";
@@ -47,7 +47,6 @@ export function NavbarFallback() {
           ))}
         </nav>
         <div className="hidden items-center gap-3 lg:flex">
-          <div className="size-10 rounded-lg border border-border/80 bg-card/40" />
           <div className="size-10 rounded-lg border border-border/80 bg-card/40" />
           <div className="size-10 rounded-full border border-border/80 bg-card/40" />
         </div>
@@ -131,15 +130,6 @@ function NavbarContent() {
 
         {/* Right: Actions (Desktop) */}
         <div className="hidden items-center gap-3 lg:flex">
-          {/* Search Button */}
-          <button
-            type="button"
-            aria-label="Search"
-            className="flex size-10 items-center justify-center rounded-lg border border-border/80 bg-card/40 text-muted-foreground transition-all duration-200 hover:border-primary/50 hover:bg-card/80 hover:text-white cursor-pointer"
-          >
-            <Search className="size-5" />
-          </button>
-
           <NotificationBell />
 
           {isLoading ? (
