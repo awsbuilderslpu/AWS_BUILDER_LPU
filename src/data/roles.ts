@@ -81,11 +81,9 @@ export const roleMeta: Record<Role, RoleInfo> = {
   },
 };
 
-// Sign-up only REQUESTS a role; removing "admin" here removes it from public sign-up.
+// Sign-up only REQUESTS a role; core team and admin are assigned by existing admins.
 export const signupRoles: Role[] = [
   "student",
   "participant",
   "member",
-  "core",
-  "admin",
 ];

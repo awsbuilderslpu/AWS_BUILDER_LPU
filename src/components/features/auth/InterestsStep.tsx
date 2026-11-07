@@ -115,8 +115,8 @@ export function InterestsStep() {
               </span>
             </legend>
 
-            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-6">
-              {signupRoles.map((roleKey, idx) => {
+            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              {signupRoles.map((roleKey) => {
                 const meta = roleMeta[roleKey];
                 const isSelected = selectedRole === roleKey;
                 const Icon = meta.icon;
@@ -128,12 +128,7 @@ export function InterestsStep() {
                       "relative flex min-h-[92px] cursor-pointer flex-col items-center justify-center rounded-lg border p-4 text-center transition-all select-none",
                       meta.tone.border,
                       meta.tone.bg,
-                      isSelected && cn("ring-2", meta.tone.ring),
-                      idx === 4
-                        ? "col-span-2 sm:col-span-3"
-                        : idx < 3
-                          ? "col-span-1 sm:col-span-2"
-                          : "col-span-1 sm:col-span-3"
+                      isSelected && cn("ring-2", meta.tone.ring)
                     )}
                   >
                     <input
