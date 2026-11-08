@@ -364,6 +364,24 @@ export async function getMemberDetailsAction(
     return null;
   }
 
+  // Ensure gender and dateOfBirth are loaded from profiles if missing from admin_members view
+  if ((data.gender == null || data.date_of_birth == null) && data.user_id) {
+    const { data: userProfile } = await supabase
+      .from("profiles")
+      .select("gender, date_of_birth")
+      .eq("id", data.user_id)
+      .maybeSingle();
+
+    if (userProfile) {
+      if (data.gender == null && userProfile.gender) {
+        data.gender = userProfile.gender;
+      }
+      if (data.date_of_birth == null && userProfile.date_of_birth) {
+        data.date_of_birth = userProfile.date_of_birth;
+      }
+    }
+  }
+
   return toMemberDetails(data);
 }
 

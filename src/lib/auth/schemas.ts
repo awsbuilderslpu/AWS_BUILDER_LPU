@@ -167,7 +167,7 @@ const graduationYearField = z
       return (
         /^\d{4}$/.test(val) &&
         !isNaN(y) &&
-        y >= currentYear &&
+        y >= (registrationConstants.minGraduationYear ?? 2020) &&
         y <= currentYear + registrationConstants.graduationSpan
       );
     },

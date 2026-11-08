@@ -293,10 +293,12 @@ export function ProfileView({
   };
 
   const currentYear = new Date().getFullYear();
+  const minGradYear = registrationConstants.minGraduationYear ?? 2020;
+  const maxGradYear = currentYear + registrationConstants.graduationSpan;
   const graduationYearOptions = Array.from(
-    { length: registrationConstants.graduationSpan + 1 },
+    { length: maxGradYear - minGradYear + 1 },
     (_, i) => {
-      const y = String(currentYear + i);
+      const y = String(minGradYear + i);
       return { value: y, label: y };
     }
   );

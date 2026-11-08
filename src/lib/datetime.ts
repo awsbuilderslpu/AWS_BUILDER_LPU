@@ -17,7 +17,7 @@ const MONTH_NAMES = [
 ] as const;
 
 const ISO_REGEX =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})$/;
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,6})?)?(Z|[+-]\d{2}:\d{2})$/;
 
 /**
  * Validates a YYYY-MM-DD date string without using new Date(string).
@@ -107,7 +107,12 @@ export function formatIst(
   iso: string,
   opts?: { withTime?: boolean }
 ): string {
-  const parts = isoToIst(iso);
+  let parts = isoToIst(iso);
+  if (!parts && typeof iso === "string" && iso.trim()) {
+    let norm = iso.trim().replace(" ", "T");
+    if (/([+-]\d{2})$/.test(norm)) norm = norm + ":00";
+    parts = isoToIst(norm);
+  }
   if (!parts) return "";
 
   const [yStr, mStr, dStr] = parts.date.split("-");

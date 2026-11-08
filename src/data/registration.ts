@@ -131,6 +131,7 @@ export const registrationConstants = {
   minAge: 16,
   // Digits only; TODO: tighten to the university's real format
   registrationNumberLength: { min: 6, max: 12 },
+  minGraduationYear: 2020,
   graduationSpan: 7,
   resendSeconds: 60,
 };

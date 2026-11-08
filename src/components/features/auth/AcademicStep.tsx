@@ -24,10 +24,12 @@ export function AcademicStep() {
 
   const graduationYears = React.useMemo(() => {
     const currentYear = new Date().getFullYear();
+    const minYear = registrationConstants.minGraduationYear ?? 2020;
+    const maxYear = currentYear + registrationConstants.graduationSpan;
     const years: { value: string; label: string }[] = [];
-    for (let i = 0; i <= registrationConstants.graduationSpan; i++) {
-      const y = String(currentYear + i);
-      years.push({ value: y, label: y });
+    for (let y = minYear; y <= maxYear; y++) {
+      const val = String(y);
+      years.push({ value: val, label: val });
     }
     return years;
   }, []);

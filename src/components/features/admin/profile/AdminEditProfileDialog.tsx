@@ -27,6 +27,7 @@ import {
   semesterOptions,
   interestOptions,
   genderOptions,
+  registrationConstants,
 } from "@/data/registration";
 import {
   getAdminUserProfile,
@@ -277,6 +278,26 @@ export function AdminEditProfileDialog({
     ...genderOptions.map((g) => ({ value: g.value, label: g.label })),
   ];
 
+  const gradYearOptions: SelectOption[] = React.useMemo(() => {
+    const currYear = new Date().getFullYear();
+    const minYear = registrationConstants.minGraduationYear ?? 2020;
+    const maxYear = currYear + registrationConstants.graduationSpan;
+    const options: SelectOption[] = [{ value: "", label: "Select graduation year" }];
+
+    const yearsSet = new Set<string>();
+    for (let y = minYear; y <= maxYear; y++) {
+      yearsSet.add(String(y));
+    }
+    if (graduationYear && !yearsSet.has(graduationYear)) {
+      yearsSet.add(graduationYear);
+    }
+    const sortedYears = Array.from(yearsSet).sort((a, b) => Number(a) - Number(b));
+    for (const y of sortedYears) {
+      options.push({ value: y, label: y });
+    }
+    return options;
+  }, [graduationYear]);
+
   return (
     <DetailDrawer
       open={open}
@@ -463,11 +484,11 @@ export function AdminEditProfileDialog({
                   options={semOptions}
                 />
 
-                <TextField
+                <SelectField
                   label="Graduation Year"
                   value={graduationYear}
                   onChange={(e) => setGraduationYear(e.target.value)}
-                  placeholder="e.g. 2026"
+                  options={gradYearOptions}
                 />
               </div>
             </div>

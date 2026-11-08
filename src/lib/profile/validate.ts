@@ -77,7 +77,7 @@ const graduationYearField = z
       return (
         /^\d{4}$/.test(val) &&
         !isNaN(y) &&
-        y >= currentYear &&
+        y >= (registrationConstants.minGraduationYear ?? 2020) &&
         y <= currentYear + registrationConstants.graduationSpan
       );
     },
@@ -328,7 +328,20 @@ export const adminProfileFormSchema = z
         if (val === null || val === undefined || val === "") return null;
         const num = Number(val);
         return isNaN(num) ? null : num;
-      }),
+      })
+      .refine(
+        (val) => {
+          if (val === null) return true;
+          const currentYear = new Date().getFullYear();
+          return (
+            val >= (registrationConstants.minGraduationYear ?? 2020) &&
+            val <= currentYear + registrationConstants.graduationSpan
+          );
+        },
+        {
+          message: "Graduation year must be from 2020 onwards",
+        }
+      ),
     headline: nullableString(120, profileCopy.errors.headline).optional(),
     bio: nullableString(1000, profileCopy.errors.bio).optional(),
     location: nullableString(120, profileCopy.errors.location).optional(),

@@ -20,25 +20,27 @@ export function DrawerSection({
   return (
     <div
       className={cn(
-        "rounded-lg border border-border bg-card/40 p-4 space-y-3",
+        "rounded-xl border border-slate-800/80 bg-slate-900/40 p-4 space-y-3 transition-colors hover:border-slate-700/80",
         className
       )}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
-          <Icon
-            className="size-[22px] shrink-0 text-primary"
-            strokeWidth={1.5}
-            aria-hidden="true"
-          />
-          <h4 className="text-[16px] font-semibold text-white tracking-tight truncate">
+          <div className="flex items-center justify-center size-7 rounded-lg bg-primary/10 text-primary shrink-0 border border-primary/20">
+            <Icon
+              className="size-3.5"
+              strokeWidth={2}
+              aria-hidden="true"
+            />
+          </div>
+          <h4 className="text-[15px] font-semibold text-slate-100 tracking-tight truncate">
             {title}
           </h4>
         </div>
         {action && <div className="shrink-0">{action}</div>}
       </div>
 
-      <div className="pt-1">{children}</div>
+      <div className="pt-0.5">{children}</div>
     </div>
   );
 }

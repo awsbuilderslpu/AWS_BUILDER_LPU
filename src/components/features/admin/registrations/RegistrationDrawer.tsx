@@ -11,6 +11,18 @@ import {
   LoaderCircle,
   Save,
   Pencil,
+  Copy,
+  Check,
+  Building2,
+  Calendar,
+  BookOpen,
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  Archive,
+  Phone,
+  Hash,
+  ExternalLink,
 } from "lucide-react";
 import { AdminEditProfileDialog } from "@/components/features/admin/profile/AdminEditProfileDialog";
 import { DetailDrawer } from "@/components/features/admin/kit/DetailDrawer";
@@ -45,6 +57,61 @@ export interface RegistrationDrawerProps {
   onOpenChange: (open: boolean) => void;
   onAction: (action: ReviewAction, row: RegistrationListRow) => void;
   onNoteUpdated?: () => void;
+}
+
+function CopyButton({
+  text,
+  label = "Copy",
+  className,
+}: {
+  text: string;
+  label?: string;
+  className?: string;
+}) {
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      notify.success(`${label} copied to clipboard`);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      notify.error("Failed to copy");
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      title={copied ? "Copied!" : `Copy ${label}`}
+      className={cn(
+        "inline-flex items-center justify-center size-6 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 transition-colors shrink-0",
+        className
+      )}
+    >
+      {copied ? (
+        <Check className="size-3 text-emerald-400" />
+      ) : (
+        <Copy className="size-3" />
+      )}
+      <span className="sr-only">Copy {label}</span>
+    </button>
+  );
+}
+
+function getInitials(name: string, fallback: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+  }
+  if (parts.length === 1 && parts[0].length > 0) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  const fb = fallback.trim();
+  return fb ? fb.slice(0, 2).toUpperCase() : "U";
 }
 
 export function RegistrationDrawer({
@@ -138,292 +205,483 @@ export function RegistrationDrawer({
           .join(" ")
       : "-";
 
+  const cleanPhoneUrl = details?.phoneNumber
+    ? `tel:${(details.phoneCountryCode || "+91").replace(/\s+/g, "")}${details.phoneNumber.replace(/\s+/g, "")}`
+    : null;
+
+  const appliedDateFormatted = details?.appliedAt
+    ? formatIst(details.appliedAt, { withTime: true }) ||
+      formatIst(details.appliedAt, { withTime: false }) ||
+      null
+    : null;
+
   const actions = details ? allowedActions(details.status) : [];
+  const initials = details ? getInitials(name, details.email) : "U";
+
+  // Status-based indicator colors
+  const statusColorMap = {
+    approved: "bg-emerald-400 ring-emerald-500/30",
+    pending: "bg-amber-400 ring-amber-500/30",
+    rejected: "bg-rose-400 ring-rose-500/30",
+    archived: "bg-slate-400 ring-slate-500/30",
+  };
 
   return (
     <>
       <DetailDrawer
-      open={open}
-      onOpenChange={onOpenChange}
-      title={copy.drawer.title}
-      description={
-        details
-          ? copy.drawer.subtitle(formatIst(details.appliedAt, { withTime: false }))
-          : copy.drawer.title
-      }
-      footer={
-        details && actions.length > 0 ? (
-          <div className="flex flex-wrap items-center justify-end gap-2.5 w-full">
-            {actions.includes("approve") && (
+        open={open}
+        onOpenChange={onOpenChange}
+        title={copy.drawer.title}
+        widthClass="sm:max-w-3xl lg:max-w-4xl"
+        description={
+          appliedDateFormatted
+            ? copy.drawer.subtitle(appliedDateFormatted)
+            : "Applicant profile and review details"
+        }
+        footer={
+          details ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 w-full">
               <Button
                 type="button"
-                onClick={() => handleActionClick("approve")}
-                className="h-10 px-4 bg-primary text-background hover:bg-primary-hover font-semibold cursor-pointer"
+                variant="ghost"
+                onClick={() => onOpenChange(false)}
+                className="h-10 px-4 text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-xl cursor-pointer"
               >
-                {copy.actions.approve}
+                Close
               </Button>
-            )}
 
-            {actions.includes("reject") && (
-              <Button
-                type="button"
-                onClick={() => handleActionClick("reject")}
-                className="h-10 px-4 bg-red-500/90 hover:bg-red-500 text-white font-medium cursor-pointer"
-              >
-                {copy.actions.reject}
-              </Button>
-            )}
+              <div className="flex flex-wrap items-center gap-2.5">
+                {actions.includes("reopen") && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleActionClick("reopen")}
+                    className="h-10 px-4 border-slate-700/80 hover:bg-slate-800 text-slate-200 font-medium rounded-xl cursor-pointer flex items-center gap-2"
+                  >
+                    <RotateCcw className="size-4" />
+                    <span>{copy.actions.reopen}</span>
+                  </Button>
+                )}
 
-            {actions.includes("reopen") && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleActionClick("reopen")}
-                className="h-10 px-4 font-medium cursor-pointer"
-              >
-                {copy.actions.reopen}
-              </Button>
-            )}
+                {actions.includes("archive") && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleActionClick("archive")}
+                    className="h-10 px-4 border-slate-700/80 text-slate-400 hover:text-rose-400 hover:border-rose-500/30 hover:bg-rose-500/10 font-medium rounded-xl cursor-pointer flex items-center gap-2"
+                  >
+                    <Archive className="size-4" />
+                    <span>{copy.actions.archive}</span>
+                  </Button>
+                )}
 
-            {actions.includes("archive") && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleActionClick("archive")}
-                className="h-10 px-4 font-medium text-red-400 border-red-400/40 hover:bg-red-400/10 cursor-pointer"
-              >
-                {copy.actions.archive}
-              </Button>
-            )}
+                {actions.includes("restore") && (
+                  <Button
+                    type="button"
+                    onClick={() => handleActionClick("restore")}
+                    className="h-10 px-4.5 bg-primary text-background hover:bg-primary-hover font-semibold rounded-xl cursor-pointer flex items-center gap-2"
+                  >
+                    <RotateCcw className="size-4" />
+                    <span>{copy.actions.restore}</span>
+                  </Button>
+                )}
 
-            {actions.includes("restore") && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleActionClick("restore")}
-                className="h-10 px-4 font-medium cursor-pointer"
-              >
-                {copy.actions.restore}
-              </Button>
-            )}
-          </div>
-        ) : undefined
-      }
-    >
-      {loading ? (
-        <div className="space-y-4 py-6">
-          <div className="h-14 rounded-lg bg-card/60 animate-pulse border border-border" />
-          <div className="h-32 rounded-lg bg-card/60 animate-pulse border border-border" />
-          <div className="h-32 rounded-lg bg-card/60 animate-pulse border border-border" />
-          <div className="h-32 rounded-lg bg-card/60 animate-pulse border border-border" />
-        </div>
-      ) : !details ? (
-        <div className="py-12 text-center text-sm text-muted-foreground">
-          {copy.empty.title}
-        </div>
-      ) : (
-        <div className="space-y-5">
-          {/* Header Card */}
-          <div className="rounded-lg border border-border bg-card/50 p-4 space-y-2.5">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <h3 className="text-[17px] font-semibold text-white truncate leading-snug">
-                  {name}
-                </h3>
-                <p className="text-[13px] text-muted-foreground truncate leading-tight mt-0.5">
-                  {details.email}
-                </p>
+                {actions.includes("reject") && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleActionClick("reject")}
+                    className="h-10 px-4 text-rose-400 border-rose-500/30 hover:bg-rose-500/15 hover:border-rose-500/60 font-medium rounded-xl cursor-pointer flex items-center gap-2"
+                  >
+                    <XCircle className="size-4" />
+                    <span>{copy.actions.reject}</span>
+                  </Button>
+                )}
+
+                {actions.includes("approve") && (
+                  <Button
+                    type="button"
+                    onClick={() => handleActionClick("approve")}
+                    className="h-10 px-5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl shadow-lg shadow-emerald-950/50 cursor-pointer flex items-center gap-2"
+                  >
+                    <CheckCircle2 className="size-4" />
+                    <span>{copy.actions.approve}</span>
+                  </Button>
+                )}
               </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => setEditProfileOpen(true)}
-                className="h-8 px-2.5 text-xs font-medium cursor-pointer border-border hover:bg-card/80 shrink-0 flex items-center gap-1.5"
-              >
-                <Pencil className="size-3.5" />
-                <span>Edit Profile</span>
-              </Button>
             </div>
-
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <StatusBadge tone={statusTones[details.status] ?? "muted"}>
-                {copy.statusLabels[details.status] ?? details.status}
-              </StatusBadge>
-              <RoleBadge role={details.requestedRole} />
+          ) : undefined
+        }
+      >
+        {loading ? (
+          <div className="space-y-4 py-4">
+            <div className="h-28 rounded-2xl bg-slate-900/60 animate-pulse border border-slate-800/80" />
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="h-20 rounded-xl bg-slate-900/60 animate-pulse border border-slate-800/80"
+                />
+              ))}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="h-64 rounded-xl bg-slate-900/60 animate-pulse border border-slate-800/80" />
+              <div className="h-64 rounded-xl bg-slate-900/60 animate-pulse border border-slate-800/80" />
             </div>
           </div>
+        ) : !details ? (
+          <div className="py-16 text-center text-sm text-slate-400">
+            {copy.empty.title}
+          </div>
+        ) : (
+          <div className="space-y-4 sm:space-y-5">
+            {/* Hero Profile Card */}
+            <div className="relative rounded-2xl border border-slate-800/90 bg-gradient-to-br from-slate-900/90 via-[#0D1322] to-slate-900/80 p-4 sm:p-5 shadow-xl overflow-hidden">
+              {/* Subtle ambient decorative gradient */}
+              <div className="pointer-events-none absolute -top-12 -right-12 size-48 rounded-full bg-primary/10 blur-3xl" />
 
-          {/* Contact */}
-          <DrawerSection icon={Mail} title={copy.drawer.sections.contact}>
-            <DetailRow label={copy.drawer.fields.email}>
-              <a
-                href={`mailto:${details.email}`}
-                className="text-primary hover:underline underline-offset-4"
-              >
-                {details.email}
-              </a>
-            </DetailRow>
-            <DetailRow label={copy.drawer.fields.phone}>
-              {formattedPhone}
-            </DetailRow>
-          </DrawerSection>
+              <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-start gap-3.5 sm:gap-4 min-w-0">
+                  {/* Avatar with Initials & live status dot */}
+                  <div className="relative shrink-0">
+                    <div className="flex items-center justify-center size-13 sm:size-14 rounded-2xl bg-gradient-to-br from-primary/25 via-amber-500/15 to-primary/10 border border-primary/30 text-primary font-bold text-lg sm:text-xl shadow-inner tracking-wider">
+                      {initials}
+                    </div>
+                    <span
+                      title={`Status: ${details.status}`}
+                      className={cn(
+                        "absolute -bottom-1 -right-1 size-3.5 rounded-full ring-2 ring-[#0A0E17]",
+                        statusColorMap[details.status as keyof typeof statusColorMap] ||
+                          "bg-slate-400 ring-slate-500/30"
+                      )}
+                    />
+                  </div>
 
-          {/* Personal */}
-          <DrawerSection icon={User} title={copy.drawer.sections.personal}>
-            <DetailRow label={copy.drawer.fields.dob}>
-              {formatDob(details.dateOfBirth ?? undefined) || "-"}
-            </DetailRow>
-            <DetailRow label={copy.drawer.fields.gender}>
-              {details.gender || "-"}
-            </DetailRow>
-            <DetailRow label={copy.drawer.fields.university}>
-              {uniLabel}
-            </DetailRow>
-          </DrawerSection>
+                  {/* Identity text */}
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight truncate leading-tight">
+                        {name}
+                      </h3>
+                    </div>
 
-          {/* Academic */}
-          <DrawerSection
-            icon={GraduationCap}
-            title={copy.drawer.sections.academic}
-          >
-            <DetailRow label={copy.drawer.fields.programme}>
-              {programmeLabel(details.programme, details.department, departments)}
-            </DetailRow>
-            <DetailRow label={copy.drawer.fields.year}>
-              {details.studyYear || "-"}
-            </DetailRow>
-            <DetailRow label={copy.drawer.fields.semester}>
-              {details.semester || "-"}
-            </DetailRow>
-            <DetailRow label={copy.drawer.fields.gradYear}>
-              {details.graduationYear ? String(details.graduationYear) : "-"}
-            </DetailRow>
-          </DrawerSection>
+                    <div className="flex items-center gap-1.5 text-xs sm:text-[13px] text-slate-400">
+                      <Mail className="size-3.5 text-slate-500 shrink-0" />
+                      <a
+                        href={`mailto:${details.email}`}
+                        className="truncate hover:text-primary transition-colors underline-offset-2 hover:underline"
+                        title={details.email}
+                      >
+                        {details.email}
+                      </a>
+                      <CopyButton text={details.email} label="Email" />
+                    </div>
 
-          {/* Interests */}
-          <DrawerSection icon={Sparkles} title={copy.drawer.sections.interests}>
-            {details.interests && details.interests.length > 0 ? (
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {details.interests.map((interest) => (
-                  <StatusBadge key={interest} tone="violet">
-                    {interest}
-                  </StatusBadge>
-                ))}
+                    <div className="flex flex-wrap items-center gap-2 pt-1.5">
+                      <StatusBadge tone={statusTones[details.status] ?? "muted"}>
+                        {copy.statusLabels[details.status] ?? details.status}
+                      </StatusBadge>
+                      <RoleBadge role={details.requestedRole} />
+                      {details.registrationNumber && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono bg-slate-800/80 text-slate-300 border border-slate-700/60">
+                          <Hash className="size-3 text-slate-400" />
+                          <span>{details.registrationNumber}</span>
+                          <CopyButton
+                            text={details.registrationNumber}
+                            label="Reg No"
+                            className="size-4 ml-0.5"
+                          />
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Edit Profile Action */}
+                <div className="self-end sm:self-center shrink-0">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditProfileOpen(true)}
+                    className="h-9 px-3.5 text-xs font-medium border-slate-700/80 hover:bg-slate-800 hover:text-white transition-all cursor-pointer rounded-xl flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Pencil className="size-3.5 text-primary" />
+                    <span>Edit Profile</span>
+                  </Button>
+                </div>
               </div>
-            ) : (
-              <span className="text-[13.5px] text-muted-foreground">-</span>
-            )}
-          </DrawerSection>
+            </div>
 
-          {/* Application */}
-          <DrawerSection
-            icon={ClipboardList}
-            title={copy.drawer.sections.application}
-          >
-            <DetailRow label={copy.drawer.fields.regNo}>
-              <span className="font-mono text-[13.5px]">
-                {details.registrationNumber || "-"}
-              </span>
-            </DetailRow>
-            <DetailRow label={copy.drawer.fields.appliedAt}>
-              {formatIst(details.appliedAt)}
-            </DetailRow>
-          </DrawerSection>
-
-          {/* Review */}
-          <DrawerSection icon={ShieldCheck} title={copy.drawer.sections.review}>
-            <DetailRow label={copy.drawer.fields.status}>
-              <StatusBadge tone={statusTones[details.status] ?? "muted"}>
-                {copy.statusLabels[details.status] ?? details.status}
-              </StatusBadge>
-            </DetailRow>
-            <DetailRow label={copy.drawer.fields.reviewedBy}>
-              {details.reviewedByName || "-"}
-            </DetailRow>
-            <DetailRow label={copy.drawer.fields.reviewedAt}>
-              {details.reviewedAt ? formatIst(details.reviewedAt) : "-"}
-            </DetailRow>
-
-            {/* Admin Note editing */}
-            <div className="pt-3 border-t border-border mt-3 space-y-2">
-              <div className="flex items-center justify-between text-[12.5px] font-medium text-white">
-                <label htmlFor="drawer-admin-note">
-                  {copy.drawer.fields.adminNote}
-                </label>
-                <span className="text-[11.5px] text-muted-foreground font-normal">
-                  {note.length} / 2000
-                </span>
-              </div>
-              <textarea
-                id="drawer-admin-note"
-                rows={3}
-                value={note}
-                maxLength={2000}
-                onChange={(e) => setNote(e.target.value)}
-                placeholder={copy.drawer.notePlaceholder}
-                disabled={savingNote}
-                className={cn(fieldClass, "h-auto py-2.5 resize-none leading-relaxed")}
-              />
-              <div className="flex justify-end pt-1">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={handleSaveNote}
-                  disabled={savingNote || note === (details.adminNote || "")}
-                  className="h-9 px-3.5 text-[13px] font-medium cursor-pointer"
+            {/* Quick Stat Highlights */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+              <div className="rounded-xl border border-slate-800/80 bg-slate-900/35 p-3 sm:p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                  <Building2 className="size-3.5 text-primary/80 shrink-0" />
+                  <span className="truncate">Institution</span>
+                </div>
+                <div
+                  className="text-xs sm:text-[13px] font-semibold text-slate-100 truncate"
+                  title={uniLabel}
                 >
-                  {savingNote ? (
-                    <>
-                      <LoaderCircle className="size-3.5 animate-spin mr-1.5 shrink-0" />
-                      <span>{copy.drawer.saveNote}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="size-3.5 mr-1.5 shrink-0" />
-                      <span>{copy.drawer.saveNote}</span>
-                    </>
-                  )}
-                </Button>
+                  {uniLabel}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-800/80 bg-slate-900/35 p-3 sm:p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                  <GraduationCap className="size-3.5 text-primary/80 shrink-0" />
+                  <span className="truncate">Programme</span>
+                </div>
+                <div
+                  className="text-xs sm:text-[13px] font-semibold text-slate-100 truncate"
+                  title={programmeLabel(details.programme, details.department, departments)}
+                >
+                  {programmeLabel(details.programme, details.department, departments) || "-"}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-800/80 bg-slate-900/35 p-3 sm:p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                  <BookOpen className="size-3.5 text-primary/80 shrink-0" />
+                  <span className="truncate">Study Year</span>
+                </div>
+                <div className="text-xs sm:text-[13px] font-semibold text-slate-100 truncate">
+                  {details.studyYear ? `${details.studyYear} Year` : "-"}
+                  {details.semester ? ` • Sem ${details.semester}` : ""}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-800/80 bg-slate-900/35 p-3 sm:p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                  <Calendar className="size-3.5 text-primary/80 shrink-0" />
+                  <span className="truncate">Graduation</span>
+                </div>
+                <div className="text-xs sm:text-[13px] font-semibold text-slate-100 truncate">
+                  {details.graduationYear ? `Class of ${details.graduationYear}` : "-"}
+                </div>
               </div>
             </div>
-          </DrawerSection>
-        </div>
-      )}
-    </DetailDrawer>
 
-    {details && (
-      <AdminEditProfileDialog
-        open={editProfileOpen}
-        onOpenChange={setEditProfileOpen}
-        userId={details.userId}
-        initialData={{
-          firstName: details.firstName || "",
-          lastName: details.lastName || "",
-          phoneCountryCode: details.phoneCountryCode || "+91",
-          phoneNumber: details.phoneNumber || "",
-          registrationNumber: details.registrationNumber || "",
-          dateOfBirth: details.dateOfBirth || "",
-          gender: (details.gender as "Male" | "Female") || null,
-          university: details.university || "",
-          programme: details.programme || "",
-          department: details.department || "",
-          studyYear: details.studyYear || "",
-          semester: details.semester || "",
-          graduationYear: details.graduationYear,
-          interests: details.interests || [],
-        }}
-        onSaved={async () => {
-          if (id) {
-            const updated = await getRegistrationDetailsAction(id);
-            if (updated) setDetails(updated);
-          }
-          onNoteUpdated?.();
-        }}
-      />
-    )}
-  </>
+            {/* Two-Column Structured Dossier Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Left Column */}
+              <div className="space-y-4">
+                {/* Academic Information */}
+                <DrawerSection
+                  icon={GraduationCap}
+                  title={copy.drawer.sections.academic}
+                >
+                  <DetailRow label={copy.drawer.fields.programme}>
+                    {programmeLabel(details.programme, details.department, departments) || "-"}
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.department}>
+                    {details.department || "-"}
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.year}>
+                    {details.studyYear || "-"}
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.semester}>
+                    {details.semester || "-"}
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.gradYear}>
+                    {details.graduationYear ? String(details.graduationYear) : "-"}
+                  </DetailRow>
+                </DrawerSection>
+
+                {/* Personal Information */}
+                <DrawerSection icon={User} title={copy.drawer.sections.personal}>
+                  <DetailRow label={copy.drawer.fields.dob}>
+                    {formatDob(details.dateOfBirth ?? undefined) || "-"}
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.gender}>
+                    {details.gender || "-"}
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.university}>
+                    {uniLabel}
+                  </DetailRow>
+                </DrawerSection>
+
+                {/* Interests */}
+                <DrawerSection icon={Sparkles} title={copy.drawer.sections.interests}>
+                  {details.interests && details.interests.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {details.interests.map((interest) => (
+                        <span
+                          key={interest}
+                          className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-primary/10 text-primary border border-primary/20"
+                        >
+                          {interest}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-slate-500">
+                      No specific interests recorded
+                    </span>
+                  )}
+                </DrawerSection>
+              </div>
+
+              {/* Right Column */}
+              <div className="space-y-4">
+                {/* Contact Information */}
+                <DrawerSection icon={Mail} title={copy.drawer.sections.contact}>
+                  <DetailRow label={copy.drawer.fields.email}>
+                    <div className="flex items-center justify-between gap-2">
+                      <a
+                        href={`mailto:${details.email}`}
+                        className="text-primary hover:underline underline-offset-4 truncate"
+                      >
+                        {details.email}
+                      </a>
+                      <CopyButton text={details.email} label="Email" />
+                    </div>
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.phone}>
+                    <div className="flex items-center justify-between gap-2">
+                      {cleanPhoneUrl ? (
+                        <a
+                          href={cleanPhoneUrl}
+                          className="hover:text-primary transition-colors truncate"
+                        >
+                          {formattedPhone}
+                        </a>
+                      ) : (
+                        <span>{formattedPhone}</span>
+                      )}
+                      {details.phoneNumber && (
+                        <CopyButton text={formattedPhone} label="Phone" />
+                      )}
+                    </div>
+                  </DetailRow>
+                </DrawerSection>
+
+                {/* Application & Review Details */}
+                <DrawerSection
+                  icon={ClipboardList}
+                  title={copy.drawer.sections.application}
+                >
+                  <DetailRow label={copy.drawer.fields.regNo}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-xs sm:text-[13px]">
+                        {details.registrationNumber || "-"}
+                      </span>
+                      {details.registrationNumber && (
+                        <CopyButton
+                          text={details.registrationNumber}
+                          label="Registration Number"
+                        />
+                      )}
+                    </div>
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.appliedAt}>
+                    {appliedDateFormatted || "-"}
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.status}>
+                    <StatusBadge tone={statusTones[details.status] ?? "muted"}>
+                      {copy.statusLabels[details.status] ?? details.status}
+                    </StatusBadge>
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.reviewedBy}>
+                    {details.reviewedByName || "-"}
+                  </DetailRow>
+                  <DetailRow label={copy.drawer.fields.reviewedAt}>
+                    {details.reviewedAt
+                      ? formatIst(details.reviewedAt, { withTime: true }) ||
+                        formatIst(details.reviewedAt, { withTime: false }) ||
+                        details.reviewedAt
+                      : "-"}
+                  </DetailRow>
+                </DrawerSection>
+
+                {/* Internal Admin Note */}
+                <DrawerSection icon={ShieldCheck} title={copy.drawer.sections.review}>
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between text-xs font-medium text-slate-300">
+                      <label htmlFor="drawer-admin-note" className="flex items-center gap-1.5">
+                        <span>{copy.drawer.fields.adminNote}</span>
+                        <span className="text-[11px] text-slate-500 font-normal">
+                          (Private to admins)
+                        </span>
+                      </label>
+                      <span className="text-[11px] text-slate-500">
+                        {note.length} / 2000
+                      </span>
+                    </div>
+                    <textarea
+                      id="drawer-admin-note"
+                      rows={3}
+                      value={note}
+                      maxLength={2000}
+                      onChange={(e) => setNote(e.target.value)}
+                      placeholder={copy.drawer.notePlaceholder}
+                      disabled={savingNote}
+                      className={cn(
+                        fieldClass,
+                        "h-auto py-2.5 resize-none leading-relaxed text-xs sm:text-sm bg-slate-950/60 border-slate-800 focus:border-primary/60 rounded-xl"
+                      )}
+                    />
+                    <div className="flex justify-end pt-0.5">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleSaveNote}
+                        disabled={savingNote || note === (details.adminNote || "")}
+                        className="h-8.5 px-3 text-xs font-medium rounded-xl cursor-pointer border-slate-700/80 hover:bg-slate-800"
+                      >
+                        {savingNote ? (
+                          <>
+                            <LoaderCircle className="size-3.5 animate-spin mr-1.5 shrink-0" />
+                            <span>{copy.drawer.saveNote}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save className="size-3.5 mr-1.5 shrink-0 text-primary" />
+                            <span>{copy.drawer.saveNote}</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </DrawerSection>
+              </div>
+            </div>
+          </div>
+        )}
+      </DetailDrawer>
+
+      {details && (
+        <AdminEditProfileDialog
+          open={editProfileOpen}
+          onOpenChange={setEditProfileOpen}
+          userId={details.userId}
+          initialData={{
+            firstName: details.firstName || "",
+            lastName: details.lastName || "",
+            phoneCountryCode: details.phoneCountryCode || "+91",
+            phoneNumber: details.phoneNumber || "",
+            registrationNumber: details.registrationNumber || "",
+            dateOfBirth: details.dateOfBirth || "",
+            gender: (details.gender as "Male" | "Female") || null,
+            university: details.university || "",
+            programme: details.programme || "",
+            department: details.department || "",
+            studyYear: details.studyYear || "",
+            semester: details.semester || "",
+            graduationYear: details.graduationYear,
+            interests: details.interests || [],
+          }}
+          onSaved={async () => {
+            if (id) {
+              const updated = await getRegistrationDetailsAction(id);
+              if (updated) setDetails(updated);
+            }
+            onNoteUpdated?.();
+          }}
+        />
+      )}
+    </>
   );
 }
-
