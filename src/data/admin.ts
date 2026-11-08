@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Megaphone,
   FolderGit2,
+  Mail,
 } from "lucide-react";
 import type { AppRole } from "@/lib/auth/account";
 
@@ -45,6 +46,15 @@ export const adminNav: AdminNavItem[] = [
     href: "/admin/members",
     icon: Users,
     roles: ["admin"],
+    ready: true,
+    section: "Management",
+  },
+  {
+    key: "messages",
+    label: "Messages",
+    href: "/admin/messages",
+    icon: Mail,
+    roles: ["admin", "core"],
     ready: true,
     section: "Management",
   },

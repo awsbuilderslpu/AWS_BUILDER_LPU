@@ -1,4 +1,5 @@
 import { contactCopy, formSubjects, messageLimits } from "@/data/contact";
+import { submitContactMessageAction } from "@/lib/messages/actions";
 
 export type ContactField =
   | "name"
@@ -107,64 +108,41 @@ export function validateResumeFile(file: File): string | undefined {
   return undefined;
 }
 
-// Works with Formspree / API endpoints (JSON or FormData if files are attached).
+// Submits to Supabase database (and optionally forwards to external endpoint if configured).
 export async function submitContact(
   values: ContactValues,
   resumeFile?: File | null
 ): Promise<{ ok: boolean }> {
-  const endpoint = process.env.NEXT_PUBLIC_CONTACT_ENDPOINT;
-
-  if (!endpoint) {
-    if (process.env.NODE_ENV === "production") {
-      console.warn("NEXT_PUBLIC_CONTACT_ENDPOINT is not configured.");
-      return { ok: false };
-    }
-
-    // Simulated submission in development mode.
-    await new Promise((resolve) => setTimeout(resolve, 700));
-    return { ok: true };
-  }
-
   try {
-    let response: Response;
-
+    const formData = new FormData();
+    formData.append("name", values.name.trim());
+    formData.append("email", values.email.trim());
+    formData.append("phone", values.phone.trim());
+    formData.append("registrationNumber", values.registrationNumber.trim());
+    formData.append("university", values.university.trim());
+    formData.append("subject", values.subject.trim());
+    formData.append("message", values.message.trim());
     if (resumeFile) {
-      const formData = new FormData();
-      formData.append("name", values.name.trim());
-      formData.append("email", values.email.trim());
-      formData.append("phone", values.phone.trim());
-      formData.append("registrationNumber", values.registrationNumber.trim());
-      formData.append("university", values.university.trim());
-      formData.append("subject", values.subject.trim());
-      formData.append("message", values.message.trim());
       formData.append("resume", resumeFile);
-
-      response = await fetch(endpoint, {
-        method: "POST",
-        body: formData,
-      });
-    } else {
-      const payload = {
-        name: values.name.trim(),
-        email: values.email.trim(),
-        phone: values.phone.trim(),
-        registrationNumber: values.registrationNumber.trim(),
-        university: values.university.trim(),
-        subject: values.subject.trim(),
-        message: values.message.trim(),
-      };
-
-      response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
     }
 
-    return { ok: response.ok };
+    // 1. Submit to Supabase
+    const dbResult = await submitContactMessageAction(formData);
+
+    // 2. Optionally forward to external webhook / Formspree if configured
+    const endpoint = process.env.NEXT_PUBLIC_CONTACT_ENDPOINT;
+    if (endpoint) {
+      try {
+        await fetch(endpoint, {
+          method: "POST",
+          body: formData,
+        });
+      } catch (webhookErr) {
+        console.warn("External contact endpoint error:", webhookErr);
+      }
+    }
+
+    return { ok: dbResult.ok };
   } catch (error) {
     console.error("Failed to submit contact form:", error);
     return { ok: false };
