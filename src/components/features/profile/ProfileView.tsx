@@ -88,13 +88,9 @@ import { TagInput } from "@/components/features/admin/forms/TagInput";
 import { ImageUpload } from "@/components/features/admin/forms/ImageUpload";
 import { RoleBadge } from "@/components/features/admin/kit/RoleBadge";
 import { Avatar } from "@/components/ui/Avatar";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CornerFrame } from "@/components/ui/CornerFrame";
+import { generateQrDataUrl } from "@/lib/profile/qr";
 
 export interface ProfileViewProps {
   account: AccountSummary;
@@ -271,11 +267,25 @@ export function ProfileView({
     setIsEditing(false);
   };
 
+  const uniqueSlug = profile.username || account.id;
+  const [fullShareUrl, setFullShareUrl] = React.useState<string>(`/profile/${uniqueSlug}`);
+  const [passQrDataUrl, setPassQrDataUrl] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const url = `${window.location.origin}/profile/${uniqueSlug}`;
+      setFullShareUrl(url);
+      generateQrDataUrl(url, { width: 320, margin: 2 }).then((dataUrl) => {
+        if (dataUrl) setPassQrDataUrl(dataUrl);
+      });
+    }
+  }, [uniqueSlug]);
+
   const handleShare = async () => {
     try {
       if (typeof window !== "undefined") {
-        await navigator.clipboard.writeText(window.location.href);
-        notify.success("Profile link copied to clipboard!");
+        await navigator.clipboard.writeText(fullShareUrl);
+        notify.success("Unique profile link copied to clipboard!");
       }
     } catch {
       notify.error("Could not copy link");
@@ -350,6 +360,52 @@ export function ProfileView({
       </div>
 
       <div className="space-y-4">
+        {/* Username / Unique Handle */}
+        {isEditing ? (
+          <div>
+            <TextField
+              id="profile-username"
+              label="Unique Profile Handle (Personal Link)"
+              placeholder="e.g. saifkhan"
+              error={errors.username?.message}
+              {...register("username")}
+            />
+            <p className="mt-1 text-[11px] text-muted-foreground font-mono">
+              Your public link will be: /profile/{String(watch("username") || profile.username || account.id.slice(0, 8))}
+            </p>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <span className="block text-[11px] uppercase font-mono text-primary font-bold">
+                Your Unique Profile Link
+              </span>
+              <span className="text-white font-mono text-xs sm:text-sm font-semibold">
+                /profile/{profile.username || account.id}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleShare}
+                className="h-7 px-2.5 text-xs border-primary/40 text-primary hover:bg-primary/20 cursor-pointer"
+              >
+                <Copy className="size-3 mr-1" />
+                <span>Copy Link</span>
+              </Button>
+              <Link
+                href={`/profile/${uniqueSlug}`}
+                className="inline-flex items-center gap-1 h-7 px-2.5 text-xs font-semibold rounded-md bg-primary text-background hover:bg-primary-hover transition-colors"
+              >
+                <span>View Public Page</span>
+                <ArrowUpRight className="size-3" />
+              </Link>
+            </div>
+          </div>
+        )}
+
         {isEditing ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TextField
@@ -1371,13 +1427,22 @@ export function ProfileView({
                 <span>Share</span>
               </Button>
 
+              <Link
+                href={`/profile/${uniqueSlug}`}
+                className="inline-flex h-9 items-center justify-center rounded-md border border-border/80 bg-card/60 px-3 text-xs font-semibold text-muted-foreground hover:text-white hover:border-primary/50 transition-colors"
+                title="View your public builder profile"
+              >
+                <ArrowUpRight className="size-3.5 mr-1 text-primary" />
+                <span>Public Page</span>
+              </Link>
+
               {isPublic && isApproved && (
                 <Link
                   href="/members"
                   className="inline-flex h-9 items-center justify-center rounded-md border border-border/80 bg-card/60 px-3 text-xs font-semibold text-muted-foreground hover:text-white hover:border-primary/50 transition-colors"
                 >
-                  <ArrowUpRight className="size-3.5 mr-1 text-primary" />
-                  <span>Public Directory</span>
+                  <Compass className="size-3.5 mr-1 text-primary" />
+                  <span>Directory</span>
                 </Link>
               )}
 
@@ -1481,10 +1546,15 @@ export function ProfileView({
                   <button
                     type="button"
                     onClick={() => setQrModalOpen(true)}
-                    className="p-1 rounded-lg hover:bg-primary/20 text-primary transition-colors cursor-pointer"
+                    className="size-8 rounded-lg overflow-hidden border border-primary/40 bg-white p-0.5 hover:scale-105 transition-transform cursor-pointer shrink-0"
                     title="Click to expand QR Code"
                   >
-                    <QrCode className="size-7" />
+                    {passQrDataUrl ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={passQrDataUrl} alt="QR" className="size-full object-contain" />
+                    ) : (
+                      <QrCode className="size-full text-slate-950" />
+                    )}
                   </button>
                 </div>
 
@@ -1884,7 +1954,12 @@ export function ProfileView({
           </DialogHeader>
           <div className="py-4 space-y-4">
             <div className="p-5 rounded-2xl bg-white mx-auto w-fit shadow-2xl">
-              <QrCode className="size-44 text-slate-950" />
+              {passQrDataUrl ? (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={passQrDataUrl} alt="Builder Pass QR Code" className="size-48 object-contain" />
+              ) : (
+                <QrCode className="size-44 text-slate-950" />
+              )}
             </div>
             <div>
               <h4 className="text-sm font-bold text-white">{account.displayName || account.email}</h4>

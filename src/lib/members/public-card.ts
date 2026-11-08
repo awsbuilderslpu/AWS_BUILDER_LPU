@@ -3,6 +3,7 @@ import type { PublicCard } from "../profile/directory";
 
 export function toMemberCard(card: PublicCard): Member {
   const socials: MemberSocials = {};
+  if (card.links.awsBuilder) socials.awsBuilder = card.links.awsBuilder;
   if (card.links.linkedin) socials.linkedin = card.links.linkedin;
   if (card.links.github) socials.github = card.links.github;
   if (card.links.website) socials.website = card.links.website;
@@ -10,12 +11,13 @@ export function toMemberCard(card: PublicCard): Member {
   if (card.links.youtube) socials.youtube = card.links.youtube;
 
   return {
-    slug: card.userId || card.key,
+    slug: card.username || card.userId || card.key,
     name: card.name,
     role: card.title,
     focus: card.headline?.trim() || undefined,
     group: card.group,
     skills: card.skills,
+    image: card.image,
     socials,
   };
 }
@@ -34,4 +36,3 @@ export function skillsOf(members: Member[]): string[] {
   }
   return Array.from(seen.values()).sort((a, b) => a.localeCompare(b));
 }
-

@@ -1,4 +1,5 @@
 import * as React from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui/Avatar";
 import { MemberSocials } from "@/components/features/members/MemberSocials";
@@ -10,6 +11,8 @@ export interface MemberRowCardProps {
 }
 
 export function MemberRowCard({ member, className }: MemberRowCardProps) {
+  const profileHref = `/profile/${member.slug}`;
+
   return (
     <article
       className={cn(
@@ -18,18 +21,22 @@ export function MemberRowCard({ member, className }: MemberRowCardProps) {
       )}
     >
       {/* Left */}
-      <Avatar
-        name={member.name}
-        src={member.image}
-        size={58}
-        className="shrink-0"
-      />
+      <Link href={profileHref} className="shrink-0">
+        <Avatar
+          name={member.name}
+          src={member.image}
+          size={58}
+          className="transition-transform duration-300 group-hover:scale-105"
+        />
+      </Link>
 
       {/* Right */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <h3 className="truncate text-sm sm:text-[15px] font-semibold leading-snug text-foreground">
-          {member.name}
-        </h3>
+        <Link href={profileHref}>
+          <h3 className="truncate text-sm sm:text-[15px] font-semibold leading-snug text-foreground hover:text-primary transition-colors">
+            {member.name}
+          </h3>
+        </Link>
         <p className="mt-0.5 truncate text-xs sm:text-[13px] leading-tight text-muted-foreground">
           {member.role}
         </p>

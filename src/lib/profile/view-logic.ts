@@ -3,6 +3,7 @@ import type { ProfileFormValues } from "./validate";
 
 export function formFromOwnProfile(profile: OwnProfile): ProfileFormValues {
   return {
+    username: profile.username ?? null,
     firstName: profile.firstName ?? "",
     lastName: profile.lastName ?? "",
     phoneCountryCode: (profile.phoneCountryCode as ProfileFormValues["phoneCountryCode"]) ?? "+91",

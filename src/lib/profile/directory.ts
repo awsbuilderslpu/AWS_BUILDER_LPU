@@ -3,12 +3,14 @@ import type { DirectoryMember } from "./types";
 export interface PublicMemberCard {
   key: string;
   userId: string;
+  username?: string | null;
   name: string;
   title: string;
   group: "core" | "community";
   headline: string | null;
   skills: string[];
   links: DirectoryMember["links"];
+  image?: string;
 }
 
 export type PublicCard = PublicMemberCard;
@@ -38,6 +40,7 @@ export function toPublicCard(
   return {
     key: member.userId,
     userId: member.userId,
+    username: member.username,
     name,
     title,
     group,

@@ -90,6 +90,7 @@ export async function updateOwnProfileAction(
     const { data, error } = await supabase
       .from("profiles")
       .update({
+        username: values.username || null,
         first_name: values.firstName,
         last_name: values.lastName,
         phone_country_code: values.phoneCountryCode,
@@ -125,6 +126,7 @@ export async function updateOwnProfileAction(
     }
 
     revalidatePath("/profile");
+    revalidatePath(`/profile/${account.id}`);
     revalidatePath("/members");
 
     return { ok: true };
@@ -202,6 +204,7 @@ export async function setOwnMediaAction(input: {
     }
 
     revalidatePath("/profile");
+    revalidatePath(`/profile/${account.id}`);
     revalidatePath("/members");
 
     return { ok: true };
@@ -310,6 +313,7 @@ export async function setOwnPublicProfileAction(input: {
     }
 
     revalidatePath("/profile");
+    revalidatePath(`/profile/${account.id}`);
     revalidatePath("/members");
 
     return { ok: true };
@@ -369,6 +373,7 @@ export async function adminUpdateUserProfileAction(
     const { data, error } = await supabase
       .from("profiles")
       .update({
+        username: values.username || null,
         first_name: values.firstName,
         last_name: values.lastName,
         phone_country_code: values.phoneCountryCode || null,

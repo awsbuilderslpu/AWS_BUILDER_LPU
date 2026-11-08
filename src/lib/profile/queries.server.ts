@@ -6,12 +6,15 @@ import { getCurrentAccount, getAdminAccount } from "@/lib/auth/server";
 import {
   type OwnProfile,
   type DirectoryMember,
+  type PublicProfile,
   toOwnProfile,
   toDirectoryMember,
+  toPublicProfile,
 } from "./types";
 
 const OWN_PROFILE_COLUMNS = [
   "id",
+  "username",
   "first_name",
   "last_name",
   "email",
@@ -183,4 +186,35 @@ export async function getAdminPublicTitle(
     return null;
   }
 }
+
+export async function getPublicMemberProfile(
+  identifier: string
+): Promise<{
+  profile: PublicProfile | null;
+  media: { avatarUrl: string | null; coverUrl: string | null };
+}> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc(
+      "get_public_member_profile" as never,
+      { p_identifier: identifier } as never
+    );
+
+    if (error || !data || (Array.isArray(data) && data.length === 0)) {
+      return { profile: null, media: { avatarUrl: null, coverUrl: null } };
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    const profile = toPublicProfile(row as unknown as Record<string, unknown>);
+    if (!profile) {
+      return { profile: null, media: { avatarUrl: null, coverUrl: null } };
+    }
+
+    const media = await getOwnMediaUrls(profile.avatarPath, profile.coverPath);
+    return { profile, media };
+  } catch {
+    return { profile: null, media: { avatarUrl: null, coverUrl: null } };
+  }
+}
+
 

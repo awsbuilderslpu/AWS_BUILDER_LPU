@@ -194,8 +194,32 @@ const interestsField = z.array(
   })
 );
 
+const usernameField = z
+  .unknown()
+  .transform((val, ctx) => {
+    if (val === null || val === undefined) return null;
+    if (typeof val !== "string") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Username must be 3-30 lowercase characters (letters, numbers, hyphens, underscores)",
+      });
+      return z.NEVER;
+    }
+    const trimmed = val.trim().toLowerCase();
+    if (!trimmed) return null;
+    if (trimmed.length < 3 || trimmed.length > 30 || !/^[a-z0-9_-]+$/.test(trimmed)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Username must be 3-30 letters, numbers, hyphens or underscores",
+      });
+      return z.NEVER;
+    }
+    return trimmed;
+  });
+
 export const profileFormSchema = z
   .object({
+    username: usernameField.optional().nullable(),
     firstName: firstNameField,
     lastName: lastNameField,
     phoneCountryCode: countryCodeField,
@@ -233,6 +257,7 @@ export type ProfileFormInput = z.input<typeof profileFormSchema>;
 export const adminProfileFormSchema = z
   .object({
     userId: z.string().uuid(),
+    username: usernameField.optional().nullable(),
     firstName: firstNameField,
     lastName: lastNameField,
     phoneCountryCode: countryCodeField.optional().nullable(),
