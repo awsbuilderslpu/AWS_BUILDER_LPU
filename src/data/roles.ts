@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react";
-import { GraduationCap, User, UserCheck, Crown, ShieldCheck } from "lucide-react";
+import { GraduationCap, User, UserCheck, Crown, ShieldCheck, ShieldAlert } from "lucide-react";
 
-export type Role = "admin" | "core" | "member" | "student" | "participant";
+export type Role = "administrator" | "admin" | "core" | "member" | "student" | "participant";
 
 export interface RoleTone {
   text: string;
@@ -19,6 +19,54 @@ export interface RoleInfo {
 }
 
 export const roleMeta: Record<Role, RoleInfo> = {
+  administrator: {
+    label: "Administrator",
+    description: "Root administrator",
+    icon: ShieldAlert,
+    requiresApproval: true,
+    tone: {
+      text: "text-amber-400",
+      border: "border-amber-400/60",
+      bg: "bg-amber-400/10",
+      ring: "ring-amber-400",
+    },
+  },
+  admin: {
+    label: "Admin",
+    description: "Club administrator",
+    icon: ShieldCheck,
+    requiresApproval: true,
+    tone: {
+      text: "text-red-400",
+      border: "border-red-400/60",
+      bg: "bg-red-400/10",
+      ring: "ring-red-400",
+    },
+  },
+  core: {
+    label: "Core Team",
+    description: "Leadership role",
+    icon: Crown,
+    requiresApproval: true,
+    tone: {
+      text: "text-primary",
+      border: "border-primary/60",
+      bg: "bg-primary/10",
+      ring: "ring-primary",
+    },
+  },
+  member: {
+    label: "Member",
+    description: "Active contributor",
+    icon: UserCheck,
+    requiresApproval: false,
+    tone: {
+      text: "text-accent",
+      border: "border-accent/60",
+      bg: "bg-accent/10",
+      ring: "ring-accent",
+    },
+  },
   student: {
     label: "Student",
     description: "General member",
@@ -41,42 +89,6 @@ export const roleMeta: Record<Role, RoleInfo> = {
       border: "border-border",
       bg: "bg-card/60",
       ring: "ring-border",
-    },
-  },
-  member: {
-    label: "Member",
-    description: "Active contributor",
-    icon: UserCheck,
-    requiresApproval: false,
-    tone: {
-      text: "text-accent",
-      border: "border-accent/60",
-      bg: "bg-accent/10",
-      ring: "ring-accent",
-    },
-  },
-  core: {
-    label: "Core Team",
-    description: "Leadership role",
-    icon: Crown,
-    requiresApproval: true,
-    tone: {
-      text: "text-primary",
-      border: "border-primary/60",
-      bg: "bg-primary/10",
-      ring: "ring-primary",
-    },
-  },
-  admin: {
-    label: "Admin",
-    description: "Club administrator",
-    icon: ShieldCheck,
-    requiresApproval: true,
-    tone: {
-      text: "text-red-400",
-      border: "border-red-400/60",
-      bg: "bg-red-400/10",
-      ring: "ring-red-400",
     },
   },
 };

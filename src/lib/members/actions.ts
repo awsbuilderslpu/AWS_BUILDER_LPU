@@ -24,7 +24,7 @@ import {
 
 const changeRoleSchema = z.object({
   ids: z.array(z.string().uuid()).min(1).max(25),
-  role: z.enum(["admin", "core", "member", "student", "participant"]),
+  role: z.enum(["administrator", "admin", "core", "member", "student", "participant"]),
   confirmAdmin: z.boolean().optional(),
 });
 
@@ -85,6 +85,12 @@ function mapMemberDatabaseError(
   if (msg.includes("last active admin") || msg.includes("last_admin")) {
     return "last_admin";
   }
+  if (msg.includes("only an administrator can appoint or promote")) {
+    return "only_administrator_can_promote_admin";
+  }
+  if (msg.includes("admins cannot modify administrators or other admins")) {
+    return "cannot_modify_admin";
+  }
   if (msg.includes("forbidden") || code === "42501") {
     return "forbidden";
   }
@@ -130,7 +136,10 @@ export async function changeMemberRolesAction(
 
   const { ids, role, confirmAdmin } = parsed.data;
 
-  if (role === "admin") {
+  if (role === "admin" || role === "administrator") {
+    if (admin.role !== "administrator") {
+      return { ok: false, error: "only_administrator_can_promote_admin" };
+    }
     if (ids.length !== 1) {
       return { ok: false, error: "admin_individually" };
     }
@@ -171,6 +180,7 @@ export async function changeMemberRolesAction(
 
     const check = canChangeRole({
       actorId: admin.id,
+      actorRole: admin.role,
       target,
       newRole: role,
       bulk: ids.length > 1,
@@ -252,6 +262,7 @@ export async function setMembersActiveAction(
 
     const check = canSetActive({
       actorId: admin.id,
+      actorRole: admin.role,
       target,
       active,
       bulk: ids.length > 1,
@@ -321,7 +332,11 @@ export async function removeMemberAction(
       targetRow.registration_status as RegistrationStatus | null,
   };
 
-  const check = canRemove({ actorId: admin.id, target });
+  const check = canRemove({
+    actorId: admin.id,
+    actorRole: admin.role,
+    target,
+  });
   if (!check.ok) {
     return { ok: false, error: check.reason };
   }

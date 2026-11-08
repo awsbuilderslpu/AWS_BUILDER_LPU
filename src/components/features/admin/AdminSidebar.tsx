@@ -46,8 +46,10 @@ export function AdminSidebar({
     );
   }, [navItems]);
 
-  const isAdmin = account.role === "admin";
-  const roleLabel = roleMeta[(account.role as Role) || "participant"]?.label || (isAdmin ? "Admin" : "Core");
+  const isAdministrator = account.role === "administrator";
+  const isAdmin = account.role === "admin" || isAdministrator;
+  const consoleTitle = isAdministrator ? "Administrator" : "Admin";
+  const roleLabel = roleMeta[(account.role as Role) || "participant"]?.label || consoleTitle;
 
   return (
     <aside
@@ -87,7 +89,7 @@ export function AdminSidebar({
               <span className="text-muted-foreground/30">•</span>
               <span className="inline-flex items-center gap-1 font-mono text-[9px] font-semibold tracking-wider text-primary uppercase">
                 <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-                {isAdmin ? "Admin" : "Core"} Console
+                {consoleTitle} Console
               </span>
             </div>
           </div>

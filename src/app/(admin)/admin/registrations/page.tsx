@@ -26,7 +26,7 @@ interface PageProps {
 }
 
 export default async function RegistrationsPage({ searchParams }: PageProps) {
-  await requireRole(["admin"], "/admin/registrations");
+  await requireRole(["administrator", "admin"], "/admin/registrations");
 
   const rawParams = await searchParams;
   const params = parseListParams(rawParams, registrationsListConfig);

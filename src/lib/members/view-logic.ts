@@ -10,26 +10,37 @@ export function roleChoices(bulk: boolean): AppRole[] {
 
 export function adminChoice(
   target: MemberTarget,
-  actorId: string
+  actorId: string,
+  actorRole?: AppRole | null
 ):
   | { enabled: true }
   | {
       enabled: false;
-      reason: "self" | "current" | "admin_needs_approved_active";
+      reason: "self" | "current" | "admin_needs_approved_active" | "only_administrator";
     } {
+  if (actorRole && actorRole !== "administrator") {
+    return { enabled: false, reason: "only_administrator" };
+  }
   if (target.userId === actorId) {
     return { enabled: false, reason: "self" };
   }
-  if (target.role === "admin") {
+  if (target.role === "admin" || target.role === "administrator") {
     return { enabled: false, reason: "current" };
   }
   const result = canChangeRole({
     actorId,
+    actorRole,
     target,
     newRole: "admin",
     bulk: false,
   });
   if (!result.ok) {
+    if (result.reason === "only_administrator_can_promote_admin") {
+      return {
+        enabled: false,
+        reason: "only_administrator",
+      };
+    }
     return {
       enabled: false,
       reason: "admin_needs_approved_active",
@@ -41,7 +52,8 @@ export function adminChoice(
 export function splitRoleChange(
   targets: MemberTarget[],
   newRole: AppRole,
-  actorId: string
+  actorId: string,
+  actorRole?: AppRole | null
 ): {
   applicable: MemberTarget[];
   skipped: { target: MemberTarget; reason: string }[];
@@ -51,7 +63,7 @@ export function splitRoleChange(
   const bulk = targets.length > 1;
 
   for (const target of targets) {
-    const res = canChangeRole({ actorId, target, newRole, bulk });
+    const res = canChangeRole({ actorId, actorRole, target, newRole, bulk });
     if (res.ok) {
       applicable.push(target);
     } else {
@@ -65,7 +77,8 @@ export function splitRoleChange(
 export function splitActiveChange(
   targets: MemberTarget[],
   active: boolean,
-  actorId: string
+  actorId: string,
+  actorRole?: AppRole | null
 ): {
   applicable: MemberTarget[];
   skipped: { target: MemberTarget; reason: string }[];
@@ -75,7 +88,7 @@ export function splitActiveChange(
   const bulk = targets.length > 1;
 
   for (const target of targets) {
-    const res = canSetActive({ actorId, target, active, bulk });
+    const res = canSetActive({ actorId, actorRole, target, active, bulk });
     if (res.ok) {
       applicable.push(target);
     } else {

@@ -140,11 +140,46 @@ describe("members rules helper", () => {
       };
       const res = canChangeRole({
         actorId,
+        actorRole: "administrator",
         target,
         newRole: "admin",
         bulk: false,
       });
       assert.deepEqual(res, { ok: true });
+    });
+
+    it("refuses admin grant when actor is only an admin", () => {
+      const target: MemberTarget = {
+        userId: "user-2",
+        role: "core",
+        isActive: true,
+        registrationStatus: "approved",
+      };
+      const res = canChangeRole({
+        actorId,
+        actorRole: "admin",
+        target,
+        newRole: "admin",
+        bulk: false,
+      });
+      assert.deepEqual(res, { ok: false, reason: "only_administrator_can_promote_admin" });
+    });
+
+    it("refuses modifying an admin when actor is only an admin", () => {
+      const target: MemberTarget = {
+        userId: "user-2",
+        role: "admin",
+        isActive: true,
+        registrationStatus: "approved",
+      };
+      const res = canChangeRole({
+        actorId,
+        actorRole: "admin",
+        target,
+        newRole: "core",
+        bulk: false,
+      });
+      assert.deepEqual(res, { ok: false, reason: "cannot_modify_admin" });
     });
   });
 

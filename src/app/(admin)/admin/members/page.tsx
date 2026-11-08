@@ -24,7 +24,7 @@ interface PageProps {
 }
 
 export default async function AdminMembersPage({ searchParams }: PageProps) {
-  const account = await requireRole(["admin"], "/admin/members");
+  const account = await requireRole(["administrator", "admin"], "/admin/members");
 
   const rawParams = await searchParams;
   const params = parseListParams(rawParams, membersListConfig);
@@ -65,6 +65,7 @@ export default async function AdminMembersPage({ searchParams }: PageProps) {
       counts={counts}
       params={params}
       currentUserId={account.id}
+      currentUserRole={account.role}
       loadError={loadError}
     />
   );

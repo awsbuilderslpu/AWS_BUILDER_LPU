@@ -94,6 +94,19 @@ describe("members view-logic helper", () => {
         enabled: true,
       });
     });
+
+    it("returns only_administrator when actor is not an administrator", () => {
+      const target: MemberTarget = {
+        userId: "target-555",
+        role: "member",
+        isActive: true,
+        registrationStatus: "approved",
+      };
+      assert.deepEqual(adminChoice(target, actorId, "admin"), {
+        enabled: false,
+        reason: "only_administrator",
+      });
+    });
   });
 
   describe("splitRoleChange", () => {

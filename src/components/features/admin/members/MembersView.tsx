@@ -69,6 +69,7 @@ export interface MembersViewProps {
   counts: MemberCounts | null;
   params: ReturnType<typeof useListState>["params"];
   currentUserId: string;
+  currentUserRole?: AppRole | null;
   loadError?: boolean;
 }
 
@@ -94,6 +95,7 @@ export function MembersView({
   counts,
   params: _params,
   currentUserId,
+  currentUserRole,
   loadError = false,
 }: MembersViewProps) {
   const router = useRouter();
@@ -166,6 +168,7 @@ export function MembersView({
   // CSV Export columns
   const exportColumns = React.useMemo(() => {
     const roleLabels: Record<AppRole, string> = {
+      administrator: roleMeta.administrator.label,
       admin: roleMeta.admin.label,
       core: roleMeta.core.label,
       member: roleMeta.member.label,
@@ -475,6 +478,7 @@ export function MembersView({
         onOpenChange={(open) => !open && setDialogState(null)}
         rows={dialogState?.kind === "role" ? dialogState.rows : []}
         actorId={currentUserId}
+        actorRole={currentUserRole}
         onDone={handleActionSuccess}
       />
 
@@ -594,6 +598,7 @@ export function MembersView({
       <MemberDrawer
         userId={dialogState?.kind === "drawer" ? dialogState.userId : null}
         currentUserId={currentUserId}
+        currentUserRole={currentUserRole}
         onClose={() => setDialogState(null)}
         onChanged={handleActionSuccess}
       />

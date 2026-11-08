@@ -59,6 +59,7 @@ import { cn } from "@/lib/utils";
 export interface MemberDrawerProps {
   userId: string | null;
   currentUserId: string;
+  currentUserRole?: AppRole | null;
   onClose: () => void;
   onChanged: () => void;
 }
@@ -66,6 +67,7 @@ export interface MemberDrawerProps {
 export function MemberDrawer({
   userId,
   currentUserId,
+  currentUserRole,
   onClose,
   onChanged,
 }: MemberDrawerProps) {
@@ -190,17 +192,21 @@ export function MemberDrawer({
 
   const adminCheck = React.useMemo(() => {
     if (!targetMeta) return { enabled: false as const, reason: "self" as const };
-    return adminChoice(targetMeta, currentUserId);
-  }, [targetMeta, currentUserId]);
+    return adminChoice(targetMeta, currentUserId, currentUserRole);
+  }, [targetMeta, currentUserId, currentUserRole]);
 
   const roleOptions = React.useMemo<SelectOption[]>(() => {
     const choices = roleChoices(false);
     return choices.map((r) => {
       const meta = roleMeta[r];
       if (r === "admin" && !adminCheck.enabled) {
+        const disabledReason =
+          adminCheck.reason === "only_administrator"
+            ? (copy.roleDialog.onlyAdministratorDisabled || "Only an Administrator can appoint Admins.")
+            : copy.roleDialog.adminDisabled;
         return {
           value: r,
-          label: `${meta.label} (${copy.roleDialog.adminDisabled})`,
+          label: `${meta.label} (${disabledReason})`,
           disabled: true,
         };
       }
@@ -209,7 +215,7 @@ export function MemberDrawer({
         label: meta.label,
       };
     });
-  }, [adminCheck, copy.roleDialog.adminDisabled]);
+  }, [adminCheck, copy.roleDialog.adminDisabled, copy.roleDialog.onlyAdministratorDisabled]);
 
   const handleUpdateRole = async () => {
     if (!details || savingRole || selectedRole === details.role) return;

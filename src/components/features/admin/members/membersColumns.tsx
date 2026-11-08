@@ -135,7 +135,7 @@ export function getMembersColumns({
       cell: (row) => {
         const name = row.fullName || row.email || "(no name)";
         const isSelf = row.userId === currentUserId;
-        const isAdmin = row.role === "admin";
+        const isAdmin = row.role === "admin" || row.role === "administrator";
 
         const menuItems: RowActionItem[] = isSelf
           ? [

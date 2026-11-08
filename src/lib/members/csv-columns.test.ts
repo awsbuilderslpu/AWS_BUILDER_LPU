@@ -5,7 +5,8 @@ import type { AppRole, MemberDetails } from "./types";
 
 describe("members csv-columns helper", () => {
   const roleLabels: Record<AppRole, string> = {
-    admin: "Administrator",
+    administrator: "Administrator",
+    admin: "Admin",
     core: "Core Team",
     member: "Member",
     student: "Student",

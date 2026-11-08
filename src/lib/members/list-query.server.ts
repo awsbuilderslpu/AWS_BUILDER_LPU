@@ -19,7 +19,11 @@ export function applyMemberFilters(query: any, params: ListParams): any {
   let q = query;
 
   if (params.tab && params.tab !== "all") {
-    q = q.eq("role", params.tab);
+    if (params.tab === "admin") {
+      q = q.in("role", ["administrator", "admin"]);
+    } else {
+      q = q.eq("role", params.tab);
+    }
   }
 
   if (params.filters.department) {
@@ -106,12 +110,14 @@ export async function getMemberCounts(
       supabase
         .from("admin_members")
         .select("*", { count: "exact", head: true }),
-      ...roles.map((r) =>
-        supabase
+      ...roles.map((r) => {
+        const query = supabase
           .from("admin_members")
-          .select("*", { count: "exact", head: true })
-          .eq("role", r)
-      ),
+          .select("*", { count: "exact", head: true });
+        return r === "admin"
+          ? query.in("role", ["administrator", "admin"])
+          : query.eq("role", r);
+      }),
     ]);
 
     if (totalRes.error || roleResults.some((r) => r.error)) {

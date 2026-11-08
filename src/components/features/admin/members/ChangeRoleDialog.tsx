@@ -32,6 +32,7 @@ export interface ChangeRoleDialogProps {
   onOpenChange: (open: boolean) => void;
   rows: MemberListRow[];
   actorId: string;
+  actorRole?: AppRole | null;
   onDone: () => void;
 }
 
@@ -40,6 +41,7 @@ export function ChangeRoleDialog({
   onOpenChange,
   rows,
   actorId,
+  actorRole,
   onDone,
 }: ChangeRoleDialogProps) {
   const copy = adminCopy.members;
@@ -73,16 +75,20 @@ export function ChangeRoleDialog({
 
   const adminCheck = React.useMemo(() => {
     if (!singleTargetMeta) return { enabled: false as const, reason: "self" as const };
-    return adminChoice(singleTargetMeta, actorId);
-  }, [singleTargetMeta, actorId]);
+    return adminChoice(singleTargetMeta, actorId, actorRole);
+  }, [singleTargetMeta, actorId, actorRole]);
 
   const selectOptions = React.useMemo<SelectOption[]>(() => {
     return choices.map((r) => {
       const meta = roleMeta[r];
       if (r === "admin" && !isBulk && !adminCheck.enabled) {
+        const disabledReason =
+          adminCheck.reason === "only_administrator"
+            ? (copy.roleDialog.onlyAdministratorDisabled || "Only an Administrator can appoint Admins.")
+            : copy.roleDialog.adminDisabled;
         return {
           value: r,
-          label: `${meta.label} (${copy.roleDialog.adminDisabled})`,
+          label: `${meta.label} (${disabledReason})`,
           disabled: true,
         };
       }
@@ -91,7 +97,7 @@ export function ChangeRoleDialog({
         label: meta.label,
       };
     });
-  }, [choices, isBulk, adminCheck, copy.roleDialog.adminDisabled]);
+  }, [choices, isBulk, adminCheck, copy.roleDialog.adminDisabled, copy.roleDialog.onlyAdministratorDisabled]);
 
   const targets = React.useMemo<MemberTarget[]>(() => {
     return rows.map((r) => ({
@@ -103,8 +109,8 @@ export function ChangeRoleDialog({
   }, [rows]);
 
   const { applicable, skipped } = React.useMemo(() => {
-    return splitRoleChange(targets, chosenRole, actorId);
-  }, [targets, chosenRole, actorId]);
+    return splitRoleChange(targets, chosenRole, actorId, actorRole);
+  }, [targets, chosenRole, actorId, actorRole]);
 
   const skippedCounts = React.useMemo(() => {
     return countByReason(skipped);

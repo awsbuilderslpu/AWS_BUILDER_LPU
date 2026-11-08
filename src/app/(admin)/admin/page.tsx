@@ -23,11 +23,11 @@ import {
 
 export default async function AdminDashboardPage() {
   await connection();
-  const account = await requireRole(["admin", "core"], "/admin");
+  const account = await requireRole(["administrator", "admin"], "/admin");
 
   const roleKey = (account.role as Role) || "participant";
   const roleLabel = roleMeta[roleKey]?.label || roleKey;
-  const isAdmin = account.role === "admin";
+  const isAdmin = account.role === "administrator" || account.role === "admin";
 
   const dashboardData = await getDashboardData(isAdmin);
   const counts = dashboardData.counts;

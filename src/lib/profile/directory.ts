@@ -34,7 +34,10 @@ export function toPublicCard(
 ): PublicMemberCard {
   const name = member.fullName.trim() || "(no name)";
   const title = displayTitle(member, roleLabels);
-  const isCore = member.accessRole === "admin" || member.accessRole === "core";
+  const isCore =
+    member.accessRole === "administrator" ||
+    member.accessRole === "admin" ||
+    member.accessRole === "core";
   const group: "core" | "community" = isCore ? "core" : "community";
 
   return {

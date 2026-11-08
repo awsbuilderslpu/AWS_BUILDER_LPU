@@ -24,8 +24,8 @@ export default async function AdminLayout({
 }) {
   const headerList = await headers();
   const pathname = headerList.get("x-pathname") || "/admin";
-  const account = await requireRole(["admin", "core"], pathname);
-  const isAdmin = account.role === "admin";
+  const account = await requireRole(["administrator", "admin"], pathname);
+  const isAdmin = account.role === "administrator" || account.role === "admin";
   const counts = isAdmin ? await getAdminCounts() : null;
 
   return (

@@ -27,7 +27,7 @@ export const adminNav: AdminNavItem[] = [
     label: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
-    roles: ["admin", "core"],
+    roles: ["administrator", "admin"],
     ready: true,
     section: "Overview",
   },
@@ -36,7 +36,7 @@ export const adminNav: AdminNavItem[] = [
     label: "Registrations",
     href: "/admin/registrations",
     icon: ClipboardList,
-    roles: ["admin"],
+    roles: ["administrator", "admin"],
     ready: true,
     section: "Management",
   },
@@ -45,7 +45,7 @@ export const adminNav: AdminNavItem[] = [
     label: "Members",
     href: "/admin/members",
     icon: Users,
-    roles: ["admin"],
+    roles: ["administrator", "admin"],
     ready: true,
     section: "Management",
   },
@@ -54,7 +54,7 @@ export const adminNav: AdminNavItem[] = [
     label: "Messages",
     href: "/admin/messages",
     icon: Mail,
-    roles: ["admin", "core"],
+    roles: ["administrator", "admin"],
     ready: true,
     section: "Management",
   },
@@ -63,7 +63,7 @@ export const adminNav: AdminNavItem[] = [
     label: "Events",
     href: "/admin/events",
     icon: CalendarDays,
-    roles: ["admin", "core"],
+    roles: ["administrator", "admin"],
     ready: true,
     section: "Content",
   },
@@ -72,7 +72,7 @@ export const adminNav: AdminNavItem[] = [
     label: "Blogs",
     href: "/admin/blogs",
     icon: FileText,
-    roles: ["admin", "core"],
+    roles: ["administrator", "admin"],
     ready: true,
     section: "Content",
   },
@@ -81,7 +81,7 @@ export const adminNav: AdminNavItem[] = [
     label: "Projects",
     href: "/admin/projects",
     icon: FolderGit2,
-    roles: ["admin", "core"],
+    roles: ["administrator", "admin"],
     ready: true,
     section: "Content",
   },
@@ -90,14 +90,14 @@ export const adminNav: AdminNavItem[] = [
     label: "Announcements",
     href: "/admin/announcements",
     icon: Megaphone,
-    roles: ["admin", "core"],
+    roles: ["administrator", "admin"],
     ready: true,
     section: "Content",
   },
 ];
 
 export function canAccessAdmin(role: AppRole | null): boolean {
-  return role === "admin" || role === "core";
+  return role === "administrator" || role === "admin";
 }
 
 export function visibleNav(role: AppRole | null): AdminNavItem[] {
@@ -507,6 +507,7 @@ export const adminCopy = {
         "Admins can manage the whole club, including other members. Only approved, active members can be admins.",
       adminConfirm: "I understand this gives full admin access.",
       adminDisabled: "Only approved, active members can become admins.",
+      onlyAdministratorDisabled: "Only an Administrator can appoint Admins.",
       bulkNote: "Admins can't be changed in bulk. Change them one at a time.",
       skipped: (n: number, reason: string) =>
         `${n} will be skipped: ${reason}.`,
@@ -629,6 +630,10 @@ export const adminCopy = {
         "That person isn't a member any more. The list has been refreshed.",
       admin_requires_approved_active:
         "Only approved, active members can become admins.",
+      only_administrator_can_promote_admin:
+        "Only an Administrator can assign the Admin role.",
+      cannot_modify_admin:
+        "Admins cannot modify or remove Administrators or other Admins.",
       no_change: "Nothing to change.",
       last_admin: "There must always be at least one active admin.",
       demote_admin_first: "Demote this admin first, then remove them.",
