@@ -3,26 +3,26 @@ import type { BlogFormValues } from "./validate";
 import { blogCategories } from "./categories";
 import { emptyDoc } from "../richtext/sanitize";
 
-export type BlogAction = "publish" | "unpublish" | "archive" | "restore";
+export type BlogAction = "publish" | "unpublish" | "archive" | "restore" | "delete";
 
 /**
  * Returns allowed lifecycle actions for a blog post based on its computed lifecycle:
- * - draft: ["publish", "archive"]
- * - scheduled: ["publish", "unpublish", "archive"]
- * - published: ["unpublish", "archive"]
- * - archived: ["restore"]
+ * - draft: ["publish", "archive", "delete"]
+ * - scheduled: ["publish", "unpublish", "archive", "delete"]
+ * - published: ["unpublish", "archive", "delete"]
+ * - archived: ["restore", "delete"]
  */
 export function blogActions(lifecycle: BlogLifecycle): BlogAction[] {
   if (lifecycle === "archived") {
-    return ["restore"];
+    return ["restore", "delete"];
   }
   if (lifecycle === "scheduled") {
-    return ["publish", "unpublish", "archive"];
+    return ["publish", "unpublish", "archive", "delete"];
   }
   if (lifecycle === "published") {
-    return ["unpublish", "archive"];
+    return ["unpublish", "archive", "delete"];
   }
-  return ["publish", "archive"];
+  return ["publish", "archive", "delete"];
 }
 
 /**

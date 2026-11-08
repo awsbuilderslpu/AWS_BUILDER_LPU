@@ -69,7 +69,7 @@ export interface BlogsViewProps {
 
 type OpenState =
   | { kind: "form"; id: string | null }
-  | { kind: "confirm"; action: "archive"; rows: BlogAdminRow[] }
+  | { kind: "confirm"; action: "archive" | "delete"; rows: BlogAdminRow[] }
   | null;
 
 const TAB_KEYS = ["all", "published", "drafts", "scheduled", "archived"] as const;
@@ -183,8 +183,8 @@ export function BlogsView({
   );
 
   const handleBulkAction = async (action: BlogAction) => {
-    if (action === "archive") {
-      setOpenState({ kind: "confirm", action: "archive", rows: selectedRows });
+    if (action === "archive" || action === "delete") {
+      setOpenState({ kind: "confirm", action, rows: selectedRows });
       return;
     }
 
@@ -201,8 +201,8 @@ export function BlogsView({
 
   const handleSingleAction = React.useCallback(
     async (row: BlogAdminRow, action: BlogAction) => {
-      if (action === "archive") {
-        setOpenState({ kind: "confirm", action: "archive", rows: [row] });
+      if (action === "archive" || action === "delete") {
+        setOpenState({ kind: "confirm", action, rows: [row] });
         return;
       }
 
@@ -231,13 +231,14 @@ export function BlogsView({
     [copy.results, handleActionSuccess]
   );
 
-  const handleConfirmArchive = async () => {
-    if (openState?.kind !== "confirm" || openState.action !== "archive") return;
-    const ids = openState.rows.map((r) => r.id);
-    const res = await setBlogsStateAction({ ids, action: "archive" });
+  const handleConfirmAction = async () => {
+    if (openState?.kind !== "confirm") return;
+    const { action, rows } = openState;
+    const ids = rows.map((r) => r.id);
+    const res = await setBlogsStateAction({ ids, action });
 
     if (res.ok) {
-      notify.success(copy.results.done.archive(res.changed ?? ids.length));
+      notify.success(copy.results.done[action](res.changed ?? ids.length));
       handleActionSuccess();
     } else {
       notify.error(copy.results.failedSome(ids.length));
@@ -404,7 +405,7 @@ export function BlogsView({
             key={action}
             type="button"
             size="sm"
-            variant={action === "archive" ? "destructive" : "secondary"}
+            variant={action === "archive" || action === "delete" ? "destructive" : "secondary"}
             onClick={() => handleBulkAction(action)}
             className="h-8 text-xs cursor-pointer"
           >
@@ -483,15 +484,31 @@ export function BlogsView({
         onSaved={handleActionSuccess}
       />
 
-      {/* 9. Archive Confirm Dialog */}
+      {/* 9. Confirm Dialog (Archive / Delete) */}
       <ConfirmDialog
-        open={openState?.kind === "confirm" && openState.action === "archive"}
+        open={openState?.kind === "confirm"}
         onOpenChange={(open) => !open && setOpenState(null)}
-        title={copy.confirm.archiveTitle}
-        description={copy.confirm.archiveText}
-        confirmLabel={copy.confirm.confirmArchive}
+        title={
+          openState?.kind === "confirm" && openState.action === "delete"
+            ? openState.rows.length > 1
+              ? copy.confirm.deleteTitleMultiple(openState.rows.length)
+              : copy.confirm.deleteTitle
+            : copy.confirm.archiveTitle
+        }
+        description={
+          openState?.kind === "confirm" && openState.action === "delete"
+            ? openState.rows.length > 1
+              ? copy.confirm.deleteTextMultiple(openState.rows.length)
+              : copy.confirm.deleteText
+            : copy.confirm.archiveText
+        }
+        confirmLabel={
+          openState?.kind === "confirm" && openState.action === "delete"
+            ? copy.confirm.confirmDelete
+            : copy.confirm.confirmArchive
+        }
         tone="danger"
-        onConfirm={handleConfirmArchive}
+        onConfirm={handleConfirmAction}
       />
 
       {/* 10. Import from AWS Builder Dialog */}

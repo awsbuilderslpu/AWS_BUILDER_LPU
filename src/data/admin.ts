@@ -921,18 +921,27 @@ export const adminCopy = {
       archive: "Archive",
       restore: "Restore",
       edit: "Edit",
+      delete: "Delete",
     },
     bulk: {
       publish: "Publish",
       unpublish: "Move to drafts",
       archive: "Archive",
       restore: "Restore",
+      delete: "Delete",
     },
     confirm: {
       archiveTitle: "Archive post",
       archiveText:
         "Archived posts leave the list and are hidden from the public blog. You can restore them later.",
       confirmArchive: "Archive",
+      deleteTitle: "Delete post",
+      deleteTitleMultiple: (n: number) => `Delete ${n} posts`,
+      deleteText:
+        "Are you sure you want to delete this blog post? This action cannot be undone.",
+      deleteTextMultiple: (n: number) =>
+        `Are you sure you want to delete these ${n} posts? This action cannot be undone.`,
+      confirmDelete: "Delete",
     },
     form: {
       createTitle: "Create Blog",
@@ -1038,6 +1047,7 @@ export const adminCopy = {
         unpublish: (n: number) => `Moved ${n} to drafts.`,
         archive: (n: number) => `Archived ${n}.`,
         restore: (n: number) => `Restored ${n}.`,
+        delete: (n: number) => `Deleted ${n}.`,
       },
       featured: "Featured post updated.",
       featuredDone: "Featured post updated.",

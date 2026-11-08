@@ -17,14 +17,15 @@ const mockLabels = {
   unpublish: "Move to drafts",
   archive: "Archive",
   restore: "Restore",
+  delete: "Delete",
 };
 
 describe("blog view-logic helper", () => {
   it("blogActions returns expected actions for each lifecycle", () => {
-    assert.deepEqual(blogActions("draft"), ["publish", "archive"]);
-    assert.deepEqual(blogActions("scheduled"), ["publish", "unpublish", "archive"]);
-    assert.deepEqual(blogActions("published"), ["unpublish", "archive"]);
-    assert.deepEqual(blogActions("archived"), ["restore"]);
+    assert.deepEqual(blogActions("draft"), ["publish", "archive", "delete"]);
+    assert.deepEqual(blogActions("scheduled"), ["publish", "unpublish", "archive", "delete"]);
+    assert.deepEqual(blogActions("published"), ["unpublish", "archive", "delete"]);
+    assert.deepEqual(blogActions("archived"), ["restore", "delete"]);
   });
 
   it("actionLabel returns publishNow for scheduled publish, and plain label otherwise", () => {
@@ -33,17 +34,18 @@ describe("blog view-logic helper", () => {
     assert.equal(actionLabel("unpublish", "published", mockLabels), "Move to drafts");
     assert.equal(actionLabel("archive", "draft", mockLabels), "Archive");
     assert.equal(actionLabel("restore", "archived", mockLabels), "Restore");
+    assert.equal(actionLabel("delete", "draft", mockLabels), "Delete");
   });
 
   it("commonBlogActions computes common actions for mixed, drafts, and empty list", () => {
     assert.deepEqual(commonBlogActions([]), []);
-    assert.deepEqual(commonBlogActions(["draft", "draft"]), ["publish", "archive"]);
-    // draft (publish, archive) and published (unpublish, archive) -> archive
-    assert.deepEqual(commonBlogActions(["draft", "published"]), ["archive"]);
-    // scheduled (publish, unpublish, archive) and draft (publish, archive) -> publish, archive
-    assert.deepEqual(commonBlogActions(["scheduled", "draft"]), ["publish", "archive"]);
-    // published (unpublish, archive) and archived (restore) -> []
-    assert.deepEqual(commonBlogActions(["published", "archived"]), []);
+    assert.deepEqual(commonBlogActions(["draft", "draft"]), ["publish", "archive", "delete"]);
+    // draft (publish, archive, delete) and published (unpublish, archive, delete) -> archive, delete
+    assert.deepEqual(commonBlogActions(["draft", "published"]), ["archive", "delete"]);
+    // scheduled (publish, unpublish, archive, delete) and draft (publish, archive, delete) -> publish, archive, delete
+    assert.deepEqual(commonBlogActions(["scheduled", "draft"]), ["publish", "archive", "delete"]);
+    // published (unpublish, archive, delete) and archived (restore, delete) -> delete
+    assert.deepEqual(commonBlogActions(["published", "archived"]), ["delete"]);
   });
 
   it("featuredToggleAllowed is true only for published", () => {

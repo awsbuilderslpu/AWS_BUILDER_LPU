@@ -200,7 +200,7 @@ export function getBlogColumns({
         const actions = blogActions(lifecycle);
         const menuItems: RowActionItem[] = actions.map((act) => ({
           label: actionLabel(act, lifecycle, copy.actions),
-          tone: act === "archive" ? "danger" : undefined,
+          tone: act === "archive" || act === "delete" ? "danger" : undefined,
           onSelect: () => onAction(row, act),
         }));
 

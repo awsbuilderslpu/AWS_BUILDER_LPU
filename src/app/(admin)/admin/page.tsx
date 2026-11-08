@@ -1,10 +1,25 @@
 import { connection } from "next/server";
-import { ClipboardList, UserCheck, Users } from "lucide-react";
+import {
+  ClipboardList,
+  UserCheck,
+  CalendarDays,
+  Mail,
+  FolderGit2,
+  Sparkles,
+} from "lucide-react";
 import { requireRole } from "@/lib/auth/server";
 import { roleMeta, type Role } from "@/data/roles";
 import { adminCopy, adminNav } from "@/data/admin";
-import { getAdminCounts } from "@/lib/admin/queries";
+import { getDashboardData } from "@/lib/admin/queries";
 import { StatCard, StatCardRow } from "@/components/features/admin/kit";
+import { RoleBadge } from "@/components/features/admin/kit/RoleBadge";
+import {
+  DashboardQuickActions,
+  RecentRegistrationsCard,
+  UpcomingEventsCard,
+  RecentMessagesCard,
+  ChapterPulseCard,
+} from "@/components/features/admin/dashboard";
 
 export default async function AdminDashboardPage() {
   await connection();
@@ -12,9 +27,10 @@ export default async function AdminDashboardPage() {
 
   const roleKey = (account.role as Role) || "participant";
   const roleLabel = roleMeta[roleKey]?.label || roleKey;
-
   const isAdmin = account.role === "admin";
-  const counts = isAdmin ? await getAdminCounts() : null;
+
+  const dashboardData = await getDashboardData(isAdmin);
+  const counts = dashboardData.counts;
 
   const regNavItem = adminNav.find((item) => item.key === "registrations");
   const pendingHref = regNavItem?.ready
@@ -23,62 +39,139 @@ export default async function AdminDashboardPage() {
   const approvedHref = regNavItem?.ready
     ? "/admin/registrations?tab=approved"
     : undefined;
-  const totalHref = regNavItem?.ready ? "/admin/registrations" : undefined;
 
   return (
-    <div className="space-y-6">
-      {/* Page Heading */}
-      <div>
-        <h1 className="text-2xl sm:text-[36px] font-bold tracking-tight text-white leading-tight">
-          {adminCopy.dashboard.title}
-        </h1>
-        <p className="mt-1 sm:mt-1.5 text-sm sm:text-[16px] text-muted-foreground">
-          {adminCopy.dashboard.subtitle}
-        </p>
+    <div className="space-y-6 sm:space-y-8">
+      {/* Page Heading & Welcome Banner */}
+      <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-br from-card/90 via-card/50 to-[#050B18] p-5 sm:p-7 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-mono text-primary font-semibold uppercase tracking-wider">
+              <span className="size-2 rounded-full bg-primary animate-pulse" />
+              AWS Builder Group · LPU Chapter Console
+            </div>
+            <h1 className="mt-1.5 text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
+              Welcome back, {account.displayName || "Builder"}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {adminCopy.dashboard.subtitle}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0 self-start md:self-auto">
+            <RoleBadge role={account.role || "participant"} />
+            <div className="hidden sm:flex items-center gap-2 rounded-xl border border-border/70 bg-[#050B18]/70 px-3 py-1.5 text-xs font-mono text-muted-foreground">
+              <span className="size-1.5 rounded-full bg-emerald-400" />
+              ap-south-1
+            </div>
+          </div>
+        </div>
+
+        {/* Ambient background glow */}
+        <div className="pointer-events-none absolute -right-16 -top-16 size-64 rounded-full bg-primary/10 blur-3xl" />
       </div>
 
-      {/* Admin Stat Cards (Admin role only) */}
-      {isAdmin && (
-        <div>
-          <StatCardRow>
-            <StatCard
-              label={adminCopy.dashboard.cards.pending}
-              value={counts ? counts.pending : null}
-              icon={ClipboardList}
-              tone="orange"
-              href={pendingHref}
-            />
-            <StatCard
-              label={adminCopy.dashboard.cards.approved}
-              value={counts ? counts.approved : null}
-              icon={UserCheck}
-              tone="green"
-              href={approvedHref}
-            />
-            <StatCard
-              label={adminCopy.dashboard.cards.total}
-              value={counts ? counts.total : null}
-              icon={Users}
-              tone="blue"
-              href={totalHref}
-            />
-          </StatCardRow>
-          {counts === null && (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {adminCopy.dashboard.countsUnavailable}
-            </p>
+      {/* Primary Metrics Grid */}
+      <div>
+        <StatCardRow className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          {isAdmin ? (
+            <>
+              <StatCard
+                label={adminCopy.dashboard.cards.pending}
+                value={counts.pending}
+                icon={ClipboardList}
+                tone="orange"
+                href={pendingHref}
+                hint={counts.pending > 0 ? "Requires review" : "Up to date"}
+              />
+              <StatCard
+                label={adminCopy.dashboard.cards.approved}
+                value={counts.approved}
+                icon={UserCheck}
+                tone="green"
+                href={approvedHref}
+                hint="Active club members"
+              />
+              <StatCard
+                label="Upcoming Events"
+                value={counts.upcomingEvents}
+                icon={CalendarDays}
+                tone="blue"
+                href="/admin/events"
+                hint="Workshops & sessions"
+              />
+              <StatCard
+                label="Contact Inquiries"
+                value={counts.newMessages}
+                icon={Mail}
+                tone="violet"
+                href="/admin/messages"
+                hint={counts.newMessages > 0 ? `${counts.newMessages} unread` : "All read"}
+              />
+            </>
+          ) : (
+            <>
+              <StatCard
+                label="Upcoming Events"
+                value={counts.upcomingEvents}
+                icon={CalendarDays}
+                tone="blue"
+                href="/admin/events"
+                hint="Scheduled club events"
+              />
+              <StatCard
+                label="Total Events"
+                value={counts.totalEvents}
+                icon={Sparkles}
+                tone="green"
+                href="/admin/events"
+                hint="All organized events"
+              />
+              <StatCard
+                label="Contact Inquiries"
+                value={counts.newMessages}
+                icon={Mail}
+                tone="violet"
+                href="/admin/messages"
+                hint="Inbound queries"
+              />
+              <StatCard
+                label="Club Projects"
+                value={counts.totalProjects}
+                icon={FolderGit2}
+                tone="orange"
+                href="/admin/projects"
+                hint="Community projects"
+              />
+            </>
           )}
-        </div>
-      )}
+        </StatCardRow>
+      </div>
 
-      {/* Overview Welcome Card (16a) */}
-      <div className="mt-6 sm:mt-8 rounded-2xl border border-border bg-card/60 p-4 sm:p-6 md:p-8 backdrop-blur-sm">
-        <h2 className="text-lg sm:text-xl font-semibold text-white">
-          {adminCopy.dashboard.welcome(account.displayName, roleLabel)}
-        </h2>
-        <p className="mt-2.5 sm:mt-3 text-sm leading-relaxed text-muted-foreground">
-          {adminCopy.dashboard.note}
-        </p>
+      {/* Quick Actions & Navigation Bar */}
+      <DashboardQuickActions
+        isAdmin={isAdmin}
+        pendingCount={counts.pending}
+        newMessagesCount={counts.newMessages}
+      />
+
+      {/* Main 2-Column Content Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column (Main Feed & Data) */}
+        <div className="lg:col-span-7 space-y-6">
+          {isAdmin && (
+            <RecentRegistrationsCard rows={dashboardData.recentRegistrations} />
+          )}
+
+          <RecentMessagesCard messages={dashboardData.recentMessages} />
+        </div>
+
+        {/* Right Column (Events & System Health) */}
+        <div className="lg:col-span-5 space-y-6">
+          <UpcomingEventsCard events={dashboardData.upcomingEvents} />
+
+          <ChapterPulseCard />
+        </div>
       </div>
     </div>
   );

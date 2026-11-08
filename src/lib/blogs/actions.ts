@@ -76,7 +76,7 @@ const idSchema = z.string().uuid();
 
 const setBlogsStateSchema = z.object({
   ids: z.array(z.string().uuid()).min(1).max(25),
-  action: z.enum(["publish", "unpublish", "archive", "restore"]),
+  action: z.enum(["publish", "unpublish", "archive", "restore", "delete"]),
 });
 
 const setFeaturedSchema = z.object({
@@ -242,6 +242,23 @@ export async function setBlogsStateAction(input: unknown): Promise<SetBlogsState
   }
 
   const { ids, action } = parsed.data;
+  const supabase = await createClient();
+
+  if (action === "delete") {
+    const { data, error } = await supabase
+      .from("blogs")
+      .delete()
+      .in("id", ids)
+      .select("id");
+
+    if (error) {
+      return { ok: false, error: mapDatabaseError(error) };
+    }
+
+    revalidateBlogs();
+    return { ok: true, changed: data?.length ?? ids.length };
+  }
+
   let patch: Record<string, unknown> = {};
 
   if (action === "publish") {
@@ -253,8 +270,6 @@ export async function setBlogsStateAction(input: unknown): Promise<SetBlogsState
   } else if (action === "restore") {
     patch = { status: "draft" };
   }
-
-  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("blogs")
@@ -268,6 +283,17 @@ export async function setBlogsStateAction(input: unknown): Promise<SetBlogsState
 
   revalidateBlogs();
   return { ok: true, changed: data?.length ?? 0 };
+}
+
+export async function deleteBlogsAction(
+  idsOrInput: unknown
+): Promise<SetBlogsStateResult> {
+  const ids = Array.isArray(idsOrInput)
+    ? idsOrInput
+    : typeof idsOrInput === "string"
+    ? [idsOrInput]
+    : (idsOrInput as { ids?: unknown })?.ids;
+  return setBlogsStateAction({ ids, action: "delete" });
 }
 
 export async function setFeaturedBlogAction(input: unknown): Promise<SetFeaturedBlogResult> {
