@@ -147,7 +147,7 @@ export async function signInWithPassword({
  */
 export async function registerAccount(
   input: RegisterInput
-): Promise<AuthResult & { unconfirmed?: boolean }> {
+): Promise<AuthResult & { unconfirmed?: boolean; alreadyExists?: boolean }> {
   if (!isSupabaseConfigured()) {
     return { ok: false, error: authCopy.errors.unavailable };
   }
@@ -171,10 +171,27 @@ export async function registerAccount(
       }
 
       const msg = (error.message || "").toLowerCase();
+      const code = (error.code || "").toLowerCase();
+
+      // Check for user already registered
+      if (
+        code === "user_already_exists" ||
+        error.status === 422 ||
+        msg.includes("user already registered") ||
+        msg.includes("already registered") ||
+        msg.includes("already exists") ||
+        msg.includes("user_already_exists")
+      ) {
+        return {
+          ok: false,
+          error: registrationCopy.errors.alreadyExists,
+          alreadyExists: true,
+        };
+      }
 
       if (
-        error.code === "over_request_rate_limit" ||
-        error.code === "over_email_send_rate_limit" ||
+        code === "over_request_rate_limit" ||
+        code === "over_email_send_rate_limit" ||
         error.status === 429 ||
         msg.includes("rate limit")
       ) {
@@ -182,13 +199,14 @@ export async function registerAccount(
       }
 
       if (
-        msg.includes("error sending confirmation mail") ||
-        msg.includes("error sending confirmation email")
+        msg.includes("confirmation") ||
+        msg.includes("error sending") ||
+        msg.includes("mail") ||
+        msg.includes("smtp")
       ) {
         return {
           ok: false,
-          error:
-            "Your registration was received, but the confirmation email could not be sent. Please check back later or contact an administrator.",
+          error: registrationCopy.errors.emailSendingFailed,
         };
       }
 
@@ -197,7 +215,11 @@ export async function registerAccount(
 
     // Enumeration defense: If user already exists, Supabase returns user with empty identities
     if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-      return { ok: true, unconfirmed: true };
+      return {
+        ok: false,
+        error: registrationCopy.errors.alreadyExists,
+        alreadyExists: true,
+      };
     }
 
     return { ok: true, unconfirmed: !data.session };

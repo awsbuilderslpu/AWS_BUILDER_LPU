@@ -279,6 +279,10 @@ export const registrationCopy = {
     graduationYear: "Please choose your expected graduation year.",
     role: "Please choose a role.",
     registerFailed: "We couldn't create your account. Please try again.",
+    alreadyExists:
+      "An account or registration request with this email already exists. If your registration is pending review, you will receive an email once approved. Otherwise, please sign in.",
+    emailSendingFailed:
+      "Your registration was received! However, the confirmation email could not be sent. Club admins have received your details and will review your registration.",
     resendFailed: "We couldn't resend the email. Please try again in a moment.",
     email: authCopy.errors.email,
   },

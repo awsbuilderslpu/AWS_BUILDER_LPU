@@ -39,6 +39,7 @@ export function ReviewStep() {
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [isAlreadyExists, setIsAlreadyExists] = React.useState(false);
   const [completeSuccess, setCompleteSuccess] = React.useState(false);
 
   const isCompleteMode = state.mode === "complete";
@@ -77,9 +78,16 @@ export function ReviewStep() {
     router.push(next);
   };
 
+  const handleSwitchToSignIn = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(authParam, "signin");
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsAlreadyExists(false);
 
     if (isCompleteMode) {
       const parsed = completeRegistrationSchema.safeParse(state.data);
@@ -122,8 +130,10 @@ export function ReviewStep() {
       const result = await registerAccount(parsed.data);
       if (!result.ok) {
         setError(result.error);
+        setIsAlreadyExists(Boolean(result.alreadyExists));
         return;
       }
+      setIsAlreadyExists(false);
       if (result.unconfirmed) {
         markSubmitted();
       } else {
@@ -382,9 +392,21 @@ export function ReviewStep() {
         {error && (
           <div
             role="alert"
-            className="rounded-md border border-red-400/40 bg-red-400/10 px-4 py-3 text-sm text-red-400"
+            className="rounded-lg border border-red-400/40 bg-red-400/10 p-4 text-[13.5px] leading-relaxed text-red-400"
           >
-            {error}
+            <p>{error}</p>
+            {isAlreadyExists && (
+              <div className="mt-3">
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={handleSwitchToSignIn}
+                  className="h-8 px-3 text-xs font-semibold"
+                >
+                  Sign in to your account
+                </Button>
+              </div>
+            )}
           </div>
         )}
 
