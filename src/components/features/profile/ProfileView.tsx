@@ -1157,8 +1157,8 @@ export function ProfileView({
               !isApproved
                 ? "cursor-not-allowed opacity-50 bg-card border-border"
                 : isPublic
-                ? "bg-primary cursor-pointer shadow-md shadow-primary/30"
-                : "bg-muted border-border cursor-pointer"
+                  ? "bg-primary cursor-pointer shadow-md shadow-primary/30"
+                  : "bg-muted border-border cursor-pointer"
             )}
           >
             <span
@@ -1589,9 +1589,9 @@ export function ProfileView({
               <div className="space-y-3 flex-1">
                 <div className="flex items-center gap-2">
                   <Award className="size-5 text-primary" />
-                  <h3 className="font-bold text-lg text-foreground">Official Student Builder Credential</h3>
+                  <h3 className="font-bold text-lg text-white">Official Student Builder Credential</h3>
                 </div>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   This digital membership pass confirms your affiliation with the AWS Student Builder Group at Lovely Professional University. It verifies your active participation in workshops, hackathons, cloud labs, and community networking.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">

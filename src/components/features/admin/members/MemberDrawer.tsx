@@ -470,7 +470,7 @@ export function MemberDrawer({
             <div className="rounded-lg border border-border bg-card/50 p-4 space-y-2.5">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h3 className="text-[17px] font-semibold text-white truncate leading-snug">
+                  <h3 className="text-[17px] font-semibold text-foreground truncate leading-snug">
                     {name}
                   </h3>
                   <p className="text-[13px] text-muted-foreground truncate leading-tight mt-0.5">
@@ -632,7 +632,7 @@ export function MemberDrawer({
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-between rounded-md border border-border bg-card/40 px-3 py-2 text-[13.5px] text-foreground hover:border-primary/40 hover:text-white transition-colors"
+                      className="flex items-center justify-between rounded-md border border-border bg-card/40 px-3 py-2 text-[13.5px] text-foreground hover:border-primary/40 hover:text-primary transition-colors"
                     >
                       <div className="flex items-center gap-2">
                         {link.icon}
@@ -726,7 +726,7 @@ export function MemberDrawer({
                     ) : (
                       <div className="pt-3 border-t border-border space-y-1.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-[13.5px] font-medium text-white">
+                          <span className="text-[13.5px] font-medium text-foreground">
                             {copy.drawer.activeLabel}
                           </span>
                           <button
@@ -849,7 +849,7 @@ export function MemberDrawer({
                 </p>
               ) : (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-[12.5px] font-medium text-white">
+                  <div className="flex items-center justify-between text-[12.5px] font-medium text-foreground">
                     <label htmlFor="member-drawer-notes">
                       {copy.drawer.noteLabel}
                     </label>

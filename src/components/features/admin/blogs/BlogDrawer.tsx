@@ -409,7 +409,7 @@ export function BlogDrawer({
                   {/* Excerpt with 200 character counter */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label htmlFor="blog-excerpt" className="block text-[12.5px] font-medium text-white select-none">
+                      <label htmlFor="blog-excerpt" className="block text-[12.5px] font-medium text-foreground select-none">
                         {copy.form.labels.excerpt}
                       </label>
                       <span
@@ -568,7 +568,7 @@ export function BlogDrawer({
                   {/* Meta Title with 70 character counter */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label htmlFor="blog-meta-title" className="block text-[12.5px] font-medium text-white select-none">
+                      <label htmlFor="blog-meta-title" className="block text-[12.5px] font-medium text-foreground select-none">
                         {copy.form.labels.metaTitle}
                       </label>
                       <span
@@ -602,7 +602,7 @@ export function BlogDrawer({
                   {/* Meta Description with 160 character counter */}
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label htmlFor="blog-meta-desc" className="block text-[12.5px] font-medium text-white select-none">
+                      <label htmlFor="blog-meta-desc" className="block text-[12.5px] font-medium text-foreground select-none">
                         {copy.form.labels.metaDescription}
                       </label>
                       <span
@@ -659,7 +659,7 @@ export function BlogDrawer({
                             htmlFor="blog-featured-toggle"
                             className={cn(
                               "block text-[12.5px] font-medium select-none",
-                              canFeature ? "text-white cursor-pointer" : "text-muted-foreground cursor-not-allowed"
+                              canFeature ? "text-foreground cursor-pointer" : "text-muted-foreground cursor-not-allowed"
                             )}
                           >
                             {copy.form.labels.featured}
@@ -728,7 +728,7 @@ export function BlogDrawer({
                       </span>
                     </div>
 
-                    <h2 className="text-xl font-bold text-white leading-snug">
+                    <h2 className="text-xl font-bold text-foreground leading-snug">
                       {watchedTitle || "Untitled Blog Post"}
                     </h2>
 

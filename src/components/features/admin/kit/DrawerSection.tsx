@@ -20,7 +20,7 @@ export function DrawerSection({
   return (
     <div
       className={cn(
-        "rounded-xl border border-slate-800/80 bg-slate-900/40 p-4 space-y-3 transition-colors hover:border-slate-700/80",
+        "rounded-xl border border-border bg-muted/30 p-4 space-y-3 transition-colors hover:border-primary/40",
         className
       )}
     >
@@ -33,7 +33,7 @@ export function DrawerSection({
               aria-hidden="true"
             />
           </div>
-          <h4 className="text-[15px] font-semibold text-slate-100 tracking-tight truncate">
+          <h4 className="text-[15px] font-semibold text-foreground tracking-tight truncate">
             {title}
           </h4>
         </div>

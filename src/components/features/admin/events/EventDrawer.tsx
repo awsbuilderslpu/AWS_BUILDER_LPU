@@ -541,7 +541,7 @@ export function EventDrawer({
                       <div className="space-y-1">
                         <label
                           htmlFor="event-reg-enabled"
-                          className="block text-[12.5px] font-medium text-white cursor-pointer"
+                          className="block text-[12.5px] font-medium text-foreground cursor-pointer"
                         >
                           {copy.form.labels.registrationEnabled}
                         </label>
@@ -628,7 +628,7 @@ export function EventDrawer({
                       <div className="space-y-1">
                         <label
                           htmlFor="event-published"
-                          className="block text-[12.5px] font-medium text-white cursor-pointer"
+                          className="block text-[12.5px] font-medium text-foreground cursor-pointer"
                         >
                           {copy.form.labels.isPublished}
                         </label>

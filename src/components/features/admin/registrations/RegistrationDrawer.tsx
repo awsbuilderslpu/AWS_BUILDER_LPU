@@ -245,7 +245,7 @@ export function RegistrationDrawer({
                 type="button"
                 variant="ghost"
                 onClick={() => onOpenChange(false)}
-                className="h-10 px-4 text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-xl cursor-pointer"
+                className="h-10 px-4 text-foreground hover:bg-muted rounded-xl cursor-pointer"
               >
                 Close
               </Button>
@@ -256,7 +256,7 @@ export function RegistrationDrawer({
                     type="button"
                     variant="outline"
                     onClick={() => handleActionClick("reopen")}
-                    className="h-10 px-4 border-slate-700/80 hover:bg-slate-800 text-slate-200 font-medium rounded-xl cursor-pointer flex items-center gap-2"
+                    className="h-10 px-4 border-border hover:bg-muted text-foreground font-medium rounded-xl cursor-pointer flex items-center gap-2"
                   >
                     <RotateCcw className="size-4" />
                     <span>{copy.actions.reopen}</span>
@@ -268,7 +268,7 @@ export function RegistrationDrawer({
                     type="button"
                     variant="outline"
                     onClick={() => handleActionClick("archive")}
-                    className="h-10 px-4 border-slate-700/80 text-slate-400 hover:text-rose-400 hover:border-rose-500/30 hover:bg-rose-500/10 font-medium rounded-xl cursor-pointer flex items-center gap-2"
+                    className="h-10 px-4 border-border text-muted-foreground hover:text-rose-500 hover:border-rose-500/30 hover:bg-rose-500/10 font-medium rounded-xl cursor-pointer flex items-center gap-2"
                   >
                     <Archive className="size-4" />
                     <span>{copy.actions.archive}</span>
@@ -315,28 +315,28 @@ export function RegistrationDrawer({
       >
         {loading ? (
           <div className="space-y-4 py-4">
-            <div className="h-28 rounded-2xl bg-slate-900/60 animate-pulse border border-slate-800/80" />
+            <div className="h-28 rounded-2xl bg-muted/50 animate-pulse border border-border" />
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="h-20 rounded-xl bg-slate-900/60 animate-pulse border border-slate-800/80"
+                  className="h-20 rounded-xl bg-muted/50 animate-pulse border border-border"
                 />
               ))}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="h-64 rounded-xl bg-slate-900/60 animate-pulse border border-slate-800/80" />
-              <div className="h-64 rounded-xl bg-slate-900/60 animate-pulse border border-slate-800/80" />
+              <div className="h-64 rounded-xl bg-muted/50 animate-pulse border border-border" />
+              <div className="h-64 rounded-xl bg-muted/50 animate-pulse border border-border" />
             </div>
           </div>
         ) : !details ? (
-          <div className="py-16 text-center text-sm text-slate-400">
+          <div className="py-16 text-center text-sm text-muted-foreground">
             {copy.empty.title}
           </div>
         ) : (
           <div className="space-y-4 sm:space-y-5">
             {/* Hero Profile Card */}
-            <div className="relative rounded-2xl border border-slate-800/90 bg-gradient-to-br from-slate-900/90 via-[#0D1322] to-slate-900/80 p-4 sm:p-5 shadow-xl overflow-hidden">
+            <div className="relative rounded-2xl border border-border bg-muted/40 p-4 sm:p-5 shadow-sm overflow-hidden">
               {/* Subtle ambient decorative gradient */}
               <div className="pointer-events-none absolute -top-12 -right-12 size-48 rounded-full bg-primary/10 blur-3xl" />
 
@@ -350,7 +350,7 @@ export function RegistrationDrawer({
                     <span
                       title={`Status: ${details.status}`}
                       className={cn(
-                        "absolute -bottom-1 -right-1 size-3.5 rounded-full ring-2 ring-[#0A0E17]",
+                        "absolute -bottom-1 -right-1 size-3.5 rounded-full ring-2 ring-background",
                         statusColorMap[details.status as keyof typeof statusColorMap] ||
                           "bg-slate-400 ring-slate-500/30"
                       )}
@@ -360,13 +360,13 @@ export function RegistrationDrawer({
                   {/* Identity text */}
                   <div className="min-w-0 space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight truncate leading-tight">
+                      <h3 className="text-lg sm:text-xl font-bold text-foreground tracking-tight truncate leading-tight">
                         {name}
                       </h3>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-xs sm:text-[13px] text-slate-400">
-                      <Mail className="size-3.5 text-slate-500 shrink-0" />
+                    <div className="flex items-center gap-1.5 text-xs sm:text-[13px] text-muted-foreground">
+                      <Mail className="size-3.5 text-muted-foreground shrink-0" />
                       <a
                         href={`mailto:${details.email}`}
                         className="truncate hover:text-primary transition-colors underline-offset-2 hover:underline"
@@ -383,8 +383,8 @@ export function RegistrationDrawer({
                       </StatusBadge>
                       <RoleBadge role={details.requestedRole} />
                       {details.registrationNumber && (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono bg-slate-800/80 text-slate-300 border border-slate-700/60">
-                          <Hash className="size-3 text-slate-400" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-mono bg-card text-foreground border border-border">
+                          <Hash className="size-3 text-muted-foreground" />
                           <span>{details.registrationNumber}</span>
                           <CopyButton
                             text={details.registrationNumber}
@@ -404,7 +404,7 @@ export function RegistrationDrawer({
                     variant="outline"
                     size="sm"
                     onClick={() => setEditProfileOpen(true)}
-                    className="h-9 px-3.5 text-xs font-medium border-slate-700/80 hover:bg-slate-800 hover:text-white transition-all cursor-pointer rounded-xl flex items-center gap-1.5 shadow-sm"
+                    className="h-9 px-3.5 text-xs font-medium border-border text-foreground hover:bg-muted transition-all cursor-pointer rounded-xl flex items-center gap-1.5 shadow-sm"
                   >
                     <Pencil className="size-3.5 text-primary" />
                     <span>Edit Profile</span>
@@ -415,49 +415,49 @@ export function RegistrationDrawer({
 
             {/* Quick Stat Highlights */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
-              <div className="rounded-xl border border-slate-800/80 bg-slate-900/35 p-3 sm:p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+              <div className="rounded-xl border border-border bg-muted/40 p-3 sm:p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                   <Building2 className="size-3.5 text-primary/80 shrink-0" />
                   <span className="truncate">Institution</span>
                 </div>
                 <div
-                  className="text-xs sm:text-[13px] font-semibold text-slate-100 truncate"
+                  className="text-xs sm:text-[13px] font-semibold text-foreground truncate"
                   title={uniLabel}
                 >
                   {uniLabel}
                 </div>
               </div>
 
-              <div className="rounded-xl border border-slate-800/80 bg-slate-900/35 p-3 sm:p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+              <div className="rounded-xl border border-border bg-muted/40 p-3 sm:p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                   <GraduationCap className="size-3.5 text-primary/80 shrink-0" />
                   <span className="truncate">Programme</span>
                 </div>
                 <div
-                  className="text-xs sm:text-[13px] font-semibold text-slate-100 truncate"
+                  className="text-xs sm:text-[13px] font-semibold text-foreground truncate"
                   title={programmeLabel(details.programme, details.department, departments)}
                 >
                   {programmeLabel(details.programme, details.department, departments) || "-"}
                 </div>
               </div>
 
-              <div className="rounded-xl border border-slate-800/80 bg-slate-900/35 p-3 sm:p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+              <div className="rounded-xl border border-border bg-muted/40 p-3 sm:p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                   <BookOpen className="size-3.5 text-primary/80 shrink-0" />
                   <span className="truncate">Study Year</span>
                 </div>
-                <div className="text-xs sm:text-[13px] font-semibold text-slate-100 truncate">
+                <div className="text-xs sm:text-[13px] font-semibold text-foreground truncate">
                   {details.studyYear ? `${details.studyYear} Year` : "-"}
                   {details.semester ? ` • Sem ${details.semester}` : ""}
                 </div>
               </div>
 
-              <div className="rounded-xl border border-slate-800/80 bg-slate-900/35 p-3 sm:p-3.5 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+              <div className="rounded-xl border border-border bg-muted/40 p-3 sm:p-3.5 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                   <Calendar className="size-3.5 text-primary/80 shrink-0" />
                   <span className="truncate">Graduation</span>
                 </div>
-                <div className="text-xs sm:text-[13px] font-semibold text-slate-100 truncate">
+                <div className="text-xs sm:text-[13px] font-semibold text-foreground truncate">
                   {details.graduationYear ? `Class of ${details.graduationYear}` : "-"}
                 </div>
               </div>
@@ -598,14 +598,14 @@ export function RegistrationDrawer({
                 {/* Internal Admin Note */}
                 <DrawerSection icon={ShieldCheck} title={copy.drawer.sections.review}>
                   <div className="space-y-2.5">
-                    <div className="flex items-center justify-between text-xs font-medium text-slate-300">
+                    <div className="flex items-center justify-between text-xs font-medium text-foreground">
                       <label htmlFor="drawer-admin-note" className="flex items-center gap-1.5">
                         <span>{copy.drawer.fields.adminNote}</span>
-                        <span className="text-[11px] text-slate-500 font-normal">
+                        <span className="text-[11px] text-muted-foreground font-normal">
                           (Private to admins)
                         </span>
                       </label>
-                      <span className="text-[11px] text-slate-500">
+                      <span className="text-[11px] text-muted-foreground">
                         {note.length} / 2000
                       </span>
                     </div>
@@ -619,7 +619,7 @@ export function RegistrationDrawer({
                       disabled={savingNote}
                       className={cn(
                         fieldClass,
-                        "h-auto py-2.5 resize-none leading-relaxed text-xs sm:text-sm bg-slate-950/60 border-slate-800 focus:border-primary/60 rounded-xl"
+                        "h-auto py-2.5 resize-none leading-relaxed text-xs sm:text-sm bg-background border-border focus:border-primary/60 rounded-xl"
                       )}
                     />
                     <div className="flex justify-end pt-0.5">
@@ -629,7 +629,7 @@ export function RegistrationDrawer({
                         variant="outline"
                         onClick={handleSaveNote}
                         disabled={savingNote || note === (details.adminNote || "")}
-                        className="h-8.5 px-3 text-xs font-medium rounded-xl cursor-pointer border-slate-700/80 hover:bg-slate-800"
+                        className="h-8.5 px-3 text-xs font-medium rounded-xl cursor-pointer border-border text-foreground hover:bg-muted"
                       >
                         {savingNote ? (
                           <>

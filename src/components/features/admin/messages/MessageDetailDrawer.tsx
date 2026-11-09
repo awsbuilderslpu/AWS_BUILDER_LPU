@@ -148,10 +148,10 @@ export function MessageDetailDrawer({
       }
     >
       {/* 1. Header Card: Status & Sender Overview */}
-      <div className="rounded-xl border border-border/80 bg-card/60 p-4 sm:p-5">
+      <div className="rounded-xl border border-border/80 bg-muted/40 p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border/60">
           <div>
-            <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+            <h3 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
               {message.name}
             </h3>
             <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground font-mono">
@@ -173,19 +173,19 @@ export function MessageDetailDrawer({
                   statusInfo.badgeClass
                 )}
               >
-                <option value="new" className="bg-[#0A0E17] text-amber-400">
+                <option value="new" className="bg-popover text-amber-500">
                   New
                 </option>
-                <option value="read" className="bg-[#0A0E17] text-blue-400">
+                <option value="read" className="bg-popover text-blue-500">
                   Read
                 </option>
-                <option value="in_progress" className="bg-[#0A0E17] text-purple-400">
+                <option value="in_progress" className="bg-popover text-purple-500">
                   In Progress
                 </option>
-                <option value="resolved" className="bg-[#0A0E17] text-emerald-400">
+                <option value="resolved" className="bg-popover text-emerald-500">
                   Resolved
                 </option>
-                <option value="archived" className="bg-[#0A0E17] text-slate-400">
+                <option value="archived" className="bg-popover text-muted-foreground">
                   Archived
                 </option>
               </select>
@@ -267,7 +267,7 @@ export function MessageDetailDrawer({
             </Button>
           </div>
 
-          <p className="whitespace-pre-wrap pr-16 text-sm sm:text-[15px] leading-relaxed text-slate-200">
+          <p className="whitespace-pre-wrap pr-16 text-sm sm:text-[15px] leading-relaxed text-foreground">
             {message.message}
           </p>
         </div>
@@ -276,13 +276,13 @@ export function MessageDetailDrawer({
       {/* 3. Resume / CV Attachment */}
       {message.resume_path && (
         <DrawerSection icon={FileText} title="Attachment">
-          <div className="flex items-center justify-between rounded-xl border border-border/80 bg-card/60 p-4">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-muted/40 p-4">
             <div className="flex items-center gap-3 min-w-0">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary border border-primary/20">
                 <FileText className="size-5" />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-white">
+                <p className="truncate text-sm font-semibold text-foreground">
                   {message.resume_path.split("/").pop() || "Resume File"}
                 </p>
                 <p className="text-xs text-muted-foreground">
