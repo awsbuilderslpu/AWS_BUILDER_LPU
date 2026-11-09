@@ -76,3 +76,4 @@ export async function syncGoogleAvatar(
     return null;
   }
 }
+
