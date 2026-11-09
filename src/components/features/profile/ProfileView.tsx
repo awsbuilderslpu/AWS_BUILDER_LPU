@@ -42,6 +42,7 @@ import {
   Award,
   Palette,
   Copy,
+  Link as LinkIcon,
 } from "lucide-react";
 import {
   FaAws,
@@ -1320,7 +1321,8 @@ export function ProfileView({
               </div>
 
               {/* Name, Badges, and Headline */}
-              <div className="sm:mb-1 space-y-1.5">
+              <div className="sm:mb-1 space-y-2">
+                {/* Row 1: Name & Official Roles */}
                 <div className="flex flex-wrap items-center gap-2.5">
                   <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground sm:text-white tracking-tight leading-tight">
                     {account.displayName || account.email}
@@ -1329,14 +1331,144 @@ export function ProfileView({
                     <RoleBadge role={account.role as Role} />
                   )}
                   {account.registrationStatus === "approved" && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400 shadow-xs">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400 shadow-xs backdrop-blur-xs">
                       <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       <span>Verified Builder</span>
                     </span>
                   )}
-                  <span className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-[10.5px] font-medium text-primary">
+                </div>
+
+                {/* Row 2: Chapter Badge & Frosted Glass Social Island */}
+                <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary shadow-xs backdrop-blur-xs">
                     LPU Chapter
                   </span>
+
+                  <span className="hidden sm:inline-block h-3.5 w-px bg-white/20" />
+
+                  {/* Frosted Glass Socials Island */}
+                  <div className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/60 px-2 py-0.5 backdrop-blur-md shadow-md ring-1 ring-white/10">
+                    {/* GitHub */}
+                    {profile.githubUrl ? (
+                      <a
+                        href={profile.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="GitHub profile"
+                        title={`GitHub: ${profile.githubUrl}`}
+                        className="size-6 rounded-full flex items-center justify-center text-slate-300 hover:text-white hover:bg-white/15 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                      >
+                        <FaGithub className="size-3.5" />
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsEditing(true);
+                          setActiveTab("social");
+                        }}
+                        aria-label="Add GitHub profile link"
+                        title="Add GitHub profile link"
+                        className="size-6 rounded-full flex items-center justify-center text-slate-400/50 hover:text-white hover:bg-white/10 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                      >
+                        <FaGithub className="size-3.5" />
+                      </button>
+                    )}
+
+                    {/* LinkedIn */}
+                    {profile.linkedinUrl ? (
+                      <a
+                        href={profile.linkedinUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="LinkedIn profile"
+                        title={`LinkedIn: ${profile.linkedinUrl}`}
+                        className="size-6 rounded-full flex items-center justify-center text-slate-300 hover:text-[#0A66C2] hover:bg-[#0A66C2]/15 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                      >
+                        <FaLinkedin className="size-3.5" />
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsEditing(true);
+                          setActiveTab("social");
+                        }}
+                        aria-label="Add LinkedIn profile link"
+                        title="Add LinkedIn profile link"
+                        className="size-6 rounded-full flex items-center justify-center text-slate-400/50 hover:text-white hover:bg-white/10 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                      >
+                        <FaLinkedin className="size-3.5" />
+                      </button>
+                    )}
+
+                    {/* Website / Portfolio Link */}
+                    {profile.websiteUrl ? (
+                      <a
+                        href={profile.websiteUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Website or portfolio"
+                        title={`Website: ${profile.websiteUrl}`}
+                        className="size-6 rounded-full flex items-center justify-center text-slate-300 hover:text-primary hover:bg-primary/15 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                      >
+                        <LinkIcon className="size-3.5" />
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsEditing(true);
+                          setActiveTab("social");
+                        }}
+                        aria-label="Add website or portfolio link"
+                        title="Add website or portfolio link"
+                        className="size-6 rounded-full flex items-center justify-center text-slate-400/50 hover:text-white hover:bg-white/10 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                      >
+                        <LinkIcon className="size-3.5" />
+                      </button>
+                    )}
+
+                    {/* Optional Connected Socials (AWS Builder, Instagram, YouTube) */}
+                    {profile.awsBuilderUrl && (
+                      <a
+                        href={profile.awsBuilderUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="AWS Builder Profile"
+                        title={`AWS Builder: ${profile.awsBuilderUrl}`}
+                        className="size-6 rounded-full flex items-center justify-center text-[#FF9900] hover:text-[#FFB84D] hover:bg-[#FF9900]/15 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                      >
+                        <FaAws className="size-3.5" />
+                      </a>
+                    )}
+
+                    {profile.instagramUrl && (
+                      <a
+                        href={profile.instagramUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Instagram profile"
+                        title={`Instagram: ${profile.instagramUrl}`}
+                        className="size-6 rounded-full flex items-center justify-center text-slate-300 hover:text-[#E4405F] hover:bg-[#E4405F]/15 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                      >
+                        <FaInstagram className="size-3.5" />
+                      </a>
+                    )}
+
+                    {profile.youtubeUrl && (
+                      <a
+                        href={profile.youtubeUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="YouTube channel"
+                        title={`YouTube: ${profile.youtubeUrl}`}
+                        className="size-6 rounded-full flex items-center justify-center text-slate-300 hover:text-[#FF0000] hover:bg-[#FF0000]/15 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                      >
+                        <FaYoutube className="size-3.5" />
+                      </a>
+                    )}
+                  </div>
                 </div>
 
                 <div className="text-sm sm:text-base font-semibold text-primary/95 flex items-center gap-2">
@@ -1352,21 +1484,21 @@ export function ProfileView({
                 </div>
 
                 {/* Quick Meta Chips */}
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-muted-foreground">
                   {profile.university && (
-                    <span className="inline-flex items-center gap-1.5 font-medium">
+                    <span className="inline-flex items-center gap-1.5 font-medium px-2.5 py-1 rounded-md bg-muted/30 border border-border/50 text-foreground/90 transition-colors">
                       <GraduationCap className="size-3.5 text-primary shrink-0" />
                       <span className="truncate max-w-[280px]">{currentUni}</span>
                     </span>
                   )}
                   {profile.location && (
-                    <span className="inline-flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/30 border border-border/50 text-foreground/90 transition-colors">
                       <MapPin className="size-3.5 text-primary shrink-0" />
                       <span>{profile.location}</span>
                     </span>
                   )}
-                  <span className="inline-flex items-center gap-1.5">
-                    <Mail className="size-3.5 text-muted-foreground/80 shrink-0" />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted/30 border border-border/50 text-foreground/90 transition-colors">
+                    <Mail className="size-3.5 text-primary/80 shrink-0" />
                     <span>{account.email}</span>
                   </span>
                 </div>

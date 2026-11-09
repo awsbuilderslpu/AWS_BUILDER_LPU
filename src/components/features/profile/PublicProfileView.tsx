@@ -19,6 +19,7 @@ import {
   ArrowLeft,
   QrCode,
   Globe,
+  Link as LinkIcon,
 } from "lucide-react";
 import {
   FaAws,
@@ -113,10 +114,10 @@ export function PublicProfileView({
 
   const socialLinks = [
     {
-      label: "AWS Builder",
-      url: profile.awsBuilderUrl,
-      icon: FaAws,
-      color: "hover:text-[#FF9900]",
+      label: "GitHub",
+      url: profile.githubUrl,
+      icon: FaGithub,
+      color: "hover:text-white",
     },
     {
       label: "LinkedIn",
@@ -125,16 +126,16 @@ export function PublicProfileView({
       color: "hover:text-[#0A66C2]",
     },
     {
-      label: "GitHub",
-      url: profile.githubUrl,
-      icon: FaGithub,
-      color: "hover:text-white",
-    },
-    {
       label: "Portfolio",
       url: profile.websiteUrl,
-      icon: ExternalLink,
+      icon: LinkIcon,
       color: "hover:text-primary",
+    },
+    {
+      label: "AWS Builder",
+      url: profile.awsBuilderUrl,
+      icon: FaAws,
+      color: "hover:text-[#FF9900]",
     },
     {
       label: "Instagram",
@@ -216,7 +217,8 @@ export function PublicProfileView({
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2">
+                {/* Row 1: Name & Official Roles */}
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
                   <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
                     {profile.fullName}
@@ -228,6 +230,70 @@ export function PublicProfileView({
                     <Sparkles className="size-2.5" />
                     <span>Verified Builder</span>
                   </span>
+                </div>
+
+                {/* Row 2: Chapter Badge & Frosted Glass Social Island */}
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 pt-0.5">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary shadow-xs">
+                    LPU Chapter
+                  </span>
+
+                  {socialLinks.length > 0 && (
+                    <>
+                      <span className="hidden sm:inline-block h-3.5 w-px bg-white/20" />
+                      <div className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/60 px-2 py-0.5 backdrop-blur-md shadow-md ring-1 ring-white/10">
+                        {socialLinks.map((s) => {
+                          const Icon = s.icon;
+                          return (
+                            <a
+                              key={s.label}
+                              href={s.url!}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              aria-label={s.label}
+                              title={`${s.label}: ${s.url}`}
+                              className={cn(
+                                "size-6 rounded-full flex items-center justify-center text-slate-300 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer",
+                                s.color,
+                                "hover:bg-white/15"
+                              )}
+                            >
+                              <Icon className="size-3.5" />
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+
+                  {isOwner && socialLinks.length === 0 && (
+                    <>
+                      <span className="hidden sm:inline-block h-3.5 w-px bg-white/20" />
+                      <div className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/60 px-2 py-0.5 backdrop-blur-md shadow-md ring-1 ring-white/10 text-slate-400/50">
+                        <Link
+                          href="/profile"
+                          title="Add GitHub profile link"
+                          className="size-6 rounded-full flex items-center justify-center hover:text-white hover:bg-white/10 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                        >
+                          <FaGithub className="size-3.5" />
+                        </Link>
+                        <Link
+                          href="/profile"
+                          title="Add LinkedIn profile link"
+                          className="size-6 rounded-full flex items-center justify-center hover:text-white hover:bg-white/10 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                        >
+                          <FaLinkedin className="size-3.5" />
+                        </Link>
+                        <Link
+                          href="/profile"
+                          title="Add website or portfolio link"
+                          className="size-6 rounded-full flex items-center justify-center hover:text-white hover:bg-white/10 transition-all duration-150 hover:scale-110 active:scale-95 cursor-pointer"
+                        >
+                          <LinkIcon className="size-3.5" />
+                        </Link>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs text-muted-foreground">
