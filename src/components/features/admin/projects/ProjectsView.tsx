@@ -280,7 +280,7 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
       />
 
       {/* Top Stat Cards */}
-      <StatCardRow>
+      <StatCardRow className="grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Total Projects"
           value={counts.total}

@@ -307,7 +307,7 @@ export function MembersView({
       </div>
 
       {/* Six Stat Cards */}
-      <StatCardRow>
+      <StatCardRow className="grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard
           label={copy.stats.total}
           value={counts ? counts.total : null}

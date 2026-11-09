@@ -197,7 +197,7 @@ export function MessagesView({ initialMessages }: MessagesViewProps) {
       />
 
       {/* 2. Stat Cards */}
-      <StatCardRow>
+      <StatCardRow className="grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Total Messages"
           value={counts.total}

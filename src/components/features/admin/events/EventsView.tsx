@@ -320,7 +320,7 @@ export function EventsView({
       />
 
       {/* 3. StatCards */}
-      <StatCardRow>
+      <StatCardRow className="grid-cols-2 lg:grid-cols-4">
         <StatCard
           label={copy.stats.total}
           value={counts?.total ?? null}

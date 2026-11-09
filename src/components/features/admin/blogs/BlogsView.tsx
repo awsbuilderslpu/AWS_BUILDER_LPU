@@ -342,7 +342,7 @@ export function BlogsView({
       />
 
       {/* 3. StatCards */}
-      <StatCardRow>
+      <StatCardRow className="grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard
           label={copy.stats.total}
           value={counts?.total ?? null}

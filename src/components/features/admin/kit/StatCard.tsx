@@ -67,31 +67,34 @@ export function StatCard({
     <>
       <div
         className={cn(
-          "flex size-11 shrink-0 items-center justify-center rounded-lg border",
+          "flex size-9 sm:size-11 shrink-0 items-center justify-center rounded-lg border",
           styles.tileBorder,
           styles.tileBg
         )}
       >
         <Icon
-          className={cn("size-6", styles.tileText)}
+          className={cn("size-5 sm:size-6", styles.tileText)}
           strokeWidth={1.5}
           aria-hidden="true"
         />
       </div>
 
       <div className="flex flex-col justify-center min-w-0">
-        <span className="text-[28px] font-semibold leading-tight text-foreground tracking-tight">
+        <span className="text-xl sm:text-[28px] font-semibold leading-tight text-foreground tracking-tight">
           {value !== null ? (
             value
           ) : (
             <span aria-label={adminCopy.kit.unavailable}>-</span>
           )}
         </span>
-        <span className="text-[14px] text-muted-foreground truncate leading-snug">
+        <span
+          className="text-xs sm:text-[14px] text-muted-foreground line-clamp-1 sm:truncate leading-snug"
+          title={label}
+        >
           {label}
         </span>
         {hint && (
-          <span className="text-[12px] text-muted-foreground/80 leading-none mt-0.5">
+          <span className="text-[11px] sm:text-[12px] text-muted-foreground/80 leading-none mt-0.5 truncate">
             {hint}
           </span>
         )}
@@ -100,7 +103,7 @@ export function StatCard({
   );
 
   const baseClasses = cn(
-    "flex items-center gap-3.5 rounded-lg border border-border bg-card/60 p-4 min-h-[78px] transition-colors",
+    "flex items-center gap-2.5 sm:gap-3.5 rounded-lg border border-border bg-card/60 p-3 sm:p-4 min-h-[70px] sm:min-h-[78px] transition-colors",
     href &&
       "hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background",
     className

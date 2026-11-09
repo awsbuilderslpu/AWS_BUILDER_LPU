@@ -353,7 +353,7 @@ export function RegistrationsView({
       </div>
 
       {/* Stat Cards Row */}
-      <StatCardRow>
+      <StatCardRow className="grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard
           label={copy.stats.total}
           value={counts ? counts.total : null}
