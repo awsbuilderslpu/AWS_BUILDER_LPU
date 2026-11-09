@@ -376,32 +376,32 @@ export function ProfileView({
             </p>
           </div>
         ) : (
-          <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <span className="block text-[11px] uppercase font-mono text-primary font-bold">
+          <div className="rounded-xl border border-primary/30 bg-primary/5 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <span className="block text-[11px] uppercase tracking-wider font-mono text-primary font-bold">
                 Your Unique Profile Link
               </span>
-              <span className="text-foreground font-mono text-xs sm:text-sm font-semibold">
+              <span className="text-foreground font-mono text-xs sm:text-sm font-semibold break-all">
                 /profile/{profile.username || account.id}
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0 flex-wrap sm:flex-nowrap">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={handleShare}
-                className="h-7 px-2.5 text-xs border-primary/40 text-primary hover:bg-primary/20 cursor-pointer"
+                className="h-8 px-3 text-xs border-primary/40 text-primary hover:bg-primary/20 cursor-pointer shrink-0 whitespace-nowrap"
               >
-                <Copy className="size-3 mr-1" />
+                <Copy className="size-3.5 mr-1.5 shrink-0" />
                 <span>Copy Link</span>
               </Button>
               <Link
                 href={`/profile/${uniqueSlug}`}
-                className="inline-flex items-center gap-1 h-7 px-2.5 text-xs font-semibold rounded-md bg-primary text-background hover:bg-primary-hover transition-colors"
+                className="inline-flex items-center justify-center gap-1.5 h-8 px-3 text-xs font-semibold rounded-md bg-primary text-background hover:bg-primary-hover transition-colors shrink-0 whitespace-nowrap"
               >
                 <span>View Public Page</span>
-                <ArrowUpRight className="size-3" />
+                <ArrowUpRight className="size-3.5 shrink-0" />
               </Link>
             </div>
           </div>
