@@ -30,15 +30,15 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
         {/* Ambient atmospheric glow behind the globe */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 -z-10 scale-95 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-3xl"
+          className="pointer-events-none absolute inset-0 -z-10 scale-75 rounded-full bg-gradient-to-tr from-primary/6 via-accent/5 to-transparent blur-3xl opacity-40"
         />
         <div
           className="relative w-full aspect-video overflow-hidden"
           style={{
             maskImage:
-              "radial-gradient(ellipse 48% 42% at 50% 50%, black 20%, transparent 72%)",
+              "radial-gradient(ellipse 47% 50% at 50% 50%, black 55%, transparent 92%)",
             WebkitMaskImage:
-              "radial-gradient(ellipse 48% 42% at 50% 50%, black 20%, transparent 72%)",
+              "radial-gradient(ellipse 47% 50% at 50% 50%, black 55%, transparent 92%)",
           }}
         >
           <video
@@ -49,6 +49,9 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
             preload="auto"
             poster="/images/back_ground/poster.webp"
             className="h-full w-full object-contain pointer-events-none select-none mix-blend-screen"
+            style={{
+              filter: "contrast(1.6) brightness(0.85)",
+            }}
           >
             <source src="/images/back_ground/aws_builder_lpu.mp4" type="video/mp4" />
             <source src="/images/back_ground/aws_builder_lpu.mkv" type="video/x-matroska" />
@@ -116,15 +119,15 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
         <div className="relative mt-12 mb-10 w-full max-w-lg self-center xl:hidden pointer-events-none select-none">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 -z-10 scale-95 rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-3xl"
+            className="pointer-events-none absolute inset-0 -z-10 scale-75 rounded-full bg-gradient-to-tr from-primary/6 via-accent/5 to-transparent blur-3xl opacity-40"
           />
           <div
             className="relative w-full aspect-video overflow-hidden"
             style={{
               maskImage:
-                "radial-gradient(ellipse 48% 42% at 50% 50%, black 20%, transparent 72%)",
+                "radial-gradient(ellipse 47% 50% at 50% 50%, black 55%, transparent 92%)",
               WebkitMaskImage:
-                "radial-gradient(ellipse 48% 42% at 50% 50%, black 20%, transparent 72%)",
+                "radial-gradient(ellipse 47% 50% at 50% 50%, black 55%, transparent 92%)",
             }}
           >
             <video
@@ -135,6 +138,9 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
               preload="auto"
               poster="/images/back_ground/poster.webp"
               className="h-full w-full object-contain pointer-events-none select-none mix-blend-screen"
+              style={{
+                filter: "contrast(1.6) brightness(0.85)",
+              }}
             >
               <source src="/images/back_ground/aws_builder_lpu.mp4" type="video/mp4" />
               <source src="/images/back_ground/aws_builder_lpu.mkv" type="video/x-matroska" />
