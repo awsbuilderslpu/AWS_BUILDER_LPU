@@ -32,6 +32,8 @@ export interface RegistrationListRow {
   programme: string | null;
   department: string | null;
   studyYear: string | null;
+  avatarPath?: string | null;
+  avatarUrl?: string | null;
 }
 
 export interface RegistrationDetails extends RegistrationListRow {
@@ -68,6 +70,8 @@ export function toListRow(
     programme: r.programme != null ? String(r.programme) : null,
     department: r.department != null ? String(r.department) : null,
     studyYear: r.study_year != null ? String(r.study_year) : null,
+    avatarPath: r.avatar_path != null ? String(r.avatar_path) : null,
+    avatarUrl: r.avatar_url != null ? String(r.avatar_url) : null,
   };
 }
 
@@ -99,6 +103,8 @@ export function toDetails(
 
   return {
     ...base,
+    avatarPath: r.avatar_path != null ? String(r.avatar_path) : base.avatarPath ?? null,
+    avatarUrl: r.avatar_url != null ? String(r.avatar_url) : base.avatarUrl ?? null,
     phoneCountryCode:
       r.phone_country_code != null ? String(r.phone_country_code) : null,
     phoneNumber: r.phone_number != null ? String(r.phone_number) : null,

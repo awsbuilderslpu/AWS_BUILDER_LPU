@@ -67,6 +67,7 @@ export function RecentRegistrationsCard({ rows }: RecentRegistrationsCardProps) 
                 <div className="flex items-center gap-3 min-w-0">
                   <UserCell
                     name={row.fullName || row.email || "Applicant"}
+                    src={row.avatarUrl || undefined}
                     secondary={
                       [
                         row.registrationNumber,

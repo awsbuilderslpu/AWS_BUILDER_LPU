@@ -1,10 +1,12 @@
+"use client";
+
 import * as React from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string;
-  src?: string;
+  src?: string | null;
   size?: number; // px, default 32
   className?: string;
 }
@@ -16,6 +18,13 @@ export function Avatar({
   className,
   ...props
 }: AvatarProps) {
+  const [imageError, setImageError] = React.useState(false);
+
+  // Reset error state if src changes
+  React.useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
   const words = name.trim().split(/\s+/);
   const initials = words
     .slice(0, 2)
@@ -23,6 +32,7 @@ export function Avatar({
     .join("");
 
   const fontSize = Math.max(9, Math.round(size * 0.38));
+  const showImage = Boolean(src && !imageError);
 
   return (
     <div
@@ -34,13 +44,15 @@ export function Avatar({
       style={{ width: `${size}px`, height: `${size}px` }}
       {...props}
     >
-      {src ? (
+      {showImage && src ? (
         <Image
           src={src}
           alt=""
           fill
+          unoptimized={src.startsWith("http://") || src.startsWith("https://")}
           sizes={`${size}px`}
           className="object-cover"
+          onError={() => setImageError(true)}
         />
       ) : (
         <>

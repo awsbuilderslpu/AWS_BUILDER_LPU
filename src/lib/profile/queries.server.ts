@@ -84,9 +84,41 @@ export async function getPublicDirectory(): Promise<DirectoryMember[]> {
       return [];
     }
 
-    return (data as unknown as Array<Record<string, unknown>>).map((item) =>
+    const members = (data as unknown as Array<Record<string, unknown>>).map((item) =>
       toDirectoryMember(item)
     );
+
+    // Resolve avatar URLs for members with storage avatar paths
+    const pathsToSign = members
+      .map((m) => m.avatarPath)
+      .filter((p): p is string => Boolean(p && !p.startsWith("http://") && !p.startsWith("https://")));
+
+    if (pathsToSign.length > 0) {
+      try {
+        const authClient = await createClient();
+        const { data: signedData } = await authClient.storage
+          .from("avatars")
+          .createSignedUrls(pathsToSign, 3600);
+
+        if (signedData) {
+          const urlMap = new Map<string, string>();
+          for (const item of signedData) {
+            if (item.signedUrl && item.path) {
+              urlMap.set(item.path, item.signedUrl);
+            }
+          }
+          for (const m of members) {
+            if (m.avatarPath && urlMap.has(m.avatarPath)) {
+              m.avatarUrl = urlMap.get(m.avatarPath);
+            }
+          }
+        }
+      } catch {
+        // Fall back gracefully to existing paths or initials
+      }
+    }
+
+    return members;
   } catch {
     return [];
   }
@@ -103,28 +135,36 @@ export async function getOwnMediaUrls(
     const supabase = await createClient();
 
     if (avatarPath) {
-      try {
-        const { data, error } = await supabase.storage
-          .from("avatars")
-          .createSignedUrl(avatarPath, 3600);
-        if (!error && data?.signedUrl) {
-          avatarUrl = data.signedUrl;
+      if (avatarPath.startsWith("http://") || avatarPath.startsWith("https://")) {
+        avatarUrl = avatarPath;
+      } else {
+        try {
+          const { data, error } = await supabase.storage
+            .from("avatars")
+            .createSignedUrl(avatarPath, 3600);
+          if (!error && data?.signedUrl) {
+            avatarUrl = data.signedUrl;
+          }
+        } catch {
+          avatarUrl = null;
         }
-      } catch {
-        avatarUrl = null;
       }
     }
 
     if (coverPath) {
-      try {
-        const { data, error } = await supabase.storage
-          .from("covers")
-          .createSignedUrl(coverPath, 3600);
-        if (!error && data?.signedUrl) {
-          coverUrl = data.signedUrl;
+      if (coverPath.startsWith("http://") || coverPath.startsWith("https://")) {
+        coverUrl = coverPath;
+      } else {
+        try {
+          const { data, error } = await supabase.storage
+            .from("covers")
+            .createSignedUrl(coverPath, 3600);
+          if (!error && data?.signedUrl) {
+            coverUrl = data.signedUrl;
+          }
+        } catch {
+          coverUrl = null;
         }
-      } catch {
-        coverUrl = null;
       }
     }
   } catch {

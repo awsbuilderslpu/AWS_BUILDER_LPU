@@ -342,15 +342,24 @@ export function RegistrationDrawer({
 
               <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-start gap-3.5 sm:gap-4 min-w-0">
-                  {/* Avatar with Initials & live status dot */}
+                  {/* Avatar with image / initials & live status dot */}
                   <div className="relative shrink-0">
-                    <div className="flex items-center justify-center size-13 sm:size-14 rounded-2xl bg-gradient-to-br from-primary/25 via-amber-500/15 to-primary/10 border border-primary/30 text-primary font-bold text-lg sm:text-xl shadow-inner tracking-wider">
-                      {initials}
+                    <div className="relative flex items-center justify-center size-13 sm:size-14 rounded-2xl overflow-hidden bg-gradient-to-br from-primary/25 via-amber-500/15 to-primary/10 border border-primary/30 text-primary font-bold text-lg sm:text-xl shadow-inner tracking-wider">
+                      {details.avatarUrl ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={details.avatarUrl}
+                          alt={details.fullName || "User"}
+                          className="size-full object-cover"
+                        />
+                      ) : (
+                        initials
+                      )}
                     </div>
                     <span
                       title={`Status: ${details.status}`}
                       className={cn(
-                        "absolute -bottom-1 -right-1 size-3.5 rounded-full ring-2 ring-background",
+                        "absolute -bottom-1 -right-1 size-3.5 rounded-full ring-2 ring-background z-10",
                         statusColorMap[details.status as keyof typeof statusColorMap] ||
                           "bg-slate-400 ring-slate-500/30"
                       )}

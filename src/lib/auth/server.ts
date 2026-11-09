@@ -11,6 +11,7 @@ import {
   type AppRole,
   isProfileComplete,
 } from "@/lib/auth/account";
+import { syncGoogleAvatar } from "@/lib/auth/sync-avatar.server";
 import { safeNext } from "@/lib/auth/safe-next";
 
 /**
@@ -82,6 +83,41 @@ export const getCurrentAccount = cache(async (): Promise<AccountSummary | null> 
     const registrationStatus = regData?.status ?? null;
     const profileComplete = isProfileComplete(profile);
 
+    // Extract default Gmail / OAuth avatar from user metadata
+    const metadataAvatar =
+      (typeof user.user_metadata?.avatar_url === "string" &&
+        user.user_metadata.avatar_url) ||
+      (typeof user.user_metadata?.picture === "string" &&
+        user.user_metadata.picture) ||
+      undefined;
+
+    let avatarUrl: string | undefined = metadataAvatar;
+
+    if (!profile?.avatar_path && metadataAvatar) {
+      // Opportunistically sync Google avatar to user storage in the background
+      void syncGoogleAvatar(supabase, user);
+    }
+
+    if (profile?.avatar_path) {
+      if (
+        profile.avatar_path.startsWith("http://") ||
+        profile.avatar_path.startsWith("https://")
+      ) {
+        avatarUrl = profile.avatar_path;
+      } else {
+        try {
+          const { data: signedData, error: signedError } = await supabase.storage
+            .from("avatars")
+            .createSignedUrl(profile.avatar_path, 3600);
+          if (!signedError && signedData?.signedUrl) {
+            avatarUrl = signedData.signedUrl;
+          }
+        } catch {
+          // Fall back to default metadata avatar
+        }
+      }
+    }
+
     return {
       id: user.id,
       email: user.email ?? "",
@@ -90,6 +126,7 @@ export const getCurrentAccount = cache(async (): Promise<AccountSummary | null> 
       isActive,
       registrationStatus,
       profileComplete,
+      avatarUrl,
     };
   } catch {
     return null;

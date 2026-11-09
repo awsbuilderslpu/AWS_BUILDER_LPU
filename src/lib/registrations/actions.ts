@@ -289,11 +289,12 @@ export async function getRegistrationDetailsAction(
     return null;
   }
 
-  // Ensure gender and dateOfBirth are loaded from profiles if missing from admin_registrations view
-  if ((data.gender == null || data.date_of_birth == null) && data.user_id) {
+  // Ensure gender, dateOfBirth, and avatar are loaded from profiles
+  let avatarUrl: string | null = null;
+  if (data.user_id) {
     const { data: userProfile } = await supabase
       .from("profiles")
-      .select("gender, date_of_birth")
+      .select("gender, date_of_birth, avatar_path")
       .eq("id", data.user_id)
       .maybeSingle();
 
@@ -304,8 +305,30 @@ export async function getRegistrationDetailsAction(
       if (data.date_of_birth == null && userProfile.date_of_birth) {
         data.date_of_birth = userProfile.date_of_birth;
       }
+      if (userProfile.avatar_path) {
+        data.avatar_path = userProfile.avatar_path;
+        if (
+          userProfile.avatar_path.startsWith("http://") ||
+          userProfile.avatar_path.startsWith("https://")
+        ) {
+          avatarUrl = userProfile.avatar_path;
+        } else {
+          try {
+            const { data: signed } = await supabase.storage
+              .from("avatars")
+              .createSignedUrl(userProfile.avatar_path, 3600);
+            if (signed?.signedUrl) {
+              avatarUrl = signed.signedUrl;
+            }
+          } catch {
+            // ignore
+          }
+        }
+      }
     }
   }
+
+  data.avatar_url = avatarUrl;
 
   let reviewerName: string | null = null;
   if (data.reviewed_by) {

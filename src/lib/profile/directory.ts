@@ -50,5 +50,8 @@ export function toPublicCard(
     headline: member.headline,
     skills: member.skills,
     links: member.links,
+    image:
+      member.avatarUrl ||
+      (member.avatarPath?.startsWith("http") ? member.avatarPath : undefined),
   };
 }

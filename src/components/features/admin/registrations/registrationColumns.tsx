@@ -49,6 +49,7 @@ export function getRegistrationColumns({
         <UserCell
           name={rowName(row)}
           secondary={row.email || undefined}
+          src={row.avatarUrl || undefined}
         />
       ),
     },

@@ -79,6 +79,54 @@ export async function listRegistrations(
       throw new Error("registrations_query_failed");
     }
 
+    const userIds = data.map((d) => d.user_id).filter(Boolean);
+    if (userIds.length > 0) {
+      try {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("id, avatar_path")
+          .in("id", userIds);
+
+        if (profiles && profiles.length > 0) {
+          const pathMap = new Map<string, string>();
+          const pathsToSign: string[] = [];
+          for (const p of profiles) {
+            if (p.avatar_path) {
+              pathMap.set(p.id, p.avatar_path);
+              if (!p.avatar_path.startsWith("http://") && !p.avatar_path.startsWith("https://")) {
+                pathsToSign.push(p.avatar_path);
+              }
+            }
+          }
+
+          const signedMap = new Map<string, string>();
+          if (pathsToSign.length > 0) {
+            const { data: signed } = await supabase.storage
+              .from("avatars")
+              .createSignedUrls(pathsToSign, 3600);
+            if (signed) {
+              for (const s of signed) {
+                if (s.path && s.signedUrl) {
+                  signedMap.set(s.path, s.signedUrl);
+                }
+              }
+            }
+          }
+
+          for (const item of data) {
+            const rawItem = item as Record<string, unknown>;
+            const path = pathMap.get(item.user_id);
+            if (path) {
+              rawItem.avatar_path = path;
+              rawItem.avatar_url = signedMap.get(path) || (path.startsWith("http") ? path : null);
+            }
+          }
+        }
+      } catch {
+        // Fall back gracefully
+      }
+    }
+
     const rows = data.map((item) => toListRow(item));
     return {
       rows,

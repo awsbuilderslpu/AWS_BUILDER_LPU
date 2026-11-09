@@ -172,10 +172,12 @@ export function ProfileView({
   const bioRaw = watch("bio");
   const bioValue = typeof bioRaw === "string" ? bioRaw : "";
 
+  const effectiveAvatarUrl = media.avatarUrl || account.avatarUrl || null;
+
   // Completeness score and detailed checklist
   const completeness = React.useMemo(() => {
     const checks = [
-      { id: "photo", label: "Profile photo", done: Boolean(media.avatarUrl || profile.avatarPath), weight: 15 },
+      { id: "photo", label: "Profile photo", done: Boolean(media.avatarUrl || account.avatarUrl || profile.avatarPath), weight: 15 },
       { id: "cover", label: "Cover banner", done: Boolean(media.coverUrl || profile.coverPath), weight: 10 },
       { id: "bio", label: "About / Bio", done: Boolean(profile.bio && profile.bio.trim().length > 0), weight: 15 },
       { id: "headline", label: "Headline", done: Boolean(profile.headline && profile.headline.trim().length > 0), weight: 10 },
@@ -187,7 +189,7 @@ export function ProfileView({
     const score = checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0);
     const nextItem = checks.find((item) => !item.done);
     return { score, nextItem, checks };
-  }, [media.avatarUrl, media.coverUrl, profile]);
+  }, [media.avatarUrl, media.coverUrl, account.avatarUrl, profile]);
 
   const handleTogglePublic = async () => {
     if (!isApproved || switchingPublic) return;
@@ -1189,9 +1191,9 @@ export function ProfileView({
           <div className="rounded-xl border border-primary/30 bg-gradient-to-br from-background/90 to-card p-4 space-y-3 shadow-md">
             <div className="flex items-center gap-3">
               <div className="size-11 rounded-full overflow-hidden shrink-0 border border-border bg-card">
-                {media.avatarUrl ? (
+                {effectiveAvatarUrl ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
-                  <img src={media.avatarUrl} alt="" className="size-full object-cover" />
+                  <img src={effectiveAvatarUrl} alt="" className="size-full object-cover" />
                 ) : (
                   <Avatar name={account.displayName} size={44} />
                 )}
@@ -1318,10 +1320,10 @@ export function ProfileView({
             <div className="flex flex-col sm:flex-row sm:items-end gap-5">
               {/* Avatar circle with multi-ring glow */}
               <div className="relative size-32 sm:size-36 shrink-0 rounded-full border-4 border-card bg-slate-900 shadow-2xl overflow-hidden ring-4 ring-primary/30 group">
-                {media.avatarUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element -- private bucket signed URL */
+                {effectiveAvatarUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element -- private bucket signed URL or OAuth avatar */
                   <img
-                    src={media.avatarUrl}
+                    src={effectiveAvatarUrl}
                     alt={account.displayName || "Avatar"}
                     className="h-full w-full object-cover"
                   />
@@ -1559,9 +1561,9 @@ export function ProfileView({
 
                 <div className="flex items-center gap-4 py-4">
                   <div className="size-16 rounded-xl border-2 border-primary/60 bg-slate-950 overflow-hidden shrink-0 shadow-lg">
-                    {media.avatarUrl ? (
+                    {effectiveAvatarUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
-                      <img src={media.avatarUrl} alt="" className="size-full object-cover" />
+                      <img src={effectiveAvatarUrl} alt="" className="size-full object-cover" />
                     ) : (
                       <Avatar name={account.displayName} size={64} />
                     )}

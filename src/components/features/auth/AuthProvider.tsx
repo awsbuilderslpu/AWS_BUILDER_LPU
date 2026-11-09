@@ -97,6 +97,35 @@ export function AuthProvider({
         (user.email ? user.email.split("@")[0] : "") ||
         "Member";
 
+      const metadataAvatar =
+        (typeof user.user_metadata?.avatar_url === "string" &&
+          user.user_metadata.avatar_url) ||
+        (typeof user.user_metadata?.picture === "string" &&
+          user.user_metadata.picture) ||
+        undefined;
+
+      let avatarUrl: string | undefined = metadataAvatar;
+
+      if (profile?.avatar_path) {
+        if (
+          profile.avatar_path.startsWith("http://") ||
+          profile.avatar_path.startsWith("https://")
+        ) {
+          avatarUrl = profile.avatar_path;
+        } else {
+          try {
+            const { data: signedData, error: signedError } = await supabase.storage
+              .from("avatars")
+              .createSignedUrl(profile.avatar_path, 3600);
+            if (!signedError && signedData?.signedUrl) {
+              avatarUrl = signedData.signedUrl;
+            }
+          } catch {
+            // Fall back to metadata avatar
+          }
+        }
+      }
+
       setAccount({
         id: user.id,
         email: user.email ?? "",
@@ -105,6 +134,7 @@ export function AuthProvider({
         isActive: roleData?.is_active ?? true,
         registrationStatus: regData?.status ?? null,
         profileComplete: isProfileComplete(profile),
+        avatarUrl,
       });
     } catch {
       setAccount(null);

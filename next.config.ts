@@ -24,6 +24,16 @@ if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
 remotePatterns.push(
   {
     protocol: "https",
+    hostname: "**.googleusercontent.com",
+    pathname: "/**",
+  },
+  {
+    protocol: "https",
+    hostname: "**.githubusercontent.com",
+    pathname: "/**",
+  },
+  {
+    protocol: "https",
     hostname: "prod-assets.cosmic.aws.dev",
     pathname: "/**",
   },

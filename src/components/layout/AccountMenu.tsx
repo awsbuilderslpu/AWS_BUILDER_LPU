@@ -136,7 +136,11 @@ export function AccountMenu({
             className
           )}
         >
-          <Avatar name={account.displayName || "User"} size={40} />
+          <Avatar
+            name={account.displayName || "User"}
+            src={account.avatarUrl}
+            size={40}
+          />
           <div className="hidden min-w-0 flex-1 flex-col leading-tight sm:flex">
             <span className="max-w-[150px] truncate text-sm font-semibold text-foreground">
               {account.displayName}
@@ -161,7 +165,11 @@ export function AccountMenu({
         className="w-[300px] overflow-hidden rounded-2xl border border-border bg-card p-0 shadow-xl"
       >
         <div className="flex items-center gap-3 px-4 pb-3 pt-4">
-          <Avatar name={account.displayName || "User"} size={44} />
+          <Avatar
+            name={account.displayName || "User"}
+            src={account.avatarUrl}
+            size={44}
+          />
           <div className="flex min-w-0 flex-1 flex-col leading-tight">
             <span className="truncate text-[15px] font-semibold text-foreground">
               {account.displayName}

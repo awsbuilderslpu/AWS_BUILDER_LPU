@@ -27,6 +27,7 @@ import { formatDob } from "@/lib/auth/format";
 import { safeNext } from "@/lib/auth/safe-next";
 import { useRegistration } from "@/components/features/auth/RegistrationProvider";
 import { RegisterStepFrame } from "@/components/features/auth/RegisterStepFrame";
+import { useAuth } from "@/components/features/auth/AuthProvider";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -36,6 +37,7 @@ export function ReviewStep() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { state, goToStep, markSubmitted, markVerified } = useRegistration();
+  const { account } = useAuth();
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -196,7 +198,11 @@ export function ReviewStep() {
         {/* Top Profile Card */}
         <div className="flex items-center justify-between rounded-lg border border-border bg-card/60 p-5">
           <div className="flex items-center gap-4 min-w-0">
-            <Avatar name={fullName || "User"} size={64} />
+            <Avatar
+              name={fullName || "User"}
+              src={account?.avatarUrl}
+              size={64}
+            />
             <div className="min-w-0">
               <div className="text-[20px] font-semibold text-foreground truncate">
                 {fullName || "—"}

@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
 import { safeNext } from "@/lib/auth/safe-next";
 import { isProfileComplete } from "@/lib/auth/account";
+import { syncGoogleAvatar } from "@/lib/auth/sync-avatar.server";
 
 /**
  * Handles OAuth callback and email verification redirects from Supabase.
@@ -55,6 +56,9 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (user) {
+      // Sync Google OAuth avatar into Supabase storage avatars bucket if not already set
+      await syncGoogleAvatar(supabase, user);
+
       const { data: profile } = await supabase
         .from("profiles")
         .select("*")

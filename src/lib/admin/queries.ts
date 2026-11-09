@@ -20,6 +20,7 @@ export interface DashboardRecentRegistration {
   status: string;
   requestedRole: string;
   appliedAt: string;
+  avatarUrl?: string | null;
 }
 
 export interface DashboardEventItem {

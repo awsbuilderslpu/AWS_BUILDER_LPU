@@ -54,6 +54,7 @@ export interface DirectoryMember {
   location: string | null;
   skills: string[];
   avatarPath?: string | null;
+  avatarUrl?: string | null;
   links: {
     awsBuilder?: string;
     linkedin?: string;
@@ -174,6 +175,10 @@ export function toDirectoryMember(raw: Record<string, unknown> | null | undefine
       ? r.skills.filter((s): s is string => typeof s === "string")
       : [],
     avatarPath: typeof r.avatar_path === "string" ? r.avatar_path : null,
+    avatarUrl:
+      typeof r.avatar_path === "string" && (r.avatar_path.startsWith("http://") || r.avatar_path.startsWith("https://"))
+        ? r.avatar_path
+        : null,
     links,
   };
 }

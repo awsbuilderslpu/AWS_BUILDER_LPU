@@ -241,7 +241,11 @@ function NavbarContent() {
                 {account ? (
                   <>
                     <div className="flex items-center gap-3">
-                      <Avatar name={account.displayName || "User"} size={40} />
+                      <Avatar
+                        name={account.displayName || "User"}
+                        src={account.avatarUrl}
+                        size={40}
+                      />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <p className="truncate text-sm font-semibold text-foreground">

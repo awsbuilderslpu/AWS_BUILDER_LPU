@@ -29,6 +29,10 @@ export function MemberCoreCard({ member, className }: MemberCoreCardProps) {
             src={member.image}
             alt=""
             fill
+            unoptimized={
+              member.image.startsWith("http://") ||
+              member.image.startsWith("https://")
+            }
             sizes="(min-width: 1536px) 165px, (min-width: 640px) 33vw, 50vw"
             className="object-cover object-top transition-transform duration-300 group-hover:scale-105"
           />
