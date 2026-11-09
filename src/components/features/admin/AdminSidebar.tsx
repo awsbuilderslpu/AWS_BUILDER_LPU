@@ -47,7 +47,6 @@ export function AdminSidebar({
   }, [navItems]);
 
   const isAdministrator = account.role === "administrator";
-  const isAdmin = account.role === "admin" || isAdministrator;
   const consoleTitle = isAdministrator ? "Administrator" : "Admin";
   const roleLabel = roleMeta[(account.role as Role) || "participant"]?.label || consoleTitle;
 

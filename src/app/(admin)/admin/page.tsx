@@ -8,7 +8,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { requireRole } from "@/lib/auth/server";
-import { roleMeta, type Role } from "@/data/roles";
 import { adminCopy, adminNav } from "@/data/admin";
 import { getDashboardData } from "@/lib/admin/queries";
 import { StatCard, StatCardRow } from "@/components/features/admin/kit";
@@ -25,8 +24,6 @@ export default async function AdminDashboardPage() {
   await connection();
   const account = await requireRole(["administrator", "admin"], "/admin");
 
-  const roleKey = (account.role as Role) || "participant";
-  const roleLabel = roleMeta[roleKey]?.label || roleKey;
   const isAdmin = account.role === "administrator" || account.role === "admin";
 
   const dashboardData = await getDashboardData(isAdmin);

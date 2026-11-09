@@ -18,6 +18,24 @@ import type { AnnouncementItem, NotificationType } from "@/lib/notifications/typ
 
 export type { AnnouncementItem as NotificationItem };
 
+function formatRelativeTime(isoString?: string): string {
+  if (!isoString) return "Recent";
+  try {
+    const diff = Date.now() - new Date(isoString).getTime();
+    const mins = Math.floor(diff / (1000 * 60));
+    if (mins < 5) return "Just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days === 1) return "Yesterday";
+    if (days < 7) return `${days}d ago`;
+    return new Date(isoString).toLocaleDateString();
+  } catch {
+    return "Recent";
+  }
+}
+
 export function NotificationBell() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [notifications, setNotifications] = React.useState<AnnouncementItem[]>([]);
@@ -154,24 +172,6 @@ export function NotificationBell() {
     }
   };
 
-  const formatRelativeTime = (isoString?: string) => {
-    if (!mounted || !isoString) return "Recent";
-    try {
-      const diff = Date.now() - new Date(isoString).getTime();
-      const mins = Math.floor(diff / (1000 * 60));
-      if (mins < 5) return "Just now";
-      if (mins < 60) return `${mins}m ago`;
-      const hours = Math.floor(mins / 60);
-      if (hours < 24) return `${hours}h ago`;
-      const days = Math.floor(hours / 24);
-      if (days === 1) return "Yesterday";
-      if (days < 7) return `${days}d ago`;
-      return new Date(isoString).toLocaleDateString();
-    } catch {
-      return "Recent";
-    }
-  };
-
   const getIcon = (type: NotificationType) => {
     switch (type) {
       case "event":
@@ -290,7 +290,7 @@ export function NotificationBell() {
                       </p>
                       <div className="mt-1 flex items-center justify-between gap-2">
                         <span className="block font-mono text-[10.5px] text-muted-foreground/75">
-                          {formatRelativeTime(item.created_at)}
+                          {mounted ? formatRelativeTime(item.created_at) : "Recent"}
                         </span>
                         {item.href && (
                           <span className="inline-flex items-center gap-1 text-[11px] font-medium text-primary">

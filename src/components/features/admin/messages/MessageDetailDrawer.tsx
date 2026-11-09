@@ -10,7 +10,6 @@ import {
   Clock,
   FileText,
   Download,
-  ExternalLink,
   Copy,
   Check,
   Trash2,

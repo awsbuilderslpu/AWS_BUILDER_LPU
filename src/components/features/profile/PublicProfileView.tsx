@@ -9,7 +9,6 @@ import {
   GraduationCap,
   Sparkles,
   ShieldCheck,
-  Calendar,
   Layers,
   Award,
   Cpu,

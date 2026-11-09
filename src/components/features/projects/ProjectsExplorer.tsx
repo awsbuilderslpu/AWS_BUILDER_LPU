@@ -97,6 +97,7 @@ export function ProjectsExplorer({ initialProjects }: ProjectsExplorerProps = {}
       return true;
     });
   }, [
+    allProjects,
     selectedStatusTab,
     selectedCategory,
     selectedTech,

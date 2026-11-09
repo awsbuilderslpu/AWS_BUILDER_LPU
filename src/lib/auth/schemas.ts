@@ -4,7 +4,6 @@ import {
   registrationCopy,
   registrationConstants,
   countryCodes,
-  genderOptions,
   universities,
   programmes,
   departments,

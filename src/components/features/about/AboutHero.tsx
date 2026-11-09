@@ -6,7 +6,7 @@ import { PageHeading } from "@/components/ui/PageHeading";
 import { Button } from "@/components/ui/button";
 import { ArtworkSlot } from "@/components/ui/ArtworkSlot";
 import { AboutDecor } from "@/components/features/about/AboutDecor";
-import { MapPin, Link2, Mail, ArrowRight, ShieldCheck, Sparkles, Terminal } from "lucide-react";
+import { MapPin, Link2, Mail, ShieldCheck, Sparkles, Terminal } from "lucide-react";
 import {
   FaInstagram,
   FaLinkedinIn,

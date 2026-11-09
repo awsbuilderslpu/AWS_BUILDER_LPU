@@ -4,6 +4,7 @@ import "server-only";
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { getStaffAccount } from "@/lib/auth/server";
 import { projects as defaultProjects } from "@/data/projects";
 import {
@@ -16,7 +17,10 @@ import {
 
 export async function fetchProjectsAction(): Promise<ProjectItem[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
+    if (!supabase) {
+      return defaultProjects as ProjectItem[];
+    }
     const { data, error } = await supabase
       .from("projects")
       .select("*")

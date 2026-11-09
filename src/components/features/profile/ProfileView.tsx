@@ -136,7 +136,6 @@ export function ProfileView({
   account,
   profile,
   media,
-  requestedRole,
 }: ProfileViewProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = React.useState(false);
@@ -321,8 +320,6 @@ export function ProfileView({
   const memberId = profile.registrationNumber
     ? `AWS-${profile.registrationNumber}`
     : `AWS-MBR-${account.id.slice(0, 6).toUpperCase()}`;
-
-  const studyYearNumber = parseInt(profile.studyYear || "1", 10) || 1;
 
   // Filter skills based on user category tab
   const filteredSkills = React.useMemo(() => {

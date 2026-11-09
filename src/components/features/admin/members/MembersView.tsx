@@ -67,7 +67,7 @@ export interface MembersViewProps {
   rows: MemberListRow[];
   total: number;
   counts: MemberCounts | null;
-  params: ReturnType<typeof useListState>["params"];
+  params?: ReturnType<typeof useListState>["params"];
   currentUserId: string;
   currentUserRole?: AppRole | null;
   loadError?: boolean;
@@ -93,7 +93,6 @@ export function MembersView({
   rows,
   total,
   counts,
-  params: _params,
   currentUserId,
   currentUserRole,
   loadError = false,

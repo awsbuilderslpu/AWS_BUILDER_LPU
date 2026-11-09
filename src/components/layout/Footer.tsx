@@ -5,7 +5,6 @@ import {
   Mail,
   Link2,
   Calendar,
-  Heart,
 } from "lucide-react";
 import {
   FaLinkedinIn,
@@ -201,10 +200,8 @@ export function Footer() {
           </div>
 
           {/* Right: Credits */}
-          <div className="flex items-center gap-1">
-            <span>Built with</span>
-            <Heart className="size-3.5 fill-red-500 text-red-500" />
-            <span>by the LPU Cloud Community</span>
+          <div>
+            Built by AWS_BUILDER_GROUP_LPU
           </div>
         </div>
       </div>
