@@ -132,16 +132,3 @@ body {
 @utility animate-float {
   animation: float 9s ease-in-out infinite;
 }
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-150%);
-  }
-  100% {
-    transform: translateX(150%);
-  }
-}
-
-@utility animate-shimmer {
-  animation: shimmer 3.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}

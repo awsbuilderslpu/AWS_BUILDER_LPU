@@ -37,10 +37,10 @@ export function HeroDecor({ className, ...props }: HeroDecorProps) {
         className="absolute left-[14%] top-[6%]"
       />
 
-      {/* 3, 4, 5. PlusMarks with gentle breathing */}
-      <PlusMark className="absolute left-[21.5%] top-[4.5%] animate-pulse [animation-duration:4s]" />
-      <PlusMark className="absolute left-[10.6%] top-[19%] animate-pulse [animation-duration:5s]" />
-      <PlusMark className="absolute left-[71%] top-[44.5%] animate-pulse [animation-duration:3.5s]" />
+      {/* 3, 4, 5. PlusMarks */}
+      <PlusMark className="absolute left-[21.5%] top-[4.5%]" />
+      <PlusMark className="absolute left-[10.6%] top-[19%]" />
+      <PlusMark className="absolute left-[71%] top-[44.5%]" />
 
       {/* 6. StackedLabel: Students / Technology / Community / Impact */}
       <StackedLabel
@@ -98,18 +98,6 @@ export function HeroDecor({ className, ...props }: HeroDecorProps) {
         sizes="24vw"
         className="absolute left-0 top-[15%] h-[55%] w-[24%] aspect-auto motion-safe:animate-float motion-safe:[animation-delay:2s]"
       />
-
-      {/* 14. HUD Telemetry Coordinate Bar */}
-      <div className="absolute left-[13%] 2xl:left-[15%] bottom-2.5 hidden 2xl:flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.25em] text-muted-foreground/35 select-none">
-        <span className="flex items-center gap-1.5">
-          <span className="size-1 rounded-full bg-emerald-500/80 animate-pulse" />
-          SYS: ACTIVE
-        </span>
-        <span>•</span>
-        <span>GEO: 31.2536°N, 75.7037°E</span>
-        <span>•</span>
-        <span>AWS_LPU_CORE_v2.0</span>
-      </div>
     </div>
   );
 }

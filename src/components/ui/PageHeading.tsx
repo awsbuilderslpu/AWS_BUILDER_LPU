@@ -5,7 +5,6 @@ export interface HeadingLine {
   text: string;
   accent?: boolean;
   dot?: boolean;
-  gradient?: boolean;
 }
 
 export interface PageHeadingProps
@@ -13,7 +12,6 @@ export interface PageHeadingProps
   lines: HeadingLine[];
   size?: "xl" | "lg" | "md" | "sm";
   as?: "h1" | "h2";
-  gradient?: boolean;
   className?: string;
 }
 
@@ -21,7 +19,6 @@ export function PageHeading({
   lines,
   size = "lg",
   as: Component = "h1",
-  gradient = false,
   className,
   ...props
 }: PageHeadingProps) {
@@ -45,17 +42,11 @@ export function PageHeading({
           <span
             className={cn(
               "block",
-              line.accent
-                ? (gradient || line.gradient)
-                  ? "bg-gradient-to-r from-[#FF9900] via-[#FFB84D] to-[#FF8000] bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(255,153,0,0.4)]"
-                  : "text-primary"
-                : "text-foreground drop-shadow-[0_2px_12px_rgba(0,0,0,0.4)]"
+              line.accent ? "text-primary" : "text-foreground"
             )}
           >
             {line.text}
-            {line.dot && (
-              <span className="text-primary drop-shadow-[0_0_20px_rgba(255,153,0,0.7)]">.</span>
-            )}
+            {line.dot && <span className="text-primary">.</span>}
           </span>
           {idx < lines.length - 1 && " "}
         </React.Fragment>
