@@ -34,7 +34,9 @@ import { publicObjectUrl } from "@/lib/storage/urls";
 import {
   createProjectAction,
   updateProjectAction,
+  deleteProjectAction,
 } from "@/lib/projects/actions";
+import { ConfirmDialog } from "@/components/features/admin/kit/ConfirmDialog";
 import type {
   ProjectItem,
   ProjectFormData,
@@ -51,6 +53,7 @@ interface ProjectDrawerProps {
   onOpenChange: (open: boolean) => void;
   project?: ProjectItem | null;
   onSaved: (savedProject: ProjectItem, isNew: boolean) => void;
+  onDeleted?: (deletedProject: ProjectItem) => void;
 }
 
 const COMMON_TECH_STACK = [
@@ -89,9 +92,12 @@ export function ProjectDrawer({
   onOpenChange,
   project,
   onSaved,
+  onDeleted,
 }: ProjectDrawerProps) {
   const isEditing = Boolean(project);
   const [loading, setLoading] = React.useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = React.useState(false);
+  const [deleteLoading, setDeleteLoading] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState("basics");
 
   // Form State
@@ -449,24 +455,49 @@ export function ProjectDrawer({
     }
   };
 
+  const handleDelete = async () => {
+    if (!project) return;
+    setDeleteLoading(true);
+    const targetId = project.id || project.slug;
+
+    try {
+      const res = await deleteProjectAction(targetId);
+      if (res.ok) {
+        toast.success(`Project "${project.title}" deleted.`);
+      } else {
+        toast.info(`Removed project "${project.title}" locally.`);
+      }
+      onDeleted?.(project);
+      setDeleteConfirmOpen(false);
+      onOpenChange(false);
+    } catch {
+      toast.info(`Removed project "${project.title}" locally.`);
+      onDeleted?.(project);
+      setDeleteConfirmOpen(false);
+      onOpenChange(false);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const categories = projectCategories.filter((c) => c !== "All Categories");
   const statuses = projectStatuses.filter((s) => s !== "All Status") as ProjectStatus[];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[94vw] max-w-3xl max-h-[90vh] bg-[#090E17] border border-white/10 text-white p-0 flex flex-col shadow-2xl overflow-hidden rounded-2xl gap-0">
+      <DialogContent className="w-[94vw] max-w-3xl max-h-[90vh] bg-card border border-border text-foreground p-0 flex flex-col shadow-2xl overflow-hidden rounded-2xl gap-0">
         {/* Modal Header */}
-        <DialogHeader className="p-6 border-b border-white/10 bg-black/40 shrink-0 text-left">
+        <DialogHeader className="p-6 border-b border-border bg-card shrink-0 text-left">
           <div className="flex items-center justify-between pr-6">
             <div className="flex items-center gap-3.5">
               <div className="size-10 rounded-xl bg-[#FF9900]/15 border border-[#FF9900]/30 flex items-center justify-center text-[#FF9900] shrink-0">
                 <Code2 className="size-5" />
               </div>
               <div>
-                <DialogTitle className="text-xl font-bold text-white">
+                <DialogTitle className="text-xl font-bold text-foreground">
                   {isEditing ? "Edit Project" : "Add New Project"}
                 </DialogTitle>
-                <DialogDescription className="text-xs sm:text-sm text-slate-400 mt-0.5">
+                <DialogDescription className="text-xs sm:text-sm text-muted-foreground mt-0.5">
                   {isEditing
                     ? `Update details and configurations for "${project?.title}"`
                     : "Publish a new student project or cloud architecture to the club portfolio."}
@@ -489,32 +520,32 @@ export function ProjectDrawer({
             onValueChange={setActiveTab}
             className="flex-1 flex flex-col overflow-hidden"
           >
-            <div className="px-6 pt-3 pb-2 border-b border-white/10 bg-white/[0.02]">
-              <TabsList className="bg-white/5 border border-white/10 p-1 w-full grid grid-cols-4 h-10">
+            <div className="px-6 pt-3 pb-2 border-b border-border bg-muted/40">
+              <TabsList className="bg-muted border border-border p-1 w-full grid grid-cols-4 h-10">
                 <TabsTrigger
                   value="basics"
-                  className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-black text-xs font-medium flex items-center gap-1.5"
+                  className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-black text-xs font-medium flex items-center gap-1.5 text-muted-foreground data-[state=active]:font-semibold"
                 >
                   <Info className="size-3.5" />
                   Overview
                 </TabsTrigger>
                 <TabsTrigger
                   value="tech"
-                  className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-black text-xs font-medium flex items-center gap-1.5"
+                  className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-black text-xs font-medium flex items-center gap-1.5 text-muted-foreground data-[state=active]:font-semibold"
                 >
                   <Cloud className="size-3.5" />
                   Stack & Cloud
                 </TabsTrigger>
                 <TabsTrigger
                   value="team"
-                  className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-black text-xs font-medium flex items-center gap-1.5"
+                  className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-black text-xs font-medium flex items-center gap-1.5 text-muted-foreground data-[state=active]:font-semibold"
                 >
                   <Users className="size-3.5" />
                   Team
                 </TabsTrigger>
                 <TabsTrigger
                   value="links"
-                  className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-black text-xs font-medium flex items-center gap-1.5"
+                  className="data-[state=active]:bg-[#FF9900] data-[state=active]:text-black text-xs font-medium flex items-center gap-1.5 text-muted-foreground data-[state=active]:font-semibold"
                 >
                   <ExternalLink className="size-3.5" />
                   Links & Dates
@@ -527,7 +558,7 @@ export function ProjectDrawer({
               {/* TAB 1: BASICS */}
               <TabsContent value="basics" className="space-y-4 m-0 focus-visible:outline-none">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                     Project Title *
                   </label>
                   <input
@@ -536,13 +567,13 @@ export function ProjectDrawer({
                     value={title}
                     onChange={(e) => handleTitleChange(e.target.value)}
                     placeholder="e.g. CloudOps Radar"
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900] text-sm transition-colors"
+                    className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900] text-sm transition-colors"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                       URL Slug *
                     </label>
                     <input
@@ -551,21 +582,21 @@ export function ProjectDrawer({
                       value={slug}
                       onChange={(e) => setSlug(e.target.value)}
                       placeholder="e.g. cloudops-radar"
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 font-mono text-xs focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900] transition-colors"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground font-mono text-xs focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900] transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                       Category *
                     </label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900]"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900]"
                     >
                       {categories.map((cat) => (
-                        <option key={cat} value={cat} className="bg-slate-900 text-white">
+                        <option key={cat} value={cat} className="bg-popover text-popover-foreground">
                           {cat}
                         </option>
                       ))}
@@ -575,16 +606,16 @@ export function ProjectDrawer({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                       Development Status
                     </label>
                     <select
                       value={status}
                       onChange={(e) => setStatus(e.target.value as ProjectStatus)}
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900]"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900]"
                     >
                       {statuses.map((st) => (
-                        <option key={st} value={st} className="bg-slate-900 text-white">
+                        <option key={st} value={st} className="bg-popover text-popover-foreground">
                           {st}
                         </option>
                       ))}
@@ -592,18 +623,18 @@ export function ProjectDrawer({
                   </div>
 
                   <div className="flex flex-col justify-end">
-                    <label className="flex items-center gap-3 p-2.5 rounded-lg border border-white/10 bg-white/[0.03] cursor-pointer hover:bg-white/[0.06] transition-colors">
+                    <label className="flex items-center gap-3 p-2.5 rounded-lg border border-border bg-muted/40 cursor-pointer hover:bg-muted/70 transition-colors">
                       <input
                         type="checkbox"
                         checked={featured}
                         onChange={(e) => setFeatured(e.target.checked)}
-                        className="size-4 rounded border-white/20 text-[#FF9900] focus:ring-[#FF9900] accent-[#FF9900]"
+                        className="size-4 rounded border-border text-[#FF9900] focus:ring-[#FF9900] accent-[#FF9900]"
                       />
                       <div>
-                        <span className="text-sm font-medium text-white block">
+                        <span className="text-sm font-medium text-foreground block">
                           Featured Showcase
                         </span>
-                        <span className="text-xs text-slate-400">
+                        <span className="text-xs text-muted-foreground">
                           Highlight this project on the homepage
                         </span>
                       </div>
@@ -612,7 +643,7 @@ export function ProjectDrawer({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                     Tagline (Short Punchy Description) *
                   </label>
                   <input
@@ -621,12 +652,12 @@ export function ProjectDrawer({
                     value={tagline}
                     onChange={(e) => setTagline(e.target.value)}
                     placeholder="e.g. Serverless cost optimization analyzer with automated AWS resource cleanup."
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900]"
+                    className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                     Full Description & Architecture Details
                   </label>
                   <textarea
@@ -634,17 +665,17 @@ export function ProjectDrawer({
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Provide detailed breakdown of features, cloud architecture, purpose, and impact..."
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900] leading-relaxed"
+                    className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900] leading-relaxed"
                   />
                 </div>
 
                 {/* Cover Image Upload & Preview */}
                 <div className="space-y-2.5 pt-2">
                   <div className="flex items-center justify-between">
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Cover Image *
                     </label>
-                    <div className="flex items-center rounded-lg border border-white/10 bg-black/40 p-0.5 text-xs">
+                    <div className="flex items-center rounded-lg border border-border bg-muted/50 p-0.5 text-xs">
                       <button
                         type="button"
                         onClick={() => setImageUploadMode("upload")}
@@ -652,7 +683,7 @@ export function ProjectDrawer({
                           "px-2.5 py-1 rounded-md transition-colors flex items-center gap-1.5",
                           imageUploadMode === "upload"
                             ? "bg-[#FF9900] text-black font-semibold shadow-sm"
-                            : "text-slate-400 hover:text-white"
+                            : "text-muted-foreground hover:text-foreground"
                         )}
                       >
                         <UploadCloud className="size-3.5" />
@@ -665,7 +696,7 @@ export function ProjectDrawer({
                           "px-2.5 py-1 rounded-md transition-colors flex items-center gap-1.5",
                           imageUploadMode === "url"
                             ? "bg-[#FF9900] text-black font-semibold shadow-sm"
-                            : "text-slate-400 hover:text-white"
+                            : "text-muted-foreground hover:text-foreground"
                         )}
                       >
                         <ImageIcon className="size-3.5" />
@@ -690,8 +721,8 @@ export function ProjectDrawer({
 
                       {/* Active Image Preview with replace/remove */}
                       {image ? (
-                        <div className="relative rounded-xl border border-white/15 bg-black/40 overflow-hidden group">
-                          <div className="relative aspect-video w-full overflow-hidden bg-black/60">
+                        <div className="relative rounded-xl border border-border bg-muted/30 overflow-hidden group">
+                          <div className="relative aspect-video w-full overflow-hidden bg-muted">
                             <Image
                               src={image}
                               alt="Project Cover Preview"
@@ -723,7 +754,7 @@ export function ProjectDrawer({
                               </Button>
                             </div>
                           </div>
-                          <div className="p-2.5 flex items-center justify-between text-xs text-slate-400 bg-black/40 border-t border-white/10">
+                          <div className="p-2.5 flex items-center justify-between text-xs text-muted-foreground bg-muted/50 border-t border-border">
                             <span className="truncate max-w-[280px]">
                               {image.startsWith("data:") ? "Custom uploaded image" : image}
                             </span>
@@ -755,13 +786,13 @@ export function ProjectDrawer({
                             "border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors flex flex-col items-center justify-center gap-3",
                             isDragging
                               ? "border-[#FF9900] bg-[#FF9900]/10"
-                              : "border-white/20 bg-white/[0.02] hover:border-[#FF9900]/50 hover:bg-white/[0.04]"
+                              : "border-border bg-muted/20 hover:border-[#FF9900]/50 hover:bg-muted/40"
                           )}
                         >
                           {isUploadingImage ? (
                             <div className="flex flex-col items-center gap-2">
                               <Loader2 className="size-8 text-[#FF9900] animate-spin" />
-                              <span className="text-sm text-slate-300">Processing & uploading image...</span>
+                              <span className="text-sm text-muted-foreground">Processing & uploading image...</span>
                             </div>
                           ) : (
                             <>
@@ -769,10 +800,10 @@ export function ProjectDrawer({
                                 <UploadCloud className="size-6" />
                               </div>
                               <div>
-                                <span className="text-sm font-semibold text-white block">
+                                <span className="text-sm font-semibold text-foreground block">
                                   Click to upload or drag & drop cover image
                                 </span>
-                                <span className="text-xs text-slate-400 mt-1 block">
+                                <span className="text-xs text-muted-foreground mt-1 block">
                                   Supports JPG, PNG, or WebP (max 5 MB · Recommended 1200 × 630)
                                 </span>
                               </div>
@@ -789,7 +820,7 @@ export function ProjectDrawer({
                         value={image}
                         onChange={(e) => setImage(e.target.value)}
                         placeholder="https://... or /images/projects/thefleetfly.jpg"
-                        className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900]"
+                        className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#FF9900] focus:ring-1 focus:ring-[#FF9900]"
                       />
                       <div className="flex flex-wrap gap-2">
                         {["/images/projects/thefleetfly.jpg", "/images/projects/vulnix.jpg", "/images/projects/cloudsec.jpg"].map(
@@ -802,7 +833,7 @@ export function ProjectDrawer({
                                 "text-[11px] px-2.5 py-1 rounded-md border transition-colors",
                                 image === preset
                                   ? "bg-[#FF9900]/20 border-[#FF9900] text-[#FF9900] font-medium"
-                                  : "bg-white/5 hover:bg-white/10 text-slate-300 border-white/10"
+                                  : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border-border"
                               )}
                             >
                               Preset: {preset.split("/").pop()}
@@ -812,7 +843,7 @@ export function ProjectDrawer({
                       </div>
 
                       {image && (
-                        <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-white/15 bg-black/50 mt-2">
+                        <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-border bg-muted mt-2">
                           <Image
                             src={image}
                             alt="Preview"
@@ -833,10 +864,10 @@ export function ProjectDrawer({
                 {/* Tech Stack */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Technologies & Frameworks
                     </label>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-muted-foreground">
                       {techStack.length} added
                     </span>
                   </div>
@@ -854,7 +885,7 @@ export function ProjectDrawer({
                         }
                       }}
                       placeholder="Type technology and press Enter (e.g. Next.js, Docker)"
-                      className="flex-1 px-3.5 py-2 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#FF9900]"
+                      className="flex-1 px-3.5 py-2 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                     />
                     <Button
                       type="button"
@@ -863,29 +894,29 @@ export function ProjectDrawer({
                         addTechTag(techInput);
                         setTechInput("");
                       }}
-                      className="border-white/15 text-white hover:bg-white/10"
+                      className="border-border text-foreground hover:bg-muted"
                     >
                       <Plus className="size-4" />
                     </Button>
                   </div>
 
                   {/* Active Tech Stack Pills */}
-                  <div className="flex flex-wrap gap-1.5 min-h-[38px] p-2 rounded-lg border border-white/10 bg-white/[0.02]">
+                  <div className="flex flex-wrap gap-1.5 min-h-[38px] p-2 rounded-lg border border-border bg-muted/20">
                     {techStack.length === 0 ? (
-                      <span className="text-xs text-slate-500 italic p-1">
+                      <span className="text-xs text-muted-foreground italic p-1">
                         No technologies added yet.
                       </span>
                     ) : (
                       techStack.map((tech) => (
                         <span
                           key={tech}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-500/15 text-blue-300 border border-blue-500/30"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-500/15 text-blue-600 dark:text-blue-300 border border-blue-500/30"
                         >
                           {tech}
                           <button
                             type="button"
                             onClick={() => removeTechTag(tech)}
-                            className="text-blue-300 hover:text-white"
+                            className="text-blue-600 dark:text-blue-300 hover:text-foreground"
                           >
                             <X className="size-3" />
                           </button>
@@ -896,7 +927,7 @@ export function ProjectDrawer({
 
                   {/* Quick-add chips */}
                   <div className="mt-3">
-                    <span className="text-[11px] text-slate-400 block mb-1.5">
+                    <span className="text-[11px] text-muted-foreground block mb-1.5">
                       Suggested Technologies:
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -908,8 +939,8 @@ export function ProjectDrawer({
                           disabled={techStack.includes(item)}
                           className={`text-xs px-2 py-0.5 rounded border transition-colors ${
                             techStack.includes(item)
-                              ? "bg-white/5 text-slate-600 border-white/5 cursor-not-allowed"
-                              : "bg-white/[0.04] text-slate-300 border-white/10 hover:border-[#FF9900]/50 hover:text-[#FF9900]"
+                              ? "bg-muted text-muted-foreground/40 border-border/40 cursor-not-allowed"
+                              : "bg-muted/50 text-foreground border-border hover:border-[#FF9900]/50 hover:text-[#FF9900]"
                           }`}
                         >
                           + {item}
@@ -920,12 +951,12 @@ export function ProjectDrawer({
                 </div>
 
                 {/* AWS Services */}
-                <div className="pt-4 border-t border-white/10">
+                <div className="pt-4 border-t border-border">
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       AWS Services & Infrastructure
                     </label>
-                    <span className="text-xs text-slate-400">
+                    <span className="text-xs text-muted-foreground">
                       {awsServices.length} added
                     </span>
                   </div>
@@ -943,7 +974,7 @@ export function ProjectDrawer({
                         }
                       }}
                       placeholder="Type AWS service and press Enter (e.g. AWS Lambda)"
-                      className="flex-1 px-3.5 py-2 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#FF9900]"
+                      className="flex-1 px-3.5 py-2 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                     />
                     <Button
                       type="button"
@@ -952,16 +983,16 @@ export function ProjectDrawer({
                         addAwsTag(awsInput);
                         setAwsInput("");
                       }}
-                      className="border-white/15 text-white hover:bg-white/10"
+                      className="border-border text-foreground hover:bg-muted"
                     >
                       <Plus className="size-4" />
                     </Button>
                   </div>
 
                   {/* Active AWS Pills */}
-                  <div className="flex flex-wrap gap-1.5 min-h-[38px] p-2 rounded-lg border border-white/10 bg-white/[0.02]">
+                  <div className="flex flex-wrap gap-1.5 min-h-[38px] p-2 rounded-lg border border-border bg-muted/20">
                     {awsServices.length === 0 ? (
-                      <span className="text-xs text-slate-500 italic p-1">
+                      <span className="text-xs text-muted-foreground italic p-1">
                         No AWS services added yet.
                       </span>
                     ) : (
@@ -974,7 +1005,7 @@ export function ProjectDrawer({
                           <button
                             type="button"
                             onClick={() => removeAwsTag(service)}
-                            className="text-[#FF9900] hover:text-white"
+                            className="text-[#FF9900] hover:text-foreground"
                           >
                             <X className="size-3" />
                           </button>
@@ -985,7 +1016,7 @@ export function ProjectDrawer({
 
                   {/* Quick-add AWS chips */}
                   <div className="mt-3">
-                    <span className="text-[11px] text-slate-400 block mb-1.5">
+                    <span className="text-[11px] text-muted-foreground block mb-1.5">
                       Suggested AWS Services:
                     </span>
                     <div className="flex flex-wrap gap-1.5">
@@ -997,8 +1028,8 @@ export function ProjectDrawer({
                           disabled={awsServices.includes(item)}
                           className={`text-xs px-2 py-0.5 rounded border transition-colors ${
                             awsServices.includes(item)
-                              ? "bg-white/5 text-slate-600 border-white/5 cursor-not-allowed"
-                              : "bg-white/[0.04] text-slate-300 border-white/10 hover:border-[#FF9900]/50 hover:text-[#FF9900]"
+                              ? "bg-muted text-muted-foreground/40 border-border/40 cursor-not-allowed"
+                              : "bg-muted/50 text-foreground border-border hover:border-[#FF9900]/50 hover:text-[#FF9900]"
                           }`}
                         >
                           + {item}
@@ -1012,15 +1043,15 @@ export function ProjectDrawer({
               {/* TAB 3: AUTHOR & TEAM */}
               <TabsContent value="team" className="space-y-6 m-0 focus-visible:outline-none">
                 {/* Lead Author */}
-                <div className="p-4 rounded-xl border border-white/10 bg-white/[0.02] space-y-4">
-                  <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                <div className="p-4 rounded-xl border border-border bg-muted/30 space-y-4">
+                  <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                     <Users className="size-4 text-[#FF9900]" />
                     Project Lead / Primary Author
                   </h3>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Author Name *
                       </label>
                       <input
@@ -1029,12 +1060,12 @@ export function ProjectDrawer({
                         value={authorName}
                         onChange={(e) => setAuthorName(e.target.value)}
                         placeholder="e.g. MD Arfaa Taj"
-                        className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900]"
+                        className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">
+                      <label className="block text-xs font-medium text-muted-foreground mb-1">
                         Role / Designation
                       </label>
                       <input
@@ -1042,13 +1073,13 @@ export function ProjectDrawer({
                         value={authorRole}
                         onChange={(e) => setAuthorRole(e.target.value)}
                         placeholder="e.g. Lead Full-Stack Developer"
-                        className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900]"
+                        className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">
                       Lead Author Avatar (Optional)
                     </label>
                     <div className="flex items-center gap-3">
@@ -1065,7 +1096,7 @@ export function ProjectDrawer({
                       />
 
                       {/* Avatar preview circle */}
-                      <div className="relative size-10 rounded-full overflow-hidden border border-white/20 bg-black/50 shrink-0">
+                      <div className="relative size-10 rounded-full overflow-hidden border border-border bg-muted shrink-0">
                         {authorAvatar ? (
                           <Image
                             src={authorAvatar}
@@ -1075,7 +1106,7 @@ export function ProjectDrawer({
                             className="object-cover"
                           />
                         ) : (
-                          <div className="size-full flex items-center justify-center text-xs font-bold text-slate-400 bg-white/5">
+                          <div className="size-full flex items-center justify-center text-xs font-bold text-muted-foreground bg-muted">
                             {authorName ? authorName.charAt(0).toUpperCase() : "?"}
                           </div>
                         )}
@@ -1087,7 +1118,7 @@ export function ProjectDrawer({
                           value={authorAvatar}
                           onChange={(e) => setAuthorAvatar(e.target.value)}
                           placeholder="/images/members/arfaa.png or URL"
-                          className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-xs focus:outline-none focus:border-[#FF9900]"
+                          className="flex-1 px-3 py-2 rounded-lg bg-background border border-border text-foreground text-xs focus:outline-none focus:border-[#FF9900]"
                         />
                         <Button
                           type="button"
@@ -1095,7 +1126,7 @@ export function ProjectDrawer({
                           size="sm"
                           disabled={avatarUploading}
                           onClick={() => avatarInputRef.current?.click()}
-                          className="border-white/15 text-white hover:bg-white/10 text-xs shrink-0"
+                          className="border-border text-foreground hover:bg-muted text-xs shrink-0"
                         >
                           {avatarUploading ? (
                             <Loader2 className="size-3.5 animate-spin" />
@@ -1112,7 +1143,7 @@ export function ProjectDrawer({
                             variant="ghost"
                             size="sm"
                             onClick={() => setAuthorAvatar("")}
-                            className="text-slate-400 hover:text-red-400 px-2"
+                            className="text-muted-foreground hover:text-red-500 px-2"
                             title="Remove avatar"
                           >
                             <Trash2 className="size-3.5" />
@@ -1126,32 +1157,32 @@ export function ProjectDrawer({
                 {/* Team Members List */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                       Collaborators & Team Members ({team.length})
                     </label>
                   </div>
 
                   {/* Add Member Row */}
-                  <div className="p-3 rounded-lg border border-white/10 bg-black/30 flex flex-col sm:flex-row gap-2">
+                  <div className="p-3 rounded-lg border border-border bg-muted/40 flex flex-col sm:flex-row gap-2">
                     <input
                       type="text"
                       value={newTeamName}
                       onChange={(e) => setNewTeamName(e.target.value)}
                       placeholder="Member Name"
-                      className="flex-1 px-3 py-1.5 rounded-md bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-[#FF9900]"
+                      className="flex-1 px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-xs focus:outline-none focus:border-[#FF9900]"
                     />
                     <input
                       type="text"
                       value={newTeamRole}
                       onChange={(e) => setNewTeamRole(e.target.value)}
                       placeholder="Role (e.g. Cloud Architect)"
-                      className="flex-1 px-3 py-1.5 rounded-md bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-[#FF9900]"
+                      className="flex-1 px-3 py-1.5 rounded-md bg-background border border-border text-foreground text-xs focus:outline-none focus:border-[#FF9900]"
                     />
                     <Button
                       type="button"
                       size="sm"
                       onClick={addTeamMember}
-                      className="bg-[#FF9900] text-black hover:bg-[#FF9900]/90 text-xs shrink-0"
+                      className="bg-[#FF9900] text-black hover:bg-[#FF9900]/90 text-xs shrink-0 font-medium"
                     >
                       <Plus className="size-3.5 mr-1" />
                       Add Member
@@ -1161,27 +1192,27 @@ export function ProjectDrawer({
                   {/* Team List */}
                   <div className="space-y-2">
                     {team.length === 0 ? (
-                      <p className="text-xs text-slate-500 italic py-2">
+                      <p className="text-xs text-muted-foreground italic py-2">
                         No additional team members listed.
                       </p>
                     ) : (
                       team.map((member, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center justify-between px-3.5 py-2 rounded-lg border border-white/10 bg-white/[0.02]"
+                          className="flex items-center justify-between px-3.5 py-2 rounded-lg border border-border bg-muted/30"
                         >
                           <div>
-                            <span className="text-sm font-medium text-white block">
+                            <span className="text-sm font-medium text-foreground block">
                               {member.name}
                             </span>
-                            <span className="text-xs text-slate-400">
+                            <span className="text-xs text-muted-foreground">
                               {member.role || "Developer"}
                             </span>
                           </div>
                           <button
                             type="button"
                             onClick={() => removeTeamMember(idx)}
-                            className="text-slate-400 hover:text-red-400 transition-colors p-1"
+                            className="text-muted-foreground hover:text-red-500 transition-colors p-1"
                           >
                             <Trash2 className="size-4" />
                           </button>
@@ -1196,7 +1227,7 @@ export function ProjectDrawer({
               <TabsContent value="links" className="space-y-4 m-0 focus-visible:outline-none">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                       GitHub Repository URL
                     </label>
                     <input
@@ -1204,12 +1235,12 @@ export function ProjectDrawer({
                       value={githubUrl}
                       onChange={(e) => setGithubUrl(e.target.value)}
                       placeholder="https://github.com/organization/repo"
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#FF9900]"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                       Live Demo / Deployment URL
                     </label>
                     <input
@@ -1217,14 +1248,14 @@ export function ProjectDrawer({
                       value={demoUrl}
                       onChange={(e) => setDemoUrl(e.target.value)}
                       placeholder="https://project-demo.vercel.app"
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-black/40 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-[#FF9900]"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                       Start Date
                     </label>
                     <input
@@ -1232,12 +1263,12 @@ export function ProjectDrawer({
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
                       placeholder="01 Jun 2025"
-                      className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900]"
+                      className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                       End Date
                     </label>
                     <input
@@ -1245,12 +1276,12 @@ export function ProjectDrawer({
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
                       placeholder="— or Aug 2025"
-                      className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900]"
+                      className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                       Display Date
                     </label>
                     <input
@@ -1258,18 +1289,18 @@ export function ProjectDrawer({
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
                       placeholder="Aug 2025"
-                      className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900]"
+                      className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                     />
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/10">
-                  <h4 className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">
+                <div className="pt-4 border-t border-border">
+                  <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
                     Portfolio Stats
                   </h4>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs text-slate-400 mb-1">
+                      <label className="block text-xs text-muted-foreground mb-1">
                         Likes
                       </label>
                       <input
@@ -1277,12 +1308,12 @@ export function ProjectDrawer({
                         min={0}
                         value={likes}
                         onChange={(e) => setLikes(Number(e.target.value))}
-                        className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900]"
+                        className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs text-slate-400 mb-1">
+                      <label className="block text-xs text-muted-foreground mb-1">
                         Views
                       </label>
                       <input
@@ -1290,12 +1321,12 @@ export function ProjectDrawer({
                         value={views}
                         onChange={(e) => setViews(e.target.value)}
                         placeholder="1.2K"
-                        className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900]"
+                        className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs text-slate-400 mb-1">
+                      <label className="block text-xs text-muted-foreground mb-1">
                         Rating (out of 5)
                       </label>
                       <input
@@ -1305,7 +1336,7 @@ export function ProjectDrawer({
                         max="5"
                         value={rating}
                         onChange={(e) => setRating(Number(e.target.value))}
-                        className="w-full px-3 py-2 rounded-lg bg-black/40 border border-white/15 text-white text-sm focus:outline-none focus:border-[#FF9900]"
+                        className="w-full px-3 py-2 rounded-lg bg-background border border-border text-foreground text-sm focus:outline-none focus:border-[#FF9900]"
                       />
                     </div>
                   </div>
@@ -1315,34 +1346,63 @@ export function ProjectDrawer({
           </Tabs>
 
           {/* Drawer Footer with Actions */}
-          <div className="p-4 border-t border-white/10 bg-black/40 flex items-center justify-end gap-3 shrink-0">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="border-white/15 text-white hover:bg-white/10"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="bg-[#FF9900] text-black hover:bg-[#FF9900]/90 font-semibold px-5 shadow-[0_0_15px_rgba(255,153,0,0.3)]"
-            >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <div className="size-4 animate-spin rounded-full border-2 border-black border-t-transparent" />
-                  <span>Saving...</span>
-                </div>
-              ) : isEditing ? (
-                "Save Changes"
-              ) : (
-                "Create Project"
+          <div className="p-4 border-t border-border bg-card flex items-center justify-between gap-3 shrink-0">
+            <div>
+              {isEditing && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setDeleteConfirmOpen(true)}
+                  disabled={loading || deleteLoading}
+                  className="border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/50 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Trash2 className="size-3.5" />
+                  Delete Project
+                </Button>
               )}
-            </Button>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className="border-border text-foreground hover:bg-muted text-xs cursor-pointer"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={loading || deleteLoading}
+                className="bg-[#FF9900] text-black hover:bg-[#FF9900]/90 text-xs font-semibold px-4 flex items-center gap-1.5 shadow-[0_0_15px_rgba(255,153,0,0.25)] cursor-pointer"
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="size-3.5 animate-spin rounded-full border-2 border-black border-t-transparent" />
+                    <span>Saving...</span>
+                  </div>
+                ) : isEditing ? (
+                  "Save Changes"
+                ) : (
+                  "Create Project"
+                )}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Delete Project?"
+        description={`Are you sure you want to delete "${project?.title}"? This will permanently remove the project from the admin portal and public portfolio.`}
+        confirmLabel={deleteLoading ? "Deleting..." : "Delete Project"}
+        pending={deleteLoading}
+        onConfirm={handleDelete}
+        tone="danger"
+      />
     </Dialog>
   );
 }

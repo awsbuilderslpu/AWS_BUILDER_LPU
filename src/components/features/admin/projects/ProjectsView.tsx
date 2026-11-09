@@ -861,6 +861,11 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
         onOpenChange={setDrawerOpen}
         project={editingProject}
         onSaved={handleSaved}
+        onDeleted={(deleted) => {
+          setItems((prev) =>
+            prev.filter((p) => p.slug !== deleted.slug && p.id !== deleted.id)
+          );
+        }}
       />
 
       {/* Project Detail Preview Drawer */}
@@ -871,6 +876,10 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
         onEdit={(p) => {
           setPreviewOpen(false);
           handleEdit(p);
+        }}
+        onDelete={(p) => {
+          setPreviewOpen(false);
+          openDeleteDialog(p);
         }}
       />
 

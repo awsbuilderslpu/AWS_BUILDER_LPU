@@ -7,7 +7,6 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Camera,
-  Image as ImageIcon,
   MapPin,
   ExternalLink,
   Lock,
@@ -149,7 +148,6 @@ export function ProfileView({
 
   // Media dialog states
   const [avatarDialogOpen, setAvatarDialogOpen] = React.useState(false);
-  const [coverDialogOpen, setCoverDialogOpen] = React.useState(false);
 
   // Public switch state
   const isApproved = account.registrationStatus === "approved";
@@ -220,21 +218,6 @@ export function ProfileView({
       if (res.ok) {
         notify.success(profileCopy.messages.mediaSaved);
         setAvatarDialogOpen(false);
-        router.refresh();
-      } else {
-        notify.error(profileCopy.errors.update_failed);
-      }
-    } catch {
-      notify.error(profileCopy.errors.failed);
-    }
-  };
-
-  const handleSaveCover = async (path: string | null) => {
-    try {
-      const res = await setOwnMediaAction({ kind: "cover", path });
-      if (res.ok) {
-        notify.success(profileCopy.messages.coverSaved);
-        setCoverDialogOpen(false);
         router.refresh();
       } else {
         notify.error(profileCopy.errors.update_failed);
@@ -1291,7 +1274,7 @@ export function ProfileView({
             </div>
           )}
 
-          {/* Cover Controls (Preset Picker & Upload) */}
+          {/* Cover Controls (Preset Picker) */}
           <div className="absolute top-4 right-4 flex items-center gap-2">
             <button
               type="button"
@@ -1300,15 +1283,6 @@ export function ProfileView({
             >
               <Palette className="size-3.5 text-primary" aria-hidden="true" />
               <span className="hidden sm:inline">Theme</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setCoverDialogOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/20 bg-black/60 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-md transition-all hover:bg-black/90 hover:border-primary/70 hover:scale-105 cursor-pointer shadow-xl"
-            >
-              <ImageIcon className="size-3.5 text-primary" aria-hidden="true" />
-              <span>{profileCopy.actions.uploadCover}</span>
             </button>
           </div>
         </div>
@@ -1529,25 +1503,25 @@ export function ProfileView({
       {/* Virtual Digital Builder Pass (Toggleable Modal/Banner) */}
       {showIdCard && (
         <div className="animate-in fade-in slide-in-from-top-4 duration-300">
-          <CornerFrame className="bg-gradient-to-br from-slate-950 via-[#0B1120] to-slate-900 border-primary/40 shadow-2xl p-6 sm:p-8">
+          <CornerFrame className="bg-card border border-primary/30 dark:bg-gradient-to-br dark:from-slate-950 dark:via-[#0B1120] dark:to-slate-900 shadow-xl p-6 sm:p-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               {/* Pass Visual */}
-              <div className="w-full max-w-md rounded-2xl border-2 border-primary/50 bg-gradient-to-br from-slate-900 via-slate-950 to-primary/10 p-5 shadow-2xl relative overflow-hidden group">
+              <div className="w-full max-w-md rounded-2xl border-2 border-primary/50 bg-gradient-to-br from-white via-amber-500/[0.04] to-primary/10 dark:from-slate-900 dark:via-slate-950 dark:to-primary/10 p-5 shadow-xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-36 h-36 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
-                <div className="flex items-center justify-between border-b border-primary/30 pb-3">
+                <div className="flex items-center justify-between border-b border-primary/20 dark:border-primary/30 pb-3">
                   <div className="flex items-center gap-2">
-                    <Cpu className="size-5 text-primary" />
+                    <Cpu className="size-5 text-amber-700 dark:text-primary" />
                     <div>
-                      <span className="text-xs font-black tracking-widest uppercase text-white block">
+                      <span className="text-xs font-black tracking-widest uppercase text-slate-900 dark:text-white block">
                         AWS BUILDER GROUP
                       </span>
-                      <span className="text-[10px] text-primary font-mono block">LPU CHAPTER • MEMBER PASS</span>
+                      <span className="text-[10px] text-amber-700 dark:text-primary font-mono block">LPU CHAPTER • MEMBER PASS</span>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setQrModalOpen(true)}
-                    className="size-8 rounded-lg overflow-hidden border border-primary/40 bg-white p-0.5 hover:scale-105 transition-transform cursor-pointer shrink-0"
+                    className="size-8 rounded-lg overflow-hidden border border-primary/40 bg-white p-0.5 hover:scale-105 transition-transform cursor-pointer shrink-0 shadow-xs"
                     title="Click to expand QR Code"
                   >
                     {passQrDataUrl ? (
@@ -1560,7 +1534,7 @@ export function ProfileView({
                 </div>
 
                 <div className="flex items-center gap-4 py-4">
-                  <div className="size-16 rounded-xl border-2 border-primary/60 bg-slate-950 overflow-hidden shrink-0 shadow-lg">
+                  <div className="size-16 rounded-xl border-2 border-primary/60 bg-white dark:bg-slate-950 overflow-hidden shrink-0 shadow-md">
                     {effectiveAvatarUrl ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={effectiveAvatarUrl} alt="" className="size-full object-cover" />
@@ -1569,20 +1543,20 @@ export function ProfileView({
                     )}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-extrabold text-base text-white truncate">{account.displayName || account.email}</h3>
-                    <p className="text-xs font-semibold text-primary truncate">{displayRoleTitle}</p>
+                    <h3 className="font-extrabold text-base text-slate-900 dark:text-white truncate">{account.displayName || account.email}</h3>
+                    <p className="text-xs font-semibold text-amber-700 dark:text-primary truncate">{displayRoleTitle}</p>
                     <p className="text-[11px] text-muted-foreground truncate">{currentDept}</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 text-[11px]">
+                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-border/80 dark:border-white/10 text-[11px]">
                   <div>
                     <span className="text-muted-foreground block text-[10px] uppercase font-mono">ID Number</span>
-                    <span className="font-mono font-bold text-white tracking-wider">{memberId}</span>
+                    <span className="font-mono font-bold text-slate-900 dark:text-white tracking-wider">{memberId}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground block text-[10px] uppercase font-mono">Status</span>
-                    <span className="font-bold text-emerald-400 capitalize">{account.registrationStatus || "Active"}</span>
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400 capitalize">{account.registrationStatus || "Active"}</span>
                   </div>
                 </div>
               </div>
@@ -1590,20 +1564,20 @@ export function ProfileView({
               {/* Pass Description & Benefits */}
               <div className="space-y-3 flex-1">
                 <div className="flex items-center gap-2">
-                  <Award className="size-5 text-primary" />
-                  <h3 className="font-bold text-lg text-white">Official Student Builder Credential</h3>
+                  <Award className="size-5 text-amber-700 dark:text-primary" />
+                  <h3 className="font-bold text-lg text-slate-900 dark:text-white">Official Student Builder Credential</h3>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                   This digital membership pass confirms your affiliation with the AWS Student Builder Group at Lovely Professional University. It verifies your active participation in workshops, hackathons, cloud labs, and community networking.
                 </p>
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <span className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs text-primary font-medium">
+                  <span className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs text-amber-800 dark:text-primary font-medium">
                     <CheckCircle className="size-3" /> Campus Events Access
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs text-primary font-medium">
+                  <span className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs text-amber-800 dark:text-primary font-medium">
                     <CheckCircle className="size-3" /> Cloud Workshop Eligibility
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs text-primary font-medium">
+                  <span className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/10 px-2.5 py-1 text-xs text-amber-800 dark:text-primary font-medium">
                     <CheckCircle className="size-3" /> Project Mentorship
                   </span>
                 </div>
@@ -1611,7 +1585,7 @@ export function ProfileView({
                   <button
                     type="button"
                     onClick={() => setQrModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-primary hover:underline cursor-pointer"
                   >
                     <QrCode className="size-3.5" />
                     <span>View Scannable QR Code & ID Details</span>
@@ -2012,25 +1986,6 @@ export function ProfileView({
         </DialogContent>
       </Dialog>
 
-      {/* Change Cover Dialog */}
-      <Dialog open={coverDialogOpen} onOpenChange={setCoverDialogOpen}>
-        <DialogContent className="max-w-lg bg-card border-border">
-          <DialogHeader>
-            <DialogTitle className="text-foreground text-base font-semibold">
-              {profileCopy.dialogs.changeCover}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="py-2">
-            <ImageUpload
-              id="profile-cover-upload"
-              bucket="covers"
-              aspect={7.5}
-              value={profile.coverPath}
-              onChange={handleSaveCover}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

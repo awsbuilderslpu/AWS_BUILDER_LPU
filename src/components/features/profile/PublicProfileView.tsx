@@ -289,16 +289,16 @@ export function PublicProfileView({
       >
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6">
           {/* Left: Credential Pass Mockup */}
-          <div className="w-full lg:max-w-md rounded-2xl border-2 border-primary/50 bg-slate-950/90 p-5 shadow-2xl relative overflow-hidden backdrop-blur-md">
+          <div className="w-full lg:max-w-md rounded-2xl border-2 border-primary/50 bg-gradient-to-br from-white via-amber-500/[0.04] to-primary/10 dark:from-slate-900 dark:via-slate-950 dark:to-primary/10 p-5 shadow-xl relative overflow-hidden backdrop-blur-md">
             <div className="absolute top-0 right-0 w-36 h-36 bg-primary/10 rounded-full blur-2xl pointer-events-none" />
-            <div className="flex items-center justify-between border-b border-primary/30 pb-3">
+            <div className="flex items-center justify-between border-b border-primary/20 dark:border-primary/30 pb-3">
               <div className="flex items-center gap-2">
-                <Cpu className="size-5 text-primary" />
+                <Cpu className="size-5 text-amber-700 dark:text-primary" />
                 <div>
-                  <span className="text-xs font-black tracking-widest uppercase text-white block">
+                  <span className="text-xs font-black tracking-widest uppercase text-slate-900 dark:text-white block">
                     AWS BUILDER GROUP
                   </span>
-                  <span className="text-[10px] text-primary font-mono block">
+                  <span className="text-[10px] text-amber-700 dark:text-primary font-mono block">
                     LPU CHAPTER • MEMBER PASS
                   </span>
                 </div>
@@ -306,7 +306,7 @@ export function PublicProfileView({
               <button
                 type="button"
                 onClick={() => setQrModalOpen(true)}
-                className="size-8 rounded-lg overflow-hidden border border-primary/40 bg-white p-0.5 hover:scale-105 transition-transform cursor-pointer shrink-0"
+                className="size-8 rounded-lg overflow-hidden border border-primary/40 bg-white p-0.5 hover:scale-105 transition-transform cursor-pointer shrink-0 shadow-xs"
                 title="Click to view full QR code"
               >
                 {qrDataUrl ? (
@@ -319,7 +319,7 @@ export function PublicProfileView({
             </div>
 
             <div className="flex items-center gap-4 py-4">
-              <div className="size-16 rounded-xl border-2 border-primary/60 bg-slate-950 overflow-hidden shrink-0 shadow-lg">
+              <div className="size-16 rounded-xl border-2 border-primary/60 bg-white dark:bg-slate-950 overflow-hidden shrink-0 shadow-md">
                 {media.avatarUrl ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img src={media.avatarUrl} alt="" className="size-full object-cover" />
@@ -328,20 +328,20 @@ export function PublicProfileView({
                 )}
               </div>
               <div className="min-w-0">
-                <h3 className="font-extrabold text-base text-white truncate">{profile.fullName}</h3>
-                <p className="text-xs font-semibold text-primary truncate">{displayRoleTitle}</p>
+                <h3 className="font-extrabold text-base text-slate-900 dark:text-white truncate">{profile.fullName}</h3>
+                <p className="text-xs font-semibold text-amber-700 dark:text-primary truncate">{displayRoleTitle}</p>
                 <p className="text-[11px] text-muted-foreground truncate">{currentDept}</p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10 text-[11px]">
+            <div className="grid grid-cols-2 gap-2 pt-3 border-t border-border/80 dark:border-white/10 text-[11px]">
               <div>
                 <span className="text-muted-foreground block text-[10px] uppercase font-mono">Member ID</span>
-                <span className="font-mono font-bold text-white tracking-wider">{memberId}</span>
+                <span className="font-mono font-bold text-slate-900 dark:text-white tracking-wider">{memberId}</span>
               </div>
               <div>
                 <span className="text-muted-foreground block text-[10px] uppercase font-mono">Status</span>
-                <span className="font-bold text-emerald-400 capitalize">Verified Builder</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400 capitalize">Verified Builder</span>
               </div>
             </div>
           </div>

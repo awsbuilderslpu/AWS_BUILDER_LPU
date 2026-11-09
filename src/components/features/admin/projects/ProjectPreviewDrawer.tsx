@@ -25,6 +25,7 @@ import {
   CheckSquare,
   Square,
   Sparkles,
+  Trash2,
 } from "lucide-react";
 import { FaGithub } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ interface ProjectPreviewDrawerProps {
   onOpenChange: (open: boolean) => void;
   project: ProjectItem | null;
   onEdit: (project: ProjectItem) => void;
+  onDelete?: (project: ProjectItem) => void;
 }
 
 export function ProjectPreviewDrawer({
@@ -42,6 +44,7 @@ export function ProjectPreviewDrawer({
   onOpenChange,
   project,
   onEdit,
+  onDelete,
 }: ProjectPreviewDrawerProps) {
   // Interactive roadmap checklist state
   const [completedTasks, setCompletedTasks] = React.useState<Record<string, boolean>>({});
@@ -118,21 +121,21 @@ export function ProjectPreviewDrawer({
           <div className="flex items-start justify-between pr-8 gap-4">
             <div className="flex items-start gap-4">
               {/* Category / Icon Tile */}
-              <div className="size-12 rounded-xl bg-rose-500/10 border border-rose-500/25 flex items-center justify-center text-rose-400 shrink-0 mt-0.5 shadow-[0_0_20px_rgba(244,63,94,0.15)]">
+              <div className="size-12 rounded-xl bg-rose-500/10 border border-rose-500/25 flex items-center justify-center text-rose-500 dark:text-rose-400 shrink-0 mt-0.5 shadow-[0_0_20px_rgba(244,63,94,0.15)]">
                 {project.category === "Security" ? (
-                  <ShieldCheck className="size-6 text-rose-400" />
+                  <ShieldCheck className="size-6 text-rose-500 dark:text-rose-400" />
                 ) : project.category === "AI & ML" ? (
-                  <Cpu className="size-6 text-rose-400" />
+                  <Cpu className="size-6 text-rose-500 dark:text-rose-400" />
                 ) : (
-                  <Sparkles className="size-6 text-rose-400" />
+                  <Sparkles className="size-6 text-rose-500 dark:text-rose-400" />
                 )}
               </div>
 
               <div>
-                <DialogTitle className="text-xl sm:text-2xl font-bold text-foreground tracking-tight leading-tight">
+                <DialogTitle className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
                   {project.title}
                 </DialogTitle>
-                <DialogDescription className="text-xs sm:text-sm text-muted-foreground mt-1 leading-relaxed">
+                <DialogDescription className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1 leading-relaxed">
                   {project.tagline}
                 </DialogDescription>
               </div>
@@ -147,31 +150,31 @@ export function ProjectPreviewDrawer({
             <div className="lg:col-span-7 space-y-6">
               {/* >_ PROJECT DESCRIPTION */}
               <div className="space-y-2">
-                <h4 className="text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="text-slate-400 font-bold">&gt;_</span>
+                <h4 className="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="text-slate-900 dark:text-white font-bold">&gt;_</span>
                   PROJECT DESCRIPTION
                 </h4>
-                <p className="text-sm text-slate-300 leading-relaxed font-sans">
+                <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-sans">
                   {project.description || project.tagline}
                 </p>
               </div>
 
               {/* ? WHY THIS PROJECT STANDS OUT */}
               <div className="space-y-3">
-                <h4 className="text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <span className="text-blue-400 font-bold">?</span>
+                <h4 className="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="text-blue-600 dark:text-blue-400 font-bold">?</span>
                   WHY THIS PROJECT STANDS OUT
                 </h4>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
                   As cloud and AI workloads scale into enterprise operations, real-world deployment requires production-level reliability, automated governance, and robust architectural resilience. This project is built by AWS Student Builders Group to reflect production standards.
                 </p>
 
                 {/* Uniqueness Callout Box */}
-                <div className="border-l-2 border-cyan-400 bg-cyan-950/20 px-4 py-3 rounded-r-md">
-                  <span className="text-xs font-semibold text-cyan-300 block mb-1">
+                <div className="border-l-2 border-cyan-500 dark:border-cyan-400 bg-cyan-500/10 dark:bg-cyan-950/30 px-4 py-3 rounded-r-md">
+                  <span className="text-xs font-bold text-cyan-800 dark:text-cyan-300 block mb-1">
                     Uniqueness:
                   </span>
-                  <span className="text-xs text-slate-300 leading-relaxed block">
+                  <span className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed block">
                     {project.tagline} Built with specialized cloud paradigms and tested against edge cases.
                   </span>
                 </div>
@@ -179,12 +182,12 @@ export function ProjectPreviewDrawer({
 
               {/* HOW TO IMPRESS RECRUITERS */}
               <div className="space-y-2.5">
-                <h4 className="text-xs font-mono font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                  <Award className="size-4 text-purple-400" />
+                <h4 className="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                  <Award className="size-4 text-purple-600 dark:text-purple-400" />
                   HOW TO IMPRESS RECRUITERS
                 </h4>
-                <div className="border-l-2 border-purple-500 bg-purple-950/25 px-4 py-3 rounded-r-md">
-                  <span className="text-xs text-slate-200 leading-relaxed block">
+                <div className="border-l-2 border-purple-500 dark:border-purple-400 bg-purple-500/10 dark:bg-purple-950/30 px-4 py-3 rounded-r-md">
+                  <span className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed block">
                     Highlight live architecture diagrams, benchmarked latency/cost metrics, and AWS serverless or microservice decoupling in technical interviews.
                   </span>
                 </div>
@@ -192,11 +195,11 @@ export function ProjectPreviewDrawer({
 
               {/* INDUSTRY RELEVANCE & DEMAND */}
               <div className="space-y-2.5">
-                <h4 className="text-xs font-mono font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                  <Briefcase className="size-4 text-amber-500" />
+                <h4 className="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                  <Briefcase className="size-4 text-amber-600 dark:text-amber-500" />
                   INDUSTRY RELEVANCE & DEMAND
                 </h4>
-                <div className="rounded-xl border border-border bg-muted/40 p-4 text-xs sm:text-sm text-foreground leading-relaxed">
+                <div className="rounded-xl border border-border bg-slate-50 dark:bg-muted/40 p-4 text-xs sm:text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
                   High demand across cloud engineering, DevSecOps, and distributed computing teams. Demonstrates end-to-end delivery from prototype to audited cloud deployment.
                 </div>
               </div>
@@ -204,8 +207,8 @@ export function ProjectPreviewDrawer({
               {/* Cover Media if available */}
               {project.image && (
                 <div className="space-y-2 pt-2">
-                  <h4 className="text-xs font-mono font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                    <Layers className="size-3.5 text-blue-500" />
+                  <h4 className="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                    <Layers className="size-3.5 text-blue-600 dark:text-blue-400" />
                     Cover Media
                   </h4>
                   <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-border bg-black/60 shadow-lg">
@@ -225,8 +228,8 @@ export function ProjectPreviewDrawer({
             {/* Right Column */}
             <div className="lg:col-span-5 space-y-6">
               {/* TECHNOLOGIES Card */}
-              <div className="rounded-xl border border-border bg-muted/40 p-4 sm:p-5 space-y-3 shadow-sm">
-                <h4 className="text-xs font-mono font-semibold text-muted-foreground uppercase tracking-wider">
+              <div className="rounded-xl border border-border bg-slate-50/60 dark:bg-muted/40 p-4 sm:p-5 space-y-3 shadow-xs">
+                <h4 className="text-xs font-mono font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                   TECHNOLOGIES
                 </h4>
                 <div className="flex flex-wrap gap-2">
@@ -234,26 +237,26 @@ export function ProjectPreviewDrawer({
                     project.techStack.map((tech) => (
                       <span
                         key={tech}
-                        className="text-xs px-3 py-1.5 rounded-lg bg-card text-foreground border border-border font-medium"
+                        className="text-xs px-3 py-1.5 rounded-lg bg-card text-slate-800 dark:text-slate-200 border border-border font-medium shadow-2xs"
                       >
                         {tech}
                       </span>
                     ))
                   ) : (
-                    <span className="text-xs text-slate-500 italic">No technologies listed</span>
+                    <span className="text-xs text-muted-foreground italic">No technologies listed</span>
                   )}
                 </div>
 
                 {project.awsServices && project.awsServices.length > 0 && (
-                  <div className="pt-3 border-t border-slate-800/80">
-                    <span className="text-[11px] font-mono text-slate-400 block mb-2 uppercase">
+                  <div className="pt-3 border-t border-border">
+                    <span className="text-[11px] font-mono text-slate-600 dark:text-slate-400 block mb-2 uppercase">
                       AWS Services
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {project.awsServices.map((service) => (
                         <span
                           key={service}
-                          className="text-xs px-2.5 py-1 rounded-md bg-[#FF9900]/15 text-[#FF9900] border border-[#FF9900]/30 font-medium"
+                          className="text-xs px-2.5 py-1 rounded-md bg-amber-500/10 dark:bg-[#FF9900]/15 text-amber-800 dark:text-[#FF9900] border border-amber-500/30 dark:border-[#FF9900]/30 font-medium"
                         >
                           {service}
                         </span>
@@ -264,20 +267,20 @@ export function ProjectPreviewDrawer({
               </div>
 
               {/* INTERACTIVE ROADMAP Card */}
-              <div className="rounded-xl border border-border bg-muted/40 p-4 sm:p-5 space-y-4 shadow-sm">
+              <div className="rounded-xl border border-border bg-slate-50/60 dark:bg-muted/40 p-4 sm:p-5 space-y-4 shadow-xs">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-mono font-semibold text-foreground uppercase tracking-wider">
+                  <h4 className="text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                     INTERACTIVE ROADMAP
                   </h4>
                 </div>
 
                 {/* Progress bar */}
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground font-mono">
+                  <div className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-400 font-mono">
                     <span>Progress</span>
-                    <span className="text-foreground font-semibold">{progressPct}%</span>
+                    <span className="text-slate-900 dark:text-white font-semibold">{progressPct}%</span>
                   </div>
-                  <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full bg-slate-200 dark:bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-400 rounded-full transition-all duration-300"
                       style={{ width: `${progressPct}%` }}
@@ -297,15 +300,15 @@ export function ProjectPreviewDrawer({
                         className="w-full flex items-start gap-2.5 text-left p-2 rounded-lg hover:bg-muted/80 transition-colors group cursor-pointer"
                       >
                         {isChecked ? (
-                          <CheckSquare className="size-4 text-primary shrink-0 mt-0.5" />
+                          <CheckSquare className="size-4 text-amber-600 dark:text-primary shrink-0 mt-0.5" />
                         ) : (
-                          <Square className="size-4 text-muted-foreground group-hover:text-foreground shrink-0 mt-0.5" />
+                          <Square className="size-4 text-slate-400 dark:text-muted-foreground group-hover:text-slate-700 dark:group-hover:text-foreground shrink-0 mt-0.5" />
                         )}
                         <span
                           className={`text-xs leading-relaxed transition-colors ${
                             isChecked
-                              ? "text-muted-foreground line-through decoration-muted-foreground"
-                              : "text-foreground group-hover:text-primary"
+                              ? "text-slate-400 dark:text-muted-foreground line-through decoration-slate-400 dark:decoration-muted-foreground"
+                              : "text-slate-700 dark:text-foreground group-hover:text-amber-700 dark:group-hover:text-primary"
                           }`}
                         >
                           {item.label}
@@ -317,26 +320,26 @@ export function ProjectPreviewDrawer({
               </div>
 
               {/* Project Team & Links Card */}
-              <div className="rounded-xl border border-border bg-muted/40 p-4 sm:p-5 space-y-4 shadow-sm">
-                <h4 className="text-xs font-mono font-semibold text-foreground uppercase tracking-wider flex items-center justify-between">
+              <div className="rounded-xl border border-border bg-slate-50/60 dark:bg-muted/40 p-4 sm:p-5 space-y-4 shadow-xs">
+                <h4 className="text-xs font-mono font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
-                    <Users className="size-3.5 text-muted-foreground" />
+                    <Users className="size-3.5 text-slate-500 dark:text-muted-foreground" />
                     PROJECT TEAM & REPO
                   </span>
-                  <span className="text-[11px] text-muted-foreground capitalize">{project.status}</span>
+                  <span className="text-[11px] text-slate-500 dark:text-muted-foreground capitalize">{project.status}</span>
                 </h4>
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between pb-2 border-b border-border/80">
                     <div>
-                      <span className="text-xs font-semibold text-foreground block">
+                      <span className="text-xs font-semibold text-slate-900 dark:text-foreground block">
                         {project.author?.name}
                       </span>
-                      <span className="text-[11px] text-[#FF9900]">
+                      <span className="text-[11px] text-amber-700 dark:text-[#FF9900] font-medium">
                         {project.author?.role || "Lead Developer"}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-muted text-muted-foreground border border-border">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-muted text-slate-600 dark:text-muted-foreground border border-border">
                       Lead
                     </span>
                   </div>
@@ -345,8 +348,8 @@ export function ProjectPreviewDrawer({
                     <div className="space-y-1.5">
                       {project.team.map((member, i) => (
                         <div key={i} className="flex items-center justify-between text-xs">
-                          <span className="text-foreground">{member.name}</span>
-                          <span className="text-muted-foreground text-[11px]">{member.role}</span>
+                          <span className="text-slate-800 dark:text-foreground">{member.name}</span>
+                          <span className="text-slate-500 dark:text-muted-foreground text-[11px]">{member.role}</span>
                         </div>
                       ))}
                     </div>
@@ -359,13 +362,13 @@ export function ProjectPreviewDrawer({
                         href={project.githubUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center justify-between px-3 py-2 rounded-lg border border-border bg-background hover:bg-muted text-xs text-foreground transition-colors"
+                        className="flex items-center justify-between px-3 py-2 rounded-lg border border-border bg-background hover:bg-muted text-xs text-slate-800 dark:text-foreground transition-colors"
                       >
                         <span className="flex items-center gap-2">
                           <FaGithub className="size-3.5" />
                           GitHub Repository
                         </span>
-                        <ExternalLink className="size-3 text-muted-foreground" />
+                        <ExternalLink className="size-3 text-slate-400 dark:text-muted-foreground" />
                       </a>
                     )}
 
@@ -374,7 +377,7 @@ export function ProjectPreviewDrawer({
                         href={project.demoUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center justify-between px-3 py-2 rounded-lg border border-[#FF9900]/30 bg-[#FF9900]/10 hover:bg-[#FF9900]/20 text-xs text-[#FF9900] font-medium transition-colors"
+                        className="flex items-center justify-between px-3 py-2 rounded-lg border border-[#FF9900]/30 bg-[#FF9900]/10 hover:bg-[#FF9900]/20 text-xs text-amber-800 dark:text-[#FF9900] font-medium transition-colors"
                       >
                         <span className="flex items-center gap-2">
                           <ExternalLink className="size-3.5" />
@@ -392,18 +395,29 @@ export function ProjectPreviewDrawer({
 
         {/* Modal Footer */}
         <div className="p-4 border-t border-border bg-card/95 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-4 text-xs font-mono text-muted-foreground">
+          <div className="flex items-center gap-4 text-xs font-mono text-slate-500 dark:text-muted-foreground">
             <span>slug: {project.slug}</span>
             <span className="hidden sm:inline-flex items-center gap-1">
               <Calendar className="size-3" /> {project.startDate || "N/A"}
             </span>
           </div>
           <div className="flex items-center gap-2">
+            {onDelete && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onDelete(project)}
+                className="border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 hover:border-rose-500/50 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+              >
+                <Trash2 className="size-3.5" />
+                Delete
+              </Button>
+            )}
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="border-border text-foreground hover:bg-muted text-xs"
+              className="border-border text-slate-700 dark:text-foreground hover:bg-muted text-xs cursor-pointer"
             >
               Close
             </Button>
@@ -413,7 +427,7 @@ export function ProjectPreviewDrawer({
                 onOpenChange(false);
                 onEdit(project);
               }}
-              className="bg-[#FF9900] text-black hover:bg-[#FF9900]/90 text-xs font-semibold flex items-center gap-1.5 shadow-[0_0_15px_rgba(255,153,0,0.25)]"
+              className="bg-[#FF9900] text-black hover:bg-[#FF9900]/90 text-xs font-semibold flex items-center gap-1.5 shadow-[0_0_15px_rgba(255,153,0,0.25)] cursor-pointer"
             >
               <Edit2 className="size-3.5" />
               Edit Project
