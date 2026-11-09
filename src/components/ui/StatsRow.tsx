@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { type LucideIcon, Infinity as InfinityIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,6 +16,71 @@ export interface StatsRowProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: "md" | "sm";
   action?: React.ReactNode;
   className?: string;
+}
+
+export function AnimatedStatNumber({ value }: { value: string }) {
+  const match = value.match(/^(\d+)(.*)$/);
+  const isNumeric = Boolean(match);
+  const target = match ? parseInt(match[1], 10) : 0;
+  const suffix = match ? match[2] : "";
+
+  const [count, setCount] = React.useState(target);
+  const [hasStarted, setHasStarted] = React.useState(false);
+  const ref = React.useRef<HTMLSpanElement>(null);
+
+  React.useEffect(() => {
+    if (!isNumeric) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && !hasStarted) {
+          setHasStarted(true);
+          setCount(0);
+          const duration = 1200; // ms
+          const startTime = performance.now();
+
+          const animate = (now: number) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Ease out cubic
+            const ease = 1 - Math.pow(1 - progress, 3);
+            const current = Math.round(ease * target);
+            setCount(current);
+
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            } else {
+              setCount(target);
+            }
+          };
+
+          requestAnimationFrame(animate);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [isNumeric, target, hasStarted]);
+
+  if (!isNumeric) {
+    if (value === "∞") {
+      return (
+        <span className="inline-flex items-center text-primary drop-shadow-[0_0_12px_rgba(255,153,0,0.5)]">
+          <InfinityIcon className="size-7 sm:size-8 text-primary animate-pulse" />
+        </span>
+      );
+    }
+    return <span>{value}</span>;
+  }
+
+  return (
+    <span ref={ref} className="tabular-nums">
+      {count}
+      {suffix}
+    </span>
+  );
 }
 
 export function StatsRow({
@@ -74,7 +141,7 @@ export function StatsRow({
                           )}
                         />
                       ) : (
-                        stat.value
+                        <AnimatedStatNumber value={stat.value} />
                       )}
                     </span>
                     <span
@@ -121,22 +188,22 @@ export function StatsRow({
     >
       {stats.map((stat, idx) => (
         <React.Fragment key={`${stat.label}-${idx}`}>
-          <div className="flex flex-col">
-            <span className="text-2xl font-medium text-primary sm:text-3xl leading-none flex items-center">
+          <div className="group flex flex-col transition-transform duration-200 hover:-translate-y-0.5">
+            <span className="text-2xl font-bold tracking-tight text-primary sm:text-3xl lg:text-4xl leading-none flex items-center drop-shadow-[0_0_20px_rgba(255,153,0,0.25)] group-hover:drop-shadow-[0_0_25px_rgba(255,153,0,0.45)]">
               {stat.value === "∞" ? (
-                <InfinityIcon className="size-7 sm:size-8 text-primary" />
+                <InfinityIcon className="size-7 sm:size-8 text-primary animate-pulse" />
               ) : (
-                stat.value
+                <AnimatedStatNumber value={stat.value} />
               )}
             </span>
-            <span className="mt-1.5 font-mono text-[11px] font-medium uppercase tracking-wider text-muted-foreground sm:text-xs">
+            <span className="mt-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-muted-foreground group-hover:text-foreground transition-colors sm:text-xs">
               {stat.label}
             </span>
           </div>
           {idx < stats.length - 1 && (
             <div
               aria-hidden="true"
-              className="hidden h-10 w-px bg-border lg:block"
+              className="hidden h-10 w-px bg-border/70 lg:block"
             />
           )}
         </React.Fragment>
