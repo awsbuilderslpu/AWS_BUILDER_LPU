@@ -36,7 +36,7 @@ function VerifiedView({ onClose }: { onClose: () => void }) {
       <h2
         id="auth-view-heading"
         tabIndex={-1}
-        className="mt-6 text-2xl font-bold tracking-tight text-white outline-none"
+        className="mt-6 text-2xl font-bold tracking-tight text-foreground outline-none"
       >
         {authCopy.signinSuccess.title}
       </h2>
@@ -230,7 +230,7 @@ export function AuthModal() {
             type="button"
             onClick={handleClose}
             aria-label="Close"
-            className="absolute right-3.5 top-3.5 z-20 flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
+            className="absolute right-3.5 top-3.5 z-20 flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
           >
             <X className="size-4.5" aria-hidden="true" />
           </button>

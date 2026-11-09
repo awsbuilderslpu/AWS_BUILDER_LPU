@@ -193,7 +193,7 @@ export function ReviewDialog({
       <DialogContent className="border border-border bg-card p-6 shadow-2xl sm:max-w-lg">
         <form onSubmit={handleSubmit} className="space-y-5">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-white">
+            <DialogTitle className="text-lg font-semibold text-foreground">
               {title}
             </DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
@@ -268,7 +268,7 @@ export function ReviewDialog({
 
           {/* Note */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-[12.5px] font-medium text-white">
+            <div className="flex items-center justify-between text-[12.5px] font-medium text-foreground">
               <label htmlFor="review-note">{copy.dialog.noteLabel}</label>
               <span className="text-[11.5px] text-muted-foreground font-normal">
                 {note.length} / 2000

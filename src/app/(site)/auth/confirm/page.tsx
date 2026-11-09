@@ -49,7 +49,7 @@ async function ConfirmContent({ searchParams }: ConfirmPageProps) {
           <AlertTriangle className="size-7" />
         </div>
 
-        <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">
+        <h1 className="mt-5 text-2xl font-bold tracking-tight text-foreground">
           {authCopy.confirmPage.expiredTitle}
         </h1>
 
@@ -74,7 +74,7 @@ async function ConfirmContent({ searchParams }: ConfirmPageProps) {
         <MailCheck className="size-7" />
       </div>
 
-      <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">
+      <h1 className="mt-5 text-2xl font-bold tracking-tight text-foreground">
         {authCopy.confirmPage.title}
       </h1>
 

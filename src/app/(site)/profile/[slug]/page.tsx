@@ -66,7 +66,7 @@ export default async function PublicProfilePage({
           <div className="mx-auto size-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary mb-4">
             <Lock className="size-6" />
           </div>
-          <h2 className="text-xl font-bold text-white">Profile Unavailable</h2>
+          <h2 className="text-xl font-bold text-foreground">Profile Unavailable</h2>
           <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
             This profile does not exist or has been set to private by the member.
           </p>
@@ -80,7 +80,7 @@ export default async function PublicProfilePage({
             </Link>
             <Link
               href="/"
-              className="inline-flex h-9 items-center justify-center rounded-lg border border-border px-4 text-xs font-semibold text-muted-foreground hover:text-white transition-colors"
+              className="inline-flex h-9 items-center justify-center rounded-lg border border-border px-4 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
             >
               Back to Home
             </Link>

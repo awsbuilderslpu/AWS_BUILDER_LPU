@@ -359,7 +359,7 @@ export function AdminEditProfileDialog({
                     "flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer",
                     isActive
                       ? "bg-primary text-background shadow-md shadow-primary/20"
-                      : "text-muted-foreground hover:text-white hover:bg-card"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >
                   <Icon className="size-3.5 shrink-0" />
@@ -372,7 +372,7 @@ export function AdminEditProfileDialog({
           {/* Tab 1: Personal */}
           {activeTab === "personal" && (
             <div className="space-y-4 rounded-xl border border-border bg-card/40 p-5">
-              <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <User className="size-4 text-primary" />
                 <span>Personal & Contact Information</span>
               </h4>
@@ -441,7 +441,7 @@ export function AdminEditProfileDialog({
           {/* Tab 2: Academic */}
           {activeTab === "academic" && (
             <div className="space-y-4 rounded-xl border border-border bg-card/40 p-5">
-              <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <GraduationCap className="size-4 text-primary" />
                 <span>Academic Information</span>
               </h4>
@@ -497,7 +497,7 @@ export function AdminEditProfileDialog({
           {/* Tab 3: Bio & Skills */}
           {activeTab === "bio" && (
             <div className="space-y-4 rounded-xl border border-border bg-card/40 p-5">
-              <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <Sparkles className="size-4 text-primary" />
                 <span>Headline, Bio & Skills</span>
               </h4>
@@ -521,7 +521,7 @@ export function AdminEditProfileDialog({
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[12.5px] font-medium text-white">
+                <div className="flex items-center justify-between text-[12.5px] font-medium text-foreground">
                   <label htmlFor="admin-edit-bio">Bio</label>
                   <span className="text-[11.5px] text-muted-foreground font-normal">
                     {bio.length} / 1000
@@ -548,7 +548,7 @@ export function AdminEditProfileDialog({
               />
 
               <div className="space-y-2 pt-2">
-                <label className="block text-[12.5px] font-medium text-white">
+                <label className="block text-[12.5px] font-medium text-foreground">
                   Interests
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -563,7 +563,7 @@ export function AdminEditProfileDialog({
                           "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border",
                           selected
                             ? "bg-primary/20 text-primary border-primary/50 shadow-sm"
-                            : "bg-card/60 text-muted-foreground border-border hover:border-slate-700 hover:text-white"
+                            : "bg-card/60 text-muted-foreground border-border hover:border-primary/50 hover:text-foreground"
                         )}
                       >
                         {selected && <Check className="size-3" />}
@@ -579,7 +579,7 @@ export function AdminEditProfileDialog({
           {/* Tab 4: Links & Visibility */}
           {activeTab === "links" && (
             <div className="space-y-4 rounded-xl border border-border bg-card/40 p-5">
-              <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+              <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <Globe className="size-4 text-primary" />
                 <span>Social Links & Directory Settings</span>
               </h4>
@@ -637,7 +637,7 @@ export function AdminEditProfileDialog({
                   id="admin-edit-public"
                   label={
                     <div>
-                      <span className="font-medium text-white">Public Profile</span>
+                      <span className="font-medium text-foreground">Public Profile</span>
                       <p className="text-[12px] text-muted-foreground font-normal mt-0.5">
                         Show this user&apos;s profile in the public member directory
                       </p>

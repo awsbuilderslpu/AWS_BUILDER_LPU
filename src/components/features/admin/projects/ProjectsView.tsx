@@ -454,7 +454,7 @@ export function ProjectsView({ initialProjects }: ProjectsViewProps) {
             <Button
               onClick={resetFilters}
               variant="outline"
-              className="border-white/15 text-white hover:bg-white/10 text-xs"
+              className="text-xs"
             >
               Reset filters
             </Button>

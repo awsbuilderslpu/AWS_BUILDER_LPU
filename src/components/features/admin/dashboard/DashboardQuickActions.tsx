@@ -123,7 +123,7 @@ export function DashboardQuickActions({
               </div>
 
               <div className="mt-3">
-                <span className="text-[13.5px] font-semibold text-foreground group-hover:text-white transition-colors block">
+                <span className="text-[13.5px] font-semibold text-foreground group-hover:text-primary transition-colors block">
                   {action.label}
                 </span>
                 <span className="text-[11.5px] text-muted-foreground line-clamp-1 mt-0.5">

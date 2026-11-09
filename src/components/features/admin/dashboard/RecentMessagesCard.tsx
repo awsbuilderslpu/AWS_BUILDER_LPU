@@ -79,7 +79,7 @@ export function RecentMessagesCard({ messages }: RecentMessagesCardProps) {
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[13.5px] font-semibold text-foreground group-hover:text-white transition-colors truncate">
+                    <span className="text-[13.5px] font-semibold text-foreground group-hover:text-primary transition-colors truncate">
                       {msg.name}
                     </span>
                     <span className="text-xs text-muted-foreground truncate">

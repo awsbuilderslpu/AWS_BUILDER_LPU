@@ -31,7 +31,7 @@ export function EmptyState({
           aria-hidden="true"
         />
       </div>
-      <h3 className="text-[16px] font-semibold text-white tracking-tight">
+      <h3 className="text-[16px] font-semibold text-foreground tracking-tight">
         {title}
       </h3>
       {text && (

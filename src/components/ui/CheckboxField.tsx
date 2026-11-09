@@ -43,7 +43,7 @@ export const CheckboxField = React.forwardRef<
             aria-hidden="true"
           />
         </div>
-        <div className="text-[12.5px] leading-snug text-white [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary-hover">
+        <div className="text-[12.5px] leading-snug text-foreground [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary-hover">
           {label}
         </div>
       </label>

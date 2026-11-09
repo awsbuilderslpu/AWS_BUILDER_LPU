@@ -53,7 +53,7 @@ export function AdminSidebar({
   return (
     <aside
       className={cn(
-        "relative flex h-full w-[260px] flex-col border-r border-border/80 bg-[#050B18] select-none",
+        "relative flex h-full w-[260px] flex-col border-r border-border/80 bg-background select-none",
         className
       )}
     >
@@ -187,14 +187,14 @@ export function AdminSidebar({
       </nav>
 
       {/* Fixed Bottom Section */}
-      <div className="relative z-10 mt-auto shrink-0 border-t border-border/80 p-3.5 space-y-2 bg-[#050B18]/95 backdrop-blur-md">
+      <div className="relative z-10 mt-auto shrink-0 border-t border-border/80 p-3.5 space-y-2 bg-background/95 backdrop-blur-md">
         {/* Compact AWS Public Site Link */}
         <Link
           href="/"
           onClick={onNavigate}
           className="group relative flex items-center gap-3 rounded-xl border border-border/80 bg-card/40 p-2.5 transition-all hover:border-primary/40 hover:bg-card/80 hover:shadow-[0_0_15px_rgba(255,153,0,0.12)]"
         >
-          <div className="relative flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-[#050B18] overflow-hidden p-1">
+          <div className="relative flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-card overflow-hidden p-1">
             <Image
               src="/images/artwork/Neon Cloud Computing Emblem.png"
               alt="AWS Cloud"

@@ -127,7 +127,7 @@ export function DataTable<T>({
       >
         <caption className="sr-only">{caption}</caption>
         <thead>
-          <tr className="h-12 border-b border-border bg-card/60 text-[13.5px] font-semibold text-white">
+          <tr className="h-12 border-b border-border bg-card/60 text-[13.5px] font-semibold text-foreground">
             {selectable && (
               <th
                 scope="col"
@@ -166,7 +166,7 @@ export function DataTable<T>({
                   scope="col"
                   aria-sort={col.sortKey && onSortChange ? ariaSort : undefined}
                   className={cn(
-                    "px-4 py-3 align-middle text-[13.5px] font-semibold text-white",
+                    "px-4 py-3 align-middle text-[13.5px] font-semibold text-foreground",
                     alignClass,
                     col.headerClassName
                   )}

@@ -156,7 +156,7 @@ export function PublicProfileView({
       <div className="flex items-center justify-between">
         <Link
           href="/members"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-white transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="size-4" />
           <span>Back to Member Directory</span>
@@ -218,7 +218,7 @@ export function PublicProfileView({
 
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                  <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                  <h1 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight">
                     {profile.fullName}
                   </h1>
                   {profile.accessRole && (
@@ -235,7 +235,7 @@ export function PublicProfileView({
                   {profile.username && (
                     <>
                       <span>•</span>
-                      <span className="font-mono text-white/80">@{profile.username}</span>
+                      <span className="font-mono text-foreground/80">@{profile.username}</span>
                     </>
                   )}
                   <span>•</span>
@@ -264,7 +264,7 @@ export function PublicProfileView({
                 variant="outline"
                 size="sm"
                 onClick={handleShare}
-                className="h-9 px-3.5 text-xs border-border/80 bg-card/60 hover:bg-card hover:border-primary/50 text-white cursor-pointer shadow-sm"
+                className="h-9 px-3.5 text-xs border-border/80 bg-card/60 hover:bg-card hover:border-primary/50 text-foreground cursor-pointer shadow-sm"
               >
                 <Share2 className="size-3.5 mr-1.5 text-primary" />
                 <span>Share Profile</span>
@@ -350,7 +350,7 @@ export function PublicProfileView({
           <div className="space-y-3 flex-1">
             <div className="flex items-center gap-2">
               <Award className="size-5 text-primary" />
-              <h3 className="font-bold text-lg text-white">Official Student Builder Credential</h3>
+              <h3 className="font-bold text-lg text-foreground">Official Student Builder Credential</h3>
             </div>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
               This digital credential certifies {profile.fullName}&apos;s verified affiliation with the AWS Student Builder Group at Lovely Professional University.
@@ -389,7 +389,7 @@ export function PublicProfileView({
             "inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap",
             activeTab === "overview"
               ? "bg-primary/15 border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-white hover:bg-card/60"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           <Compass className="size-3.5" />
@@ -403,7 +403,7 @@ export function PublicProfileView({
             "inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap",
             activeTab === "academics"
               ? "bg-primary/15 border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-white hover:bg-card/60"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           <GraduationCap className="size-3.5" />
@@ -417,7 +417,7 @@ export function PublicProfileView({
             "inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap",
             activeTab === "skills"
               ? "bg-primary/15 border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-white hover:bg-card/60"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           <Layers className="size-3.5" />
@@ -436,7 +436,7 @@ export function PublicProfileView({
             "inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap",
             activeTab === "links"
               ? "bg-primary/15 border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-white hover:bg-card/60"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           <Globe className="size-3.5" />
@@ -457,7 +457,7 @@ export function PublicProfileView({
             <div className="md:col-span-2 space-y-6">
               {/* Bio & Headline */}
               <div className="rounded-xl border border-border/80 bg-card/60 p-6 space-y-4">
-                <h4 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+                <h4 className="text-sm font-bold text-foreground uppercase tracking-wider font-mono">
                   About the Builder
                 </h4>
                 {profile.headline && (
@@ -473,7 +473,7 @@ export function PublicProfileView({
               {/* Focus Areas & Interests */}
               {profile.interests.length > 0 && (
                 <div className="rounded-xl border border-border/80 bg-card/60 p-6 space-y-3">
-                  <h4 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+                  <h4 className="text-sm font-bold text-foreground uppercase tracking-wider font-mono">
                     Areas of Interest & Cloud Focus
                   </h4>
                   <div className="flex flex-wrap gap-2">
@@ -494,26 +494,26 @@ export function PublicProfileView({
             {/* Quick Summary Sidebar */}
             <div className="space-y-6">
               <div className="rounded-xl border border-border/80 bg-card/60 p-6 space-y-4">
-                <h4 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+                <h4 className="text-sm font-bold text-foreground uppercase tracking-wider font-mono">
                   Affiliation Summary
                 </h4>
                 <div className="space-y-3 text-xs">
                   <div>
                     <span className="text-muted-foreground block">Chapter</span>
-                    <span className="font-semibold text-white">AWS Student Builder Group LPU</span>
+                    <span className="font-semibold text-foreground">AWS Student Builder Group LPU</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground block">University</span>
-                    <span className="font-semibold text-white">{currentUni}</span>
+                    <span className="font-semibold text-foreground">{currentUni}</span>
                   </div>
                   <div>
                     <span className="text-muted-foreground block">Department</span>
-                    <span className="font-semibold text-white">{currentDept}</span>
+                    <span className="font-semibold text-foreground">{currentDept}</span>
                   </div>
                   {profile.location && (
                     <div>
                       <span className="text-muted-foreground block">Location</span>
-                      <span className="font-semibold text-white">{profile.location}</span>
+                      <span className="font-semibold text-foreground">{profile.location}</span>
                     </div>
                   )}
                 </div>
@@ -525,33 +525,33 @@ export function PublicProfileView({
         {/* Academics Tab */}
         {activeTab === "academics" && (
           <div className="rounded-xl border border-border/80 bg-card/60 p-6 sm:p-8 space-y-6">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
+            <h4 className="text-sm font-bold text-foreground uppercase tracking-wider font-mono flex items-center gap-2">
               <GraduationCap className="size-4 text-primary" />
               <span>Academic Details</span>
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
               <div className="p-4 rounded-lg bg-background/60 border border-border/60">
                 <span className="text-xs text-muted-foreground block font-mono uppercase">University</span>
-                <span className="font-bold text-white mt-1 block">{currentUni}</span>
+                <span className="font-bold text-foreground mt-1 block">{currentUni}</span>
               </div>
               <div className="p-4 rounded-lg bg-background/60 border border-border/60">
                 <span className="text-xs text-muted-foreground block font-mono uppercase">Programme</span>
-                <span className="font-bold text-white mt-1 block">{currentProg}</span>
+                <span className="font-bold text-foreground mt-1 block">{currentProg}</span>
               </div>
               <div className="p-4 rounded-lg bg-background/60 border border-border/60">
                 <span className="text-xs text-muted-foreground block font-mono uppercase">Department</span>
-                <span className="font-bold text-white mt-1 block">{currentDept}</span>
+                <span className="font-bold text-foreground mt-1 block">{currentDept}</span>
               </div>
               <div className="p-4 rounded-lg bg-background/60 border border-border/60">
                 <span className="text-xs text-muted-foreground block font-mono uppercase">Year / Semester</span>
-                <span className="font-bold text-white mt-1 block">
+                <span className="font-bold text-foreground mt-1 block">
                   {profile.studyYear || "1st Year"} • {profile.semester || "1st Semester"}
                 </span>
               </div>
               {profile.graduationYear && (
                 <div className="p-4 rounded-lg bg-background/60 border border-border/60">
                   <span className="text-xs text-muted-foreground block font-mono uppercase">Graduation Year</span>
-                  <span className="font-bold text-white mt-1 block">{profile.graduationYear}</span>
+                  <span className="font-bold text-foreground mt-1 block">{profile.graduationYear}</span>
                 </div>
               )}
             </div>
@@ -561,7 +561,7 @@ export function PublicProfileView({
         {/* Skills Tab */}
         {activeTab === "skills" && (
           <div className="rounded-xl border border-border/80 bg-card/60 p-6 sm:p-8 space-y-6">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
+            <h4 className="text-sm font-bold text-foreground uppercase tracking-wider font-mono flex items-center gap-2">
               <Layers className="size-4 text-primary" />
               <span>Technical Skills & Tools</span>
             </h4>
@@ -586,7 +586,7 @@ export function PublicProfileView({
         {/* Links Tab */}
         {activeTab === "links" && (
           <div className="rounded-xl border border-border/80 bg-card/60 p-6 sm:p-8 space-y-6">
-            <h4 className="text-sm font-bold text-white uppercase tracking-wider font-mono flex items-center gap-2">
+            <h4 className="text-sm font-bold text-foreground uppercase tracking-wider font-mono flex items-center gap-2">
               <Globe className="size-4 text-primary" />
               <span>Connect with {profile.fullName}</span>
             </h4>
@@ -608,7 +608,7 @@ export function PublicProfileView({
                         </div>
                         <div>
                           <span className="text-xs text-muted-foreground block">{s.label}</span>
-                          <span className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate max-w-[180px] block">
+                          <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate max-w-[180px] block">
                             {s.url}
                           </span>
                         </div>
@@ -629,7 +629,7 @@ export function PublicProfileView({
       <Dialog open={qrModalOpen} onOpenChange={setQrModalOpen}>
         <DialogContent className="max-w-sm bg-card border-border text-center">
           <DialogHeader>
-            <DialogTitle className="text-white text-base font-bold flex items-center justify-center gap-2">
+            <DialogTitle className="text-foreground text-base font-bold flex items-center justify-center gap-2">
               <QrCode className="size-4 text-primary" />
               <span>Builder Pass Verification</span>
             </DialogTitle>
@@ -644,7 +644,7 @@ export function PublicProfileView({
               )}
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white">{profile.fullName}</h4>
+              <h4 className="text-sm font-bold text-foreground">{profile.fullName}</h4>
               <p className="text-xs text-primary font-mono">{memberId}</p>
               <p className="text-[11px] text-muted-foreground mt-1">Lovely Professional University Chapter</p>
             </div>
@@ -663,7 +663,7 @@ export function PublicProfileView({
                 variant="outline"
                 size="sm"
                 onClick={() => setQrModalOpen(false)}
-                className="h-8 px-3 text-xs border-border text-muted-foreground hover:text-white cursor-pointer"
+                className="h-8 px-3 text-xs border-border text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 <span>Close</span>
               </Button>

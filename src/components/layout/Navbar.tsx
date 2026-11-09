@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { durations, easing } from "@/lib/motion/tokens";
 import { Logo } from "@/components/layout/Logo";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { useAuth } from "@/components/features/auth/AuthProvider";
 import { Avatar } from "@/components/ui/Avatar";
@@ -48,9 +49,12 @@ export function NavbarFallback() {
         </nav>
         <div className="hidden items-center gap-3 lg:flex">
           <div className="size-10 rounded-lg border border-border/80 bg-card/40" />
+          <div className="size-10 rounded-lg border border-border/80 bg-card/40" />
           <div className="size-10 rounded-full border border-border/80 bg-card/40" />
         </div>
         <div className="flex items-center gap-2 lg:hidden">
+          <div className="size-10 rounded-lg border border-border/80 bg-card/40" />
+          <div className="size-10 rounded-lg border border-border/80 bg-card/40" />
           <div className="size-10" />
         </div>
       </div>
@@ -87,7 +91,7 @@ function NavbarContent() {
   };
 
   return (
-    <header className="sticky top-0 z-50 h-[72px] w-full border-b border-white/[0.08] bg-[#040814]/85 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 h-[72px] w-full border-b border-border/80 bg-background/85 backdrop-blur-xl">
       <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left: Logo */}
         <Logo />
@@ -130,6 +134,7 @@ function NavbarContent() {
 
         {/* Right: Actions (Desktop) */}
         <div className="hidden items-center gap-3 lg:flex">
+          <ThemeToggle />
           <NotificationBell />
 
           {isLoading ? (
@@ -150,15 +155,16 @@ function NavbarContent() {
           )}
         </div>
 
-        {/* Mobile: Notification and Hamburger */}
+        {/* Mobile: Notification, Theme Toggle and Hamburger */}
         <div className="flex items-center gap-2 lg:hidden">
+          <ThemeToggle />
           <NotificationBell />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-10 w-10 text-foreground hover:bg-white/5"
+                className="h-10 w-10 text-foreground hover:bg-muted"
                 aria-label="Open navigation menu"
               >
                 <Menu className="size-6" />
@@ -191,7 +197,7 @@ function NavbarContent() {
                           "flex items-center justify-between rounded-lg px-3 py-2.5 text-base font-medium transition-colors",
                           active
                             ? "bg-primary/10 text-primary font-semibold"
-                            : "text-foreground/80 hover:bg-white/5 hover:text-primary"
+                            : "text-foreground/80 hover:bg-muted hover:text-primary"
                         )}
                       >
                         <span>{link.label}</span>
@@ -238,7 +244,7 @@ function NavbarContent() {
                       <Avatar name={account.displayName || "User"} size={40} />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="truncate text-sm font-semibold text-white">
+                          <p className="truncate text-sm font-semibold text-foreground">
                             {account.displayName}
                           </p>
                           {roleLabel && (

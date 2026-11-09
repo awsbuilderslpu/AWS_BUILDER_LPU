@@ -68,7 +68,7 @@ export function ProfileSidebar() {
                 "inline-flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-medium transition-colors select-none",
                 active
                   ? "border-primary/60 bg-primary/10 text-primary"
-                  : "border-border bg-card/60 text-muted-foreground hover:text-white hover:border-primary/40"
+                  : "border-border bg-card/60 text-muted-foreground hover:text-foreground hover:border-primary/40"
               )}
             >
               <Icon className="size-3.5 shrink-0" aria-hidden="true" />
@@ -112,7 +112,7 @@ export function ProfileSidebar() {
                 "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-colors select-none",
                 active
                   ? "border border-primary/60 bg-primary/10 text-primary font-semibold"
-                  : "text-muted-foreground hover:bg-card/80 hover:text-white"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
               <Icon className="size-4 shrink-0" aria-hidden="true" />

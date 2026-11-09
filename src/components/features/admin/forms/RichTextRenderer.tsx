@@ -24,7 +24,7 @@ function renderMarks(text: string, marks?: RichTextMark[]): React.ReactNode {
 
   for (const mark of marks) {
     if (mark.type === "bold") {
-      element = <strong className="font-semibold text-white">{element}</strong>;
+      element = <strong className="font-semibold text-foreground">{element}</strong>;
     } else if (mark.type === "italic") {
       element = <em className="italic">{element}</em>;
     } else if (mark.type === "strike") {
@@ -105,12 +105,12 @@ function renderNode(node: RichTextNode, index: number): React.ReactNode {
     const level = typeof node.attrs?.level === "number" ? node.attrs.level : 3;
     const Tag = (`h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6");
     const headingStyles: Record<number, string> = {
-      1: "text-[22px] font-bold text-white mt-6 mb-3",
-      2: "text-[18px] font-semibold text-white mt-5 mb-2.5",
-      3: "text-[15px] font-semibold text-white mt-4 mb-2",
-      4: "text-[14px] font-semibold text-white mt-3 mb-1.5",
-      5: "text-[13px] font-medium text-white mt-2 mb-1",
-      6: "text-[12px] font-medium text-white mt-2 mb-1",
+      1: "text-[22px] font-bold text-foreground mt-6 mb-3",
+      2: "text-[18px] font-semibold text-foreground mt-5 mb-2.5",
+      3: "text-[15px] font-semibold text-foreground mt-4 mb-2",
+      4: "text-[14px] font-semibold text-foreground mt-3 mb-1.5",
+      5: "text-[13px] font-medium text-foreground mt-2 mb-1",
+      6: "text-[12px] font-medium text-foreground mt-2 mb-1",
     };
     return (
       <Tag key={index} className={headingStyles[level] ?? headingStyles[3]}>

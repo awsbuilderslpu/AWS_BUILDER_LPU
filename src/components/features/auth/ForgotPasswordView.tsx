@@ -108,7 +108,7 @@ export function ForgotPasswordView() {
           ref={headingRef}
           id="auth-view-heading"
           tabIndex={-1}
-          className="text-[clamp(20px,1.8vw,25px)] font-bold leading-[1.15] text-white tracking-tight outline-none"
+          className="text-[clamp(20px,1.8vw,25px)] font-bold leading-[1.15] text-foreground tracking-tight outline-none"
         >
           {isSent ? authCopy.forgot.sentTitle : authCopy.forgot.title}
         </h2>
@@ -126,7 +126,7 @@ export function ForgotPasswordView() {
               <Check className="size-6 text-emerald-400 stroke-[2.5]" />
             </div>
 
-            <p className="text-sm font-medium text-white break-all">
+            <p className="text-sm font-medium text-foreground break-all">
               {submittedEmail}
             </p>
 
@@ -162,7 +162,7 @@ export function ForgotPasswordView() {
               <button
                 type="button"
                 onClick={handleSwitchToSignIn}
-                className="mt-2 text-sm text-muted-foreground transition-colors hover:text-white inline-flex items-center justify-center gap-1.5 cursor-pointer"
+                className="mt-2 text-sm text-muted-foreground transition-colors hover:text-foreground inline-flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <ArrowLeft className="size-4" />
                 <span>{authCopy.forgot.back}</span>
@@ -219,7 +219,7 @@ export function ForgotPasswordView() {
               <button
                 type="button"
                 onClick={handleSwitchToSignIn}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-white cursor-pointer inline-flex items-center gap-1.5"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground cursor-pointer inline-flex items-center gap-1.5"
               >
                 <ArrowLeft className="size-3.5" />
                 <span>{authCopy.forgot.back}</span>

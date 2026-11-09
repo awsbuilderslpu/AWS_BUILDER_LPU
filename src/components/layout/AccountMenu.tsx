@@ -138,7 +138,7 @@ export function AccountMenu({
         >
           <Avatar name={account.displayName || "User"} size={40} />
           <div className="hidden min-w-0 flex-1 flex-col leading-tight sm:flex">
-            <span className="max-w-[150px] truncate text-sm font-semibold text-white">
+            <span className="max-w-[150px] truncate text-sm font-semibold text-foreground">
               {account.displayName}
             </span>
             {roleLabel && (
@@ -163,7 +163,7 @@ export function AccountMenu({
         <div className="flex items-center gap-3 px-4 pb-3 pt-4">
           <Avatar name={account.displayName || "User"} size={44} />
           <div className="flex min-w-0 flex-1 flex-col leading-tight">
-            <span className="truncate text-[15px] font-semibold text-white">
+            <span className="truncate text-[15px] font-semibold text-foreground">
               {account.displayName}
             </span>
             <span className="truncate text-[13px] text-muted-foreground">
@@ -191,7 +191,7 @@ export function AccountMenu({
                   "flex h-11 w-full cursor-pointer items-center gap-3 rounded-lg px-3 text-[15px] transition-colors outline-none",
                   active
                     ? "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary focus:bg-primary/15 focus:text-primary"
-                    : "text-white hover:bg-white/5 hover:text-white focus:bg-white/5 focus:text-white"
+                    : "text-foreground hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground"
                 )}
               >
                 <Link
@@ -222,7 +222,7 @@ export function AccountMenu({
               e.preventDefault();
               void handleSignOut();
             }}
-            className="flex h-11 w-full cursor-pointer items-center gap-3 rounded-lg px-3 text-[15px] text-white transition-colors outline-none hover:bg-white/5 hover:text-white focus:bg-white/5 focus:text-white"
+            className="flex h-11 w-full cursor-pointer items-center gap-3 rounded-lg px-3 text-[15px] text-foreground transition-colors outline-none hover:bg-muted hover:text-foreground focus:bg-muted focus:text-foreground"
           >
             <LogOut
               size={18}

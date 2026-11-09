@@ -32,7 +32,7 @@ export function PhoneField({
     <div className={cn("w-full", className)}>
       <label
         htmlFor={id}
-        className="mb-1 block text-[12.5px] font-medium text-white"
+        className="mb-1 block text-[12.5px] font-medium text-foreground"
       >
         {label}
         {required && (

@@ -174,7 +174,7 @@ export function ChangeRoleDialog({
       <DialogContent className="border border-border bg-card p-6 shadow-2xl sm:max-w-md">
         <form onSubmit={handleSave} className="space-y-5">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-white">
+            <DialogTitle className="text-lg font-semibold text-foreground">
               {copy.roleDialog.title(rows.length)}
             </DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
@@ -202,7 +202,7 @@ export function ChangeRoleDialog({
             {chosenRole === "admin" && !isBulk && (
               <div className="space-y-3 rounded-lg border border-primary/30 bg-primary/5 p-3.5">
                 <div className="space-y-1">
-                  <h5 className="text-[14px] font-semibold text-white">
+                  <h5 className="text-[14px] font-semibold text-foreground">
                     {copy.roleDialog.adminTitle}
                   </h5>
                   <p className="text-[12.5px] text-muted-foreground leading-relaxed">

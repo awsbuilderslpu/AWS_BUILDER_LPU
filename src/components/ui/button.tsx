@@ -14,7 +14,7 @@ const buttonVariants = cva(
         primary:
           "bg-primary text-background font-semibold rounded-md hover:bg-primary-hover hover:shadow-[0_0_20px_color-mix(in_srgb,var(--primary)_35%,transparent)] active:scale-[0.98]",
         outline:
-          "border border-border bg-transparent text-foreground hover:bg-white/5 hover:border-accent/40",
+          "border border-border bg-transparent text-foreground hover:bg-muted hover:border-accent/40",
         outlineOrange:
           "border border-primary bg-transparent text-primary hover:bg-primary/10 hover:shadow-[0_0_15px_rgba(255,153,0,0.25)]",
         destructive:

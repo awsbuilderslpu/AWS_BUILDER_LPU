@@ -23,7 +23,7 @@ export function BulkBar({ count, onClear, children, className }: BulkBarProps) {
         className
       )}
     >
-      <span className="text-[14px] font-semibold text-white">
+      <span className="text-[14px] font-semibold text-foreground">
         {adminCopy.kit.selected(count)}
       </span>
 

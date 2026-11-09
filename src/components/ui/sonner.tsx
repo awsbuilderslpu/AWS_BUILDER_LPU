@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTheme } from "next-themes";
 import {
   CircleCheck,
   Info,
@@ -13,9 +14,11 @@ import { Toaster as Sonner } from "sonner";
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
 const Toaster = ({ ...props }: ToasterProps) => {
+  const { theme = "system" } = useTheme();
+
   return (
     <Sonner
-      theme="dark"
+      theme={theme as ToasterProps["theme"]}
       position="bottom-right"
       className="toaster group"
       icons={{
@@ -28,7 +31,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast:
-            "group toast group-[.toaster]:bg-card group-[.toaster]:text-white group-[.toaster]:border-border group-[.toaster]:shadow-xl",
+            "group toast group-[.toaster]:bg-card group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-xl",
           description: "group-[.toast]:text-muted-foreground",
           actionButton:
             "group-[.toast]:bg-primary group-[.toast]:text-background font-semibold",

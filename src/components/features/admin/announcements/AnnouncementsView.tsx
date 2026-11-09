@@ -184,7 +184,7 @@ export function AnnouncementsView({
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             Notifications & Announcements
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -207,7 +207,7 @@ export function AnnouncementsView({
             <span className="text-xs font-medium uppercase tracking-wider">Total</span>
             <Bell className="size-4 text-primary" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-white">{totalCount}</p>
+          <p className="mt-2 text-2xl font-bold text-foreground">{totalCount}</p>
           <p className="text-xs text-muted-foreground mt-0.5">All announcements</p>
         </div>
 
@@ -216,7 +216,7 @@ export function AnnouncementsView({
             <span className="text-xs font-medium uppercase tracking-wider">Published</span>
             <CheckCircle2 className="size-4 text-emerald-400" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-white">{publishedCount}</p>
+          <p className="mt-2 text-2xl font-bold text-foreground">{publishedCount}</p>
           <p className="text-xs text-muted-foreground mt-0.5">Active in notification bell</p>
         </div>
 
@@ -225,7 +225,7 @@ export function AnnouncementsView({
             <span className="text-xs font-medium uppercase tracking-wider">High / Urgent</span>
             <AlertTriangle className="size-4 text-amber-400" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-white">{urgentCount}</p>
+          <p className="mt-2 text-2xl font-bold text-foreground">{urgentCount}</p>
           <p className="text-xs text-muted-foreground mt-0.5">High priority broadcasts</p>
         </div>
 
@@ -234,7 +234,7 @@ export function AnnouncementsView({
             <span className="text-xs font-medium uppercase tracking-wider">Drafts</span>
             <Clock className="size-4 text-slate-400" />
           </div>
-          <p className="mt-2 text-2xl font-bold text-white">{draftCount}</p>
+          <p className="mt-2 text-2xl font-bold text-foreground">{draftCount}</p>
           <p className="text-xs text-muted-foreground mt-0.5">Unpublished drafts</p>
         </div>
       </div>
@@ -247,7 +247,7 @@ export function AnnouncementsView({
             value={search}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
             placeholder="Search notifications..."
-            className="h-10 w-full rounded-md border border-border bg-card/60 pl-9 pr-3 text-sm text-white placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+            className="h-10 w-full rounded-md border border-border bg-card/60 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
 
@@ -255,7 +255,7 @@ export function AnnouncementsView({
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="h-9 rounded-md border border-border bg-card/80 px-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary"
+            className="h-9 rounded-md border border-border bg-card px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="all">All Types</option>
             <option value="announcement">Announcements</option>
@@ -267,7 +267,7 @@ export function AnnouncementsView({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="h-9 rounded-md border border-border bg-card/80 px-3 text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary"
+            className="h-9 rounded-md border border-border bg-card px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="all">All Status</option>
             <option value="published">Published</option>
@@ -277,11 +277,11 @@ export function AnnouncementsView({
       </div>
 
       {/* Table / List */}
-      <div className="overflow-hidden rounded-xl border border-border/80 bg-[#060c18]">
+      <div className="overflow-hidden rounded-xl border border-border/80 bg-card">
         {filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <Bell className="size-10 text-muted-foreground/50 mb-3" />
-            <p className="text-base font-semibold text-white">No notifications found</p>
+            <p className="text-base font-semibold text-foreground">No notifications found</p>
             <p className="text-sm text-muted-foreground mt-1 max-w-sm">
               {search || typeFilter !== "all" || statusFilter !== "all"
                 ? "Try adjusting your filters or search query."
@@ -299,7 +299,7 @@ export function AnnouncementsView({
             {filteredItems.map((item) => (
               <div
                 key={item.id}
-                className="group flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between transition-colors hover:bg-white/[0.02]"
+                className="group flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between transition-colors hover:bg-muted/50"
               >
                 {/* Left: Info */}
                 <div className="flex flex-col gap-1.5 min-w-0 flex-1">
@@ -320,11 +320,11 @@ export function AnnouncementsView({
                     </span>
                   </div>
 
-                  <h3 className="text-base font-semibold text-white group-hover:text-primary transition-colors">
+                  <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
                     {item.title}
                   </h3>
 
-                  <p className="text-sm text-slate-300 line-clamp-2 max-w-2xl">
+                  <p className="text-sm text-muted-foreground line-clamp-2 max-w-2xl">
                     {item.description}
                   </p>
 
@@ -389,12 +389,12 @@ export function AnnouncementsView({
                       <button
                         type="button"
                         aria-label="Actions"
-                        className="flex size-8 items-center justify-center rounded-lg border border-border/80 bg-card/60 text-muted-foreground transition-colors hover:text-white hover:bg-white/10"
+                        className="flex size-8 items-center justify-center rounded-lg border border-border/80 bg-card/60 text-muted-foreground transition-colors hover:text-foreground hover:bg-muted"
                       >
                         <MoreVertical className="size-4" />
                       </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-44 border-border bg-[#091122] text-white">
+                    <DropdownMenuContent align="end" className="w-44 border-border bg-popover text-popover-foreground">
                       <DropdownMenuItem
                         onClick={() => handleTogglePublish(item)}
                         className="cursor-pointer gap-2"

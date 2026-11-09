@@ -72,14 +72,14 @@ export function ProjectDetailsDrawer({
     >
       {/* Drawer Header */}
       <div className="flex h-14 shrink-0 items-center justify-between border-b border-border/70 px-5">
-        <h2 className="text-base font-bold text-white tracking-tight">
+        <h2 className="text-base font-bold text-foreground tracking-tight">
           {projectsCopy.drawerTitle}
         </h2>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close project details"
-          className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/10 hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
+          className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary"
         >
           <X className="size-4" />
         </button>
@@ -110,7 +110,7 @@ export function ProjectDetailsDrawer({
 
         {/* Title and Tagline */}
         <div className="mt-4">
-          <h3 className="text-xl font-bold text-white tracking-tight">
+          <h3 className="text-xl font-bold text-foreground tracking-tight">
             {project.title}
           </h3>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
@@ -139,7 +139,7 @@ export function ProjectDetailsDrawer({
                     "relative pb-2.5 text-xs sm:text-sm font-medium transition-colors cursor-pointer select-none",
                     isActive
                       ? "text-primary font-semibold"
-                      : "text-muted-foreground hover:text-white"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   {tab.label}
@@ -220,7 +220,7 @@ export function ProjectDetailsDrawer({
                   {project.techStack.map((tech) => (
                     <span
                       key={tech}
-                      className="inline-flex items-center rounded-md border border-border bg-card/80 px-2.5 py-1 text-xs font-mono text-muted-foreground hover:text-white"
+                      className="inline-flex items-center rounded-md border border-border bg-card/80 px-2.5 py-1 text-xs font-mono text-muted-foreground hover:text-foreground"
                     >
                       {tech}
                     </span>
@@ -241,7 +241,7 @@ export function ProjectDetailsDrawer({
                       href={project.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-between rounded-lg border border-border bg-background/40 px-3 py-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-card hover:text-white"
+                      className="flex items-center justify-between rounded-lg border border-border bg-background/40 px-3 py-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-card hover:text-foreground"
                     >
                       <div className="flex items-center gap-2">
                         <FaGithub className="size-4 shrink-0 text-foreground" />
@@ -256,7 +256,7 @@ export function ProjectDetailsDrawer({
                       href={project.demoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-between rounded-lg border border-border bg-background/40 px-3 py-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-card hover:text-white"
+                      className="flex items-center justify-between rounded-lg border border-border bg-background/40 px-3 py-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-card hover:text-foreground"
                     >
                       <div className="flex items-center gap-2 truncate">
                         <ExternalLink className="size-4 shrink-0 text-primary" />
@@ -321,7 +321,7 @@ export function ProjectDetailsDrawer({
                 >
                   <Avatar name={member.name} size={32} />
                   <div>
-                    <p className="font-semibold text-white">{member.name}</p>
+                    <p className="font-semibold text-foreground">{member.name}</p>
                     <p className="text-muted-foreground">{member.role || "Developer"}</p>
                   </div>
                 </div>
@@ -353,7 +353,7 @@ export function ProjectDetailsDrawer({
           <div className="flex items-center justify-center gap-2.5 rounded-lg border border-border/80 bg-card/60 py-2 px-2.5">
             <Heart className="size-4 text-rose-400 shrink-0" />
             <div className="flex flex-col text-left leading-none">
-              <span className="font-bold text-white text-xs">{project.stats.likes}</span>
+              <span className="font-bold text-foreground text-xs">{project.stats.likes}</span>
               <span className="text-muted-foreground text-[10px] mt-0.5">{projectsCopy.meta.likes}</span>
             </div>
           </div>
@@ -361,7 +361,7 @@ export function ProjectDetailsDrawer({
           <div className="flex items-center justify-center gap-2.5 rounded-lg border border-border/80 bg-card/60 py-2 px-2.5">
             <Eye className="size-4 text-sky-400 shrink-0" />
             <div className="flex flex-col text-left leading-none">
-              <span className="font-bold text-white text-xs">{project.stats.views}</span>
+              <span className="font-bold text-foreground text-xs">{project.stats.views}</span>
               <span className="text-muted-foreground text-[10px] mt-0.5">{projectsCopy.meta.views}</span>
             </div>
           </div>
@@ -369,7 +369,7 @@ export function ProjectDetailsDrawer({
           <div className="flex items-center justify-center gap-2.5 rounded-lg border border-border/80 bg-card/60 py-2 px-2.5">
             <Star className="size-4 text-amber-400 shrink-0" />
             <div className="flex flex-col text-left leading-none">
-              <span className="font-bold text-white text-xs">{project.stats.rating}</span>
+              <span className="font-bold text-foreground text-xs">{project.stats.rating}</span>
               <span className="text-muted-foreground text-[10px] mt-0.5">{projectsCopy.meta.rating}</span>
             </div>
           </div>

@@ -63,7 +63,7 @@ export function RowActionsMenu({
                 "flex items-center gap-2.5 px-3 py-2 text-[14px] cursor-pointer rounded-md transition-colors",
                 item.tone === "danger"
                   ? "text-red-400 focus:bg-red-400/10 focus:text-red-400"
-                  : "text-foreground focus:bg-card focus:text-white"
+                  : "text-foreground focus:bg-muted focus:text-foreground"
               )}
             >
               {Icon && <Icon className="size-4 shrink-0" aria-hidden="true" />}

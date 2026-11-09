@@ -28,7 +28,7 @@ export function SignOutButton() {
       variant="outline"
       onClick={handleSignOut}
       disabled={loading}
-      className="h-10 text-sm font-medium border-border hover:bg-white/5 hover:text-white"
+      className="h-10 text-sm font-medium border-border hover:bg-muted hover:text-foreground"
     >
       {loading ? (
         <Loader2 className="size-4 animate-spin shrink-0" />

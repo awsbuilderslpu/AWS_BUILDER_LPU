@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { PageBackground } from "@/components/layout/PageBackground";
 import { AuthModal } from "@/components/features/auth/AuthModal";
 import { AuthProvider } from "@/components/features/auth/AuthProvider";
@@ -41,22 +42,30 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} dark`}
+      className={`${inter.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
     >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary">
         {/* Visitors without JavaScript still see all content */}
         <noscript>
           <style>{`[data-reveal] { opacity: 1 !important; transform: none !important; }`}</style>
         </noscript>
-        <MotionProvider>
-          <AuthProvider>
-            <PageBackground />
-            {children}
-            <Suspense fallback={null}>
-              <AuthModal />
-            </Suspense>
-          </AuthProvider>
-        </MotionProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <MotionProvider>
+            <AuthProvider>
+              <PageBackground />
+              {children}
+              <Suspense fallback={null}>
+                <AuthModal />
+              </Suspense>
+            </AuthProvider>
+          </MotionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -16,7 +16,7 @@ export function UserCell({ name, secondary, src, badge, className }: UserCellPro
       <Avatar name={name} src={src} size={36} className="shrink-0" />
       <div className="flex flex-col justify-center min-w-0">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-[14.5px] font-medium text-white truncate leading-snug">
+          <span className="text-[14.5px] font-medium text-foreground truncate leading-snug">
             {name}
           </span>
           {badge}

@@ -41,7 +41,7 @@ export function RegisterStepFrame({
           ref={headingRef}
           id="auth-view-heading"
           tabIndex={-1}
-          className="text-[19px] sm:text-[21px] font-bold leading-tight text-white tracking-tight outline-none"
+          className="text-[19px] sm:text-[21px] font-bold leading-tight text-foreground tracking-tight outline-none"
         >
           {title}
         </h2>

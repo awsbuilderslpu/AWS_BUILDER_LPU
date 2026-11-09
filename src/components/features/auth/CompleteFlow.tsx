@@ -68,7 +68,7 @@ export function CompleteFlow() {
         <h2
           id="auth-view-heading"
           tabIndex={-1}
-          className="mt-4 text-lg font-semibold text-white outline-none"
+          className="mt-4 text-lg font-semibold text-foreground outline-none"
         >
           {authCopy.complete.loading}
         </h2>
@@ -85,7 +85,7 @@ export function CompleteFlow() {
         <h2
           id="auth-view-heading"
           tabIndex={-1}
-          className="mt-4 text-xl font-bold tracking-tight text-white outline-none"
+          className="mt-4 text-xl font-bold tracking-tight text-foreground outline-none"
         >
           {authCopy.complete.title}
         </h2>

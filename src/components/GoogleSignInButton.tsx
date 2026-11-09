@@ -47,7 +47,7 @@ export default function GoogleSignInButton({
         onClick={handleSignIn}
         disabled={loading}
         className={cn(
-          "h-[42px] w-full text-[14.5px] font-semibold text-white",
+          "h-[42px] w-full text-[14.5px] font-semibold text-foreground",
           className
         )}
       >

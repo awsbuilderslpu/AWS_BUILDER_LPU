@@ -1,7 +1,56 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  /* Core Theme Tokens */
+  /* Core Theme Tokens - Light Mode */
+  --background: #F8FAFC;
+  --foreground: #0B132B;
+
+  /* Card Surfaces & Borders */
+  --card: #FFFFFF;
+  --card-foreground: #0B132B;
+  --card-border: #E2E8F0;
+
+  /* Popover Surfaces & Borders */
+  --popover: #FFFFFF;
+  --popover-foreground: #0B132B;
+
+  /* Brand Accents */
+  --primary: #FF9900;
+  --primary-foreground: #050B18;
+  --primary-hover: #E68A00;
+
+  --accent: #0972D3;
+  --accent-foreground: #FFFFFF;
+  --accent-hover: #0854A0;
+
+  --success: #16A34A;
+  --success-foreground: #FFFFFF;
+
+  --violet: #9333EA;
+  --violet-foreground: #FFFFFF;
+
+  /* Muted Text & Secondary Surfaces */
+  --muted: #F1F5F9;
+  --muted-foreground: #475569;
+
+  /* UI Elements */
+  --border: #E2E8F0;
+  --input: #FFFFFF;
+  --ring: #FF9900;
+
+  /* Specific AWS Brand palette */
+  --aws-navy: #0F172A;
+  --aws-card: #FFFFFF;
+  --aws-card-border: #E2E8F0;
+  --aws-orange: #FF9900;
+  --aws-blue: #0972D3;
+  --aws-muted: #475569;
+}
+
+.dark {
+  /* Core Theme Tokens - Dark Mode */
   --background: #050B18;
   --foreground: #FFFFFF;
 
@@ -9,6 +58,10 @@
   --card: #081226;
   --card-foreground: #FFFFFF;
   --card-border: #162846;
+
+  /* Popover Surfaces & Borders */
+  --popover: #081226;
+  --popover-foreground: #FFFFFF;
 
   /* Brand Accents */
   --primary: #FF9900;
@@ -33,6 +86,14 @@
   --border: #162846;
   --input: #0B1730;
   --ring: #FF9900;
+
+  /* Specific AWS Brand palette */
+  --aws-navy: #050B18;
+  --aws-card: #081226;
+  --aws-card-border: #162846;
+  --aws-orange: #FF9900;
+  --aws-blue: #2F8CFF;
+  --aws-muted: #A8B3C7;
 }
 
 @theme inline {
@@ -45,6 +106,9 @@
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-card-border: var(--card-border);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -68,12 +132,12 @@
   --color-ring: var(--ring);
 
   /* Specific AWS Brand palette */
-  --color-aws-navy: #050B18;
-  --color-aws-card: #081226;
-  --color-aws-card-border: #162846;
-  --color-aws-orange: #FF9900;
-  --color-aws-blue: #2F8CFF;
-  --color-aws-muted: #A8B3C7;
+  --color-aws-navy: var(--aws-navy);
+  --color-aws-card: var(--aws-card);
+  --color-aws-card-border: var(--aws-card-border);
+  --color-aws-orange: var(--aws-orange);
+  --color-aws-blue: var(--aws-blue);
+  --color-aws-muted: var(--aws-muted);
 }
 
 * {
@@ -82,6 +146,15 @@
 
 html {
   background-color: var(--background);
+  color-scheme: light dark;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+html:not(.dark) {
+  color-scheme: light;
 }
 
 body {

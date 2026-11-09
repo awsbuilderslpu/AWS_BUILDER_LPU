@@ -14,7 +14,7 @@ export default function RegistrationsError({
   return (
     <div className="flex min-h-[400px] flex-col items-center justify-center text-center p-6 space-y-4">
       <div className="space-y-1.5 max-w-md">
-        <h2 className="text-xl font-semibold text-white tracking-tight">
+        <h2 className="text-xl font-semibold text-foreground tracking-tight">
           {copy.title}
         </h2>
         <p className="text-sm text-muted-foreground leading-relaxed">

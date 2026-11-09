@@ -80,7 +80,7 @@ export function StatCard({
       </div>
 
       <div className="flex flex-col justify-center min-w-0">
-        <span className="text-[28px] font-semibold leading-tight text-white tracking-tight">
+        <span className="text-[28px] font-semibold leading-tight text-foreground tracking-tight">
           {value !== null ? (
             value
           ) : (

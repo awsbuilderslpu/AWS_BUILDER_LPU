@@ -14,7 +14,7 @@ export function ProjectsHero() {
           </div>
 
           {/* Main Title */}
-          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-[38px] uppercase leading-tight">
+          <h1 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl lg:text-[38px] uppercase leading-tight">
             {projectsCopy.titlePrefix}{" "}
             <span className="text-primary">{projectsCopy.titleHighlight}</span>
           </h1>

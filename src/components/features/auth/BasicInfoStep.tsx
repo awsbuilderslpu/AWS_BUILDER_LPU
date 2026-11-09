@@ -167,7 +167,7 @@ export function BasicInfoStep() {
                 onClick={() => setShowRegInfo((prev) => !prev)}
                 aria-label={registrationCopy.basic.registrationInfoLabel}
                 aria-expanded={showRegInfo}
-                className="flex items-center text-muted-foreground transition-colors hover:text-white cursor-pointer"
+                className="flex items-center text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
               >
                 <Info className="size-[18px]" aria-hidden="true" />
               </button>

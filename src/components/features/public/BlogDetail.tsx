@@ -51,7 +51,7 @@ export function BlogDetail({
           <CategoryBadge tone="solid">{post.category}</CategoryBadge>
         </div>
 
-        <h1 className="text-4xl font-bold tracking-tight leading-tight text-white sm:text-5xl">
+        <h1 className="text-4xl font-bold tracking-tight leading-tight text-foreground sm:text-5xl">
           {post.title}
         </h1>
 
@@ -88,7 +88,7 @@ export function BlogDetail({
                 <FaAws className="size-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-white">Published on AWS Builder Center</p>
+                <p className="text-sm font-semibold text-foreground">Published on AWS Builder Center</p>
                 <p className="text-xs text-muted-foreground">Original article by {post.author_name}</p>
               </div>
             </div>

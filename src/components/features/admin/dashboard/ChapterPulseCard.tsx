@@ -88,7 +88,7 @@ export function ChapterPulseCard() {
         </div>
 
         <div className="min-w-0 flex-1">
-          <span className="text-xs font-semibold text-white group-hover:text-primary transition-colors block">
+          <span className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors block">
             Visit Public Website
           </span>
           <span className="text-[11px] text-muted-foreground line-clamp-1">

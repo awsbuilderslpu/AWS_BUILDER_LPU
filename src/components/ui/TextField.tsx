@@ -42,7 +42,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
         <div className="mb-1 flex items-center justify-between">
           <label
             htmlFor={id}
-            className="block text-[12.5px] font-medium text-white"
+            className="block text-[12.5px] font-medium text-foreground"
           >
             {label}
             {required && (

@@ -48,7 +48,7 @@ export const SelectField = React.forwardRef<
       <div className="w-full">
         <label
           htmlFor={id}
-          className="mb-1 block text-[12.5px] font-medium text-white"
+          className="mb-1 block text-[12.5px] font-medium text-foreground"
         >
           {label}
           {required && (

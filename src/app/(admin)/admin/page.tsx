@@ -40,14 +40,14 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-6 sm:space-y-8">
       {/* Page Heading & Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-br from-card/90 via-card/50 to-[#050B18] p-5 sm:p-7 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
+      <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-gradient-to-br from-card via-card/80 to-background p-5 sm:p-7 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.06)]">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono text-primary font-semibold uppercase tracking-wider">
               <span className="size-2 rounded-full bg-primary animate-pulse" />
               AWS Builder Group · LPU Chapter Console
             </div>
-            <h1 className="mt-1.5 text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
+            <h1 className="mt-1.5 text-2xl sm:text-3xl font-bold tracking-tight text-foreground leading-tight">
               Welcome back, {account.displayName || "Builder"}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -57,7 +57,7 @@ export default async function AdminDashboardPage() {
 
           <div className="flex items-center gap-3 shrink-0 self-start md:self-auto">
             <RoleBadge role={account.role || "participant"} />
-            <div className="hidden sm:flex items-center gap-2 rounded-xl border border-border/70 bg-[#050B18]/70 px-3 py-1.5 text-xs font-mono text-muted-foreground">
+            <div className="hidden sm:flex items-center gap-2 rounded-xl border border-border/70 bg-muted px-3 py-1.5 text-xs font-mono text-muted-foreground">
               <span className="size-1.5 rounded-full bg-emerald-400" />
               ap-south-1
             </div>

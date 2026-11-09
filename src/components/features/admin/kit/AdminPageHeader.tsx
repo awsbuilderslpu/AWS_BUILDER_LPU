@@ -22,7 +22,7 @@ export function AdminPageHeader({
       )}
     >
       <div className="min-w-0 flex-1">
-        <h1 className="text-2xl sm:text-[36px] font-bold leading-tight tracking-tight text-white">
+        <h1 className="text-2xl sm:text-[36px] font-bold leading-tight tracking-tight text-foreground">
           {title}
         </h1>
         {subtitle && (

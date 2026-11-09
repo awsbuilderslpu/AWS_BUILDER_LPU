@@ -65,7 +65,7 @@ export function getEventColumns({
                   e.stopPropagation();
                   onEdit(row.id);
                 }}
-                className="text-left font-medium text-white hover:text-primary transition-colors truncate cursor-pointer focus-visible:outline-none focus-visible:underline"
+                className="text-left font-medium text-foreground hover:text-primary transition-colors truncate cursor-pointer focus-visible:outline-none focus-visible:underline"
               >
                 {row.title}
               </button>

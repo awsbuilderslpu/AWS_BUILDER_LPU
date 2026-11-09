@@ -29,7 +29,7 @@ export function WelcomeView({ onUseEmail }: WelcomeViewProps) {
           ref={headingRef}
           id="auth-view-heading"
           tabIndex={-1}
-          className="text-[clamp(22px,2vw,28px)] font-bold leading-[1.15] text-white tracking-tight outline-none"
+          className="text-[clamp(22px,2vw,28px)] font-bold leading-[1.15] text-foreground tracking-tight outline-none"
         >
           {authCopy.welcome.title}
         </h2>
@@ -49,7 +49,7 @@ export function WelcomeView({ onUseEmail }: WelcomeViewProps) {
             type="button"
             variant="outline"
             onClick={onUseEmail}
-            className="h-[42px] w-full text-[14.5px] font-medium text-white hover:bg-white/5"
+            className="h-[42px] w-full text-[14.5px] font-medium text-foreground hover:bg-muted"
           >
             <Mail
               className="size-4.5! text-muted-foreground shrink-0"

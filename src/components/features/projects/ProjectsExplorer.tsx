@@ -212,7 +212,7 @@ export function ProjectsExplorer({ initialProjects }: ProjectsExplorerProps = {}
                     "h-10 rounded-lg px-4 text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer select-none",
                     isSelected
                       ? "border border-primary bg-primary text-primary-foreground font-semibold shadow-xs"
-                      : "border border-border/80 bg-card/50 text-muted-foreground hover:border-primary/50 hover:bg-card hover:text-white"
+                      : "border border-border/80 bg-card/50 text-muted-foreground hover:border-primary/50 hover:bg-card hover:text-foreground"
                   )}
                 >
                   {tab}
@@ -320,7 +320,7 @@ export function ProjectsExplorer({ initialProjects }: ProjectsExplorerProps = {}
                 "inline-flex items-center gap-1.5 text-xs font-medium cursor-pointer transition-colors whitespace-nowrap shrink-0",
                 hasActiveFilters
                   ? "text-primary hover:underline"
-                  : "text-muted-foreground hover:text-white"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               <RotateCcw className="size-3" />
@@ -334,7 +334,7 @@ export function ProjectsExplorer({ initialProjects }: ProjectsExplorerProps = {}
           <div className="mt-6">
             {filteredProjects.length === 0 ? (
               <div className="rounded-xl border border-dashed border-border p-12 text-center bg-card/30">
-                <h3 className="text-base font-semibold text-white">
+                <h3 className="text-base font-semibold text-foreground">
                   {projectsCopy.empty.title}
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -402,7 +402,7 @@ export function ProjectsExplorer({ initialProjects }: ProjectsExplorerProps = {}
                   disabled={activePage <= 1}
                   onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                   aria-label="Previous page"
-                  className="flex size-8 items-center justify-center rounded-lg border border-border/80 bg-card/60 text-muted-foreground transition-colors hover:border-primary/50 hover:text-white disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                  className="flex size-8 items-center justify-center rounded-lg border border-border/80 bg-card/60 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
                 >
                   <ChevronLeft className="size-4" />
                 </button>
@@ -441,7 +441,7 @@ export function ProjectsExplorer({ initialProjects }: ProjectsExplorerProps = {}
                         "flex size-8 items-center justify-center rounded-lg text-xs font-semibold transition-colors cursor-pointer",
                         isCurrent
                           ? "border border-primary bg-primary text-primary-foreground shadow-xs"
-                          : "border border-border/80 bg-card/60 text-muted-foreground hover:border-primary/50 hover:text-white"
+                          : "border border-border/80 bg-card/60 text-muted-foreground hover:border-primary/50 hover:text-foreground"
                       )}
                     >
                       {pageNumber}
@@ -455,7 +455,7 @@ export function ProjectsExplorer({ initialProjects }: ProjectsExplorerProps = {}
                   disabled={activePage >= totalPages}
                   onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                   aria-label="Next page"
-                  className="flex size-8 items-center justify-center rounded-lg border border-border/80 bg-card/60 text-muted-foreground transition-colors hover:border-primary/50 hover:text-white disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                  className="flex size-8 items-center justify-center rounded-lg border border-border/80 bg-card/60 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
                 >
                   <ChevronRight className="size-4" />
                 </button>

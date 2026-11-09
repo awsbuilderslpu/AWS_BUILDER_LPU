@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, Search, ChevronRight } from "lucide-react";
 import { LogoIcon } from "@/components/layout/Logo";
 import { NotificationsBell } from "@/components/features/admin/NotificationsBell";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { AdminUserMenu } from "@/components/features/admin/AdminUserMenu";
 import { adminNav } from "@/data/admin";
 import type { AccountSummary } from "@/lib/auth/account";
@@ -35,7 +36,7 @@ export function AdminTopBar({
   const CurrentIcon = currentNav?.icon;
 
   return (
-    <header className="sticky top-0 z-30 flex h-[70px] items-center justify-between gap-3 border-b border-border/80 bg-[#050B18]/95 px-4 sm:px-6 backdrop-blur-xl">
+    <header className="sticky top-0 z-30 flex h-[70px] items-center justify-between gap-3 border-b border-border/80 bg-background/95 px-4 sm:px-6 backdrop-blur-xl">
       {/* Left side: Mobile Hamburger + Logo OR Desktop Dynamic Breadcrumbs */}
       <div className="flex items-center gap-3 min-w-0">
         {/* Mobile controls (hidden on lg) */}
@@ -160,6 +161,9 @@ export function AdminTopBar({
           <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
           <span>ap-south-1</span>
         </div>
+
+        {/* Theme Toggle */}
+        <ThemeToggle />
 
         {/* Notifications Bell */}
         <NotificationsBell />

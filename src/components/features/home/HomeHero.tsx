@@ -48,10 +48,7 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
             playsInline
             preload="auto"
             poster="/images/back_ground/poster.webp"
-            className="h-full w-full object-contain pointer-events-none select-none mix-blend-screen"
-            style={{
-              filter: "contrast(1.6) brightness(0.85)",
-            }}
+            className="h-full w-full object-contain pointer-events-none select-none mix-blend-multiply dark:mix-blend-screen [filter:invert(1)_hue-rotate(180deg)_contrast(1.3)] dark:[filter:contrast(1.6)_brightness(0.85)]"
           >
             <source src="/images/back_ground/aws_builder_lpu.mp4" type="video/mp4" />
             <source src="/images/back_ground/aws_builder_lpu.mkv" type="video/x-matroska" />
@@ -137,10 +134,7 @@ export function HomeHero({ className, ...props }: HomeHeroProps) {
               playsInline
               preload="auto"
               poster="/images/back_ground/poster.webp"
-              className="h-full w-full object-contain pointer-events-none select-none mix-blend-screen"
-              style={{
-                filter: "contrast(1.6) brightness(0.85)",
-              }}
+              className="h-full w-full object-contain pointer-events-none select-none mix-blend-multiply dark:mix-blend-screen [filter:invert(1)_hue-rotate(180deg)_contrast(1.3)] dark:[filter:contrast(1.6)_brightness(0.85)]"
             >
               <source src="/images/back_ground/aws_builder_lpu.mp4" type="video/mp4" />
               <source src="/images/back_ground/aws_builder_lpu.mkv" type="video/x-matroska" />

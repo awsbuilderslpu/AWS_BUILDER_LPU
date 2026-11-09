@@ -24,7 +24,7 @@ export function PageBackground() {
 
       {/* Ambient Radial Glow: Electric Blue (Top-Right) */}
       <div
-        className="absolute -top-[10%] -right-[10%] h-[600px] w-[600px] sm:h-[800px] sm:w-[800px] rounded-full blur-[140px]"
+        className="absolute -top-[10%] -right-[10%] h-[600px] w-[600px] sm:h-[800px] sm:w-[800px] rounded-full blur-[140px] opacity-35 dark:opacity-100"
         style={{
           background:
             "radial-gradient(circle, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 70%)",
@@ -33,7 +33,7 @@ export function PageBackground() {
 
       {/* Ambient Radial Glow: AWS Orange (Bottom-Left) */}
       <div
-        className="absolute -bottom-[10%] -left-[10%] h-[600px] w-[600px] sm:h-[800px] sm:w-[800px] rounded-full blur-[140px]"
+        className="absolute -bottom-[10%] -left-[10%] h-[600px] w-[600px] sm:h-[800px] sm:w-[800px] rounded-full blur-[140px] opacity-35 dark:opacity-100"
         style={{
           background:
             "radial-gradient(circle, color-mix(in srgb, var(--primary) 12%, transparent) 0%, transparent 70%)",

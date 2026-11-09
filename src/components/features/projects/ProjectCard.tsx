@@ -87,7 +87,7 @@ export function ProjectCard({
         {/* Content Body */}
         <div className="p-4 sm:p-5">
           {/* Title */}
-          <h3 className="text-[17px] font-bold leading-snug text-white transition-colors duration-200 group-hover:text-primary">
+          <h3 className="text-[17px] font-bold leading-snug text-foreground transition-colors duration-200 group-hover:text-primary">
             {project.title}
           </h3>
 

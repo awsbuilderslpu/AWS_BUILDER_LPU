@@ -259,7 +259,7 @@ export function NotificationBell() {
                 const itemContent = (
                   <div
                     className={cn(
-                      "group flex items-start gap-3 rounded-lg p-2.5 transition-colors duration-150 hover:bg-white/5 cursor-pointer",
+                      "group flex items-start gap-3 rounded-lg p-2.5 transition-colors duration-150 hover:bg-muted cursor-pointer",
                       isUnread && "bg-primary/[0.04]"
                     )}
                   >

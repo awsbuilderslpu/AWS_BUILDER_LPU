@@ -93,7 +93,7 @@ export function ResetPasswordView() {
             ref={headingRef}
             id="auth-view-heading"
             tabIndex={-1}
-            className="mt-5 text-2xl font-bold tracking-tight text-white outline-none"
+            className="mt-5 text-2xl font-bold tracking-tight text-foreground outline-none"
           >
             {authCopy.reset.expiredTitle}
           </h2>
@@ -122,7 +122,7 @@ export function ResetPasswordView() {
           ref={headingRef}
           id="auth-view-heading"
           tabIndex={-1}
-          className="text-[clamp(20px,1.8vw,25px)] font-bold leading-[1.15] text-white tracking-tight outline-none"
+          className="text-[clamp(20px,1.8vw,25px)] font-bold leading-[1.15] text-foreground tracking-tight outline-none"
         >
           {isSuccess
             ? authCopy.reset.successTitle

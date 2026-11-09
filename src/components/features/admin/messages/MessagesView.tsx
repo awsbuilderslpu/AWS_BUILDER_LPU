@@ -365,7 +365,7 @@ export function MessagesView({ initialMessages }: MessagesViewProps) {
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <p className="truncate font-semibold text-white">
+                              <p className="truncate font-semibold text-foreground">
                                 {msg.name}
                               </p>
                               {isNew && (
@@ -445,12 +445,12 @@ export function MessagesView({ initialMessages }: MessagesViewProps) {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="size-8 text-muted-foreground hover:text-white"
+                              className="size-8 text-muted-foreground hover:text-foreground hover:bg-muted"
                             >
                               <MoreVertical className="size-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-44 bg-[#0A0E17] border-slate-800">
+                          <DropdownMenuContent align="end" className="w-44 bg-popover text-popover-foreground border-border">
                             <DropdownMenuItem
                               onClick={() => handleOpenDetail(msg)}
                               className="gap-2 cursor-pointer text-slate-200"

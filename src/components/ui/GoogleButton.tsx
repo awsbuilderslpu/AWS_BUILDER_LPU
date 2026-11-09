@@ -28,7 +28,7 @@ export function GoogleButton({
       onClick={onClick}
       disabled={disabled || loading}
       className={cn(
-        "h-12 w-full text-[15.5px] font-semibold text-white",
+        "h-12 w-full text-[15.5px] font-semibold text-foreground",
         className
       )}
     >

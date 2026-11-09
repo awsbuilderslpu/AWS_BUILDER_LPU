@@ -162,7 +162,7 @@ export function NotificationsBell() {
         <button
           type="button"
           aria-label="Notifications"
-          className="relative flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
+          className="relative flex size-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background cursor-pointer"
         >
           <Bell className="size-5" />
           {displayCount && (
@@ -178,12 +178,12 @@ export function NotificationsBell() {
       <PopoverContent
         align="end"
         sideOffset={8}
-        className="w-[calc(100vw-2rem)] sm:w-96 max-w-sm rounded-2xl border border-border bg-[#060c18]/95 p-0 shadow-2xl backdrop-blur-xl"
+        className="w-[calc(100vw-2rem)] sm:w-96 max-w-sm rounded-2xl border border-border bg-popover text-popover-foreground p-0 shadow-2xl backdrop-blur-xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border/80 px-4 py-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-white">Notifications</span>
+            <span className="text-sm font-semibold text-foreground">Notifications</span>
             {unreadCount > 0 && (
               <span className="rounded-full bg-primary/20 px-2 py-0.2 text-[11px] font-medium text-primary">
                 {unreadCount} new
@@ -194,7 +194,7 @@ export function NotificationsBell() {
             <button
               type="button"
               onClick={markAllAsRead}
-              className="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-primary transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer"
             >
               <Check className="size-3.5" />
               Mark all read
@@ -207,7 +207,7 @@ export function NotificationsBell() {
           {notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-8 text-center">
               <Bell className="size-8 text-muted-foreground/40 mb-2" />
-              <p className="text-sm font-medium text-white">No notifications yet</p>
+              <p className="text-sm font-medium text-foreground">No notifications yet</p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 New announcements and alerts will appear here.
               </p>
@@ -220,8 +220,8 @@ export function NotificationsBell() {
                 <div
                   onClick={() => markSingleAsRead(item.id)}
                   className={cn(
-                    "group relative flex items-start gap-3 p-3.5 transition-colors hover:bg-white/[0.03] cursor-pointer",
-                    isUnread && "bg-white/[0.02]"
+                    "group relative flex items-start gap-3 p-3.5 transition-colors hover:bg-muted/50 cursor-pointer",
+                    isUnread && "bg-muted/30"
                   )}
                 >
                   <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg border border-border/80 bg-card/60">
@@ -233,7 +233,7 @@ export function NotificationsBell() {
                       <span
                         className={cn(
                           "text-xs font-semibold truncate transition-colors",
-                          isUnread ? "text-white" : "text-slate-300"
+                          isUnread ? "text-foreground font-bold" : "text-muted-foreground"
                         )}
                       >
                         {item.title}
@@ -243,7 +243,7 @@ export function NotificationsBell() {
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                       {item.description}
                     </p>
 

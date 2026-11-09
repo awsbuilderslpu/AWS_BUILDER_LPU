@@ -202,7 +202,7 @@ export function getMembersColumns({
               onClick={() => onViewDetails(row)}
               className={cn(
                 "flex size-9 items-center justify-center rounded-md border border-border text-muted-foreground bg-card/40 transition-colors cursor-pointer",
-                "hover:border-primary/50 hover:bg-card/80 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                "hover:border-primary/50 hover:bg-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               )}
             >
               <Eye className="size-4" aria-hidden="true" />

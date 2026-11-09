@@ -68,7 +68,7 @@ export function Stepper({ steps, current, className }: StepperProps) {
               <div
                 className={cn(
                   "mt-1.5 text-[11px] sm:text-[11.5px] leading-tight transition-colors text-center",
-                  isCurrent && "font-semibold text-white",
+                  isCurrent && "font-semibold text-foreground",
                   isCompleted && "font-medium text-muted-foreground/90",
                   !isCurrent && !isCompleted && "text-muted-foreground"
                 )}

@@ -352,7 +352,7 @@ export function ProfileView({
       <div className="flex items-center justify-between border-b border-border/70 pb-3">
         <div className="flex items-center gap-2">
           <UserCheck className="size-4 text-primary" />
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
             {profileCopy.sections.personal}
           </h2>
         </div>
@@ -379,7 +379,7 @@ export function ProfileView({
               <span className="block text-[11px] uppercase font-mono text-primary font-bold">
                 Your Unique Profile Link
               </span>
-              <span className="text-white font-mono text-xs sm:text-sm font-semibold">
+              <span className="text-foreground font-mono text-xs sm:text-sm font-semibold">
                 /profile/{profile.username || account.id}
               </span>
             </div>
@@ -446,7 +446,7 @@ export function ProfileView({
         {/* Email (Read-Only) */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <span className="text-[12.5px] font-medium text-white flex items-center gap-1.5">
+            <span className="text-[12.5px] font-medium text-foreground flex items-center gap-1.5">
               <Mail className="size-3.5 text-muted-foreground" />
               <span>{profileCopy.labels.email}</span>
             </span>
@@ -499,7 +499,7 @@ export function ProfileView({
       <div className="flex items-center justify-between border-b border-border/70 pb-3">
         <div className="flex items-center gap-2">
           <IdCard className="size-4 text-primary" />
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
             Verified Credentials
           </h2>
         </div>
@@ -515,7 +515,7 @@ export function ProfileView({
             <span className="block text-[11px] text-muted-foreground mb-0.5">
               {profileCopy.labels.registrationNumber}
             </span>
-            <span className="font-mono text-xs font-bold text-white">
+            <span className="font-mono text-xs font-bold text-foreground">
               {profile.registrationNumber || "-"}
             </span>
           </div>
@@ -524,7 +524,7 @@ export function ProfileView({
             <span className="block text-[11px] text-muted-foreground mb-0.5">
               {profileCopy.labels.dateOfBirth}
             </span>
-            <span className="text-xs font-semibold text-white flex items-center gap-1">
+            <span className="text-xs font-semibold text-foreground flex items-center gap-1">
               <Calendar className="size-3 text-muted-foreground" />
               {formatDob(profile.dateOfBirth)}
             </span>
@@ -534,7 +534,7 @@ export function ProfileView({
             <span className="block text-[11px] text-muted-foreground mb-0.5">
               {profileCopy.labels.gender}
             </span>
-            <span className="text-xs font-semibold text-white">
+            <span className="text-xs font-semibold text-foreground">
               {profile.gender || "-"}
             </span>
           </div>
@@ -562,7 +562,7 @@ export function ProfileView({
       <div className="flex items-center justify-between border-b border-border/70 pb-3">
         <div className="flex items-center gap-2">
           <Sparkles className="size-4 text-primary" />
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
             {profileCopy.sections.about}
           </h2>
         </div>
@@ -582,7 +582,7 @@ export function ProfileView({
             <div className="flex items-center justify-between mb-1">
               <label
                 htmlFor="profile-bio-textarea"
-                className="block text-[12.5px] font-medium text-white"
+                className="block text-[12.5px] font-medium text-foreground"
               >
                 {profileCopy.labels.bio}
               </label>
@@ -619,7 +619,7 @@ export function ProfileView({
             <span className="block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
               {profileCopy.labels.headline}
             </span>
-            <p className="text-sm sm:text-base text-white font-medium">
+            <p className="text-sm sm:text-base text-foreground font-medium">
               {profile.headline || (
                 <span className="text-muted-foreground italic">{profileCopy.labels.none}</span>
               )}
@@ -657,7 +657,7 @@ export function ProfileView({
       <div className="flex items-center justify-between border-b border-border/70 pb-3">
         <div className="flex items-center gap-2">
           <GraduationCap className="size-4 text-primary" />
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
             {profileCopy.sections.academic}
           </h2>
         </div>
@@ -732,7 +732,7 @@ export function ProfileView({
               <span className="block text-[11px] text-muted-foreground mb-0.5">
                 {profileCopy.labels.university}
               </span>
-              <span className="text-xs font-bold text-white truncate block" title={currentUni}>
+              <span className="text-xs font-bold text-foreground truncate block" title={currentUni}>
                 {currentUni}
               </span>
             </div>
@@ -741,7 +741,7 @@ export function ProfileView({
               <span className="block text-[11px] text-muted-foreground mb-0.5">
                 {profileCopy.labels.programme}
               </span>
-              <span className="text-xs font-semibold text-white truncate block">
+              <span className="text-xs font-semibold text-foreground truncate block">
                 {profile.programme || "-"}
               </span>
             </div>
@@ -750,7 +750,7 @@ export function ProfileView({
               <span className="block text-[11px] text-muted-foreground mb-0.5">
                 {profileCopy.labels.department}
               </span>
-              <span className="text-xs font-semibold text-white truncate block" title={currentDept}>
+              <span className="text-xs font-semibold text-foreground truncate block" title={currentDept}>
                 {currentDept}
               </span>
             </div>
@@ -767,7 +767,7 @@ export function ProfileView({
 
           <div className="text-[11px] text-muted-foreground/80 leading-relaxed pt-2 border-t border-border/50 flex items-center justify-between">
             <span>
-              Expected Graduation: <strong className="text-white font-mono">{profile.graduationYear || "-"}</strong>
+              Expected Graduation: <strong className="text-foreground font-mono">{profile.graduationYear || "-"}</strong>
             </span>
             <span className="text-[10.5px] text-emerald-400 font-mono font-medium">
               4-Year Degree
@@ -784,7 +784,7 @@ export function ProfileView({
       <div className="flex items-center justify-between border-b border-border/70 pb-3">
         <div className="flex items-center gap-2">
           <Layers className="size-4 text-primary" />
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
             {profileCopy.sections.skills}
           </h2>
         </div>
@@ -812,7 +812,7 @@ export function ProfileView({
                 "px-2.5 py-1 text-[11px] font-semibold rounded-md border transition-all cursor-pointer whitespace-nowrap",
                 skillCategory === cat.id
                   ? "bg-primary text-background border-primary shadow-xs"
-                  : "border-border/80 bg-card/40 text-muted-foreground hover:text-white"
+                  : "border-border/80 bg-card/40 text-muted-foreground hover:text-foreground"
               )}
             >
               {cat.label}
@@ -844,7 +844,7 @@ export function ProfileView({
               {filteredSkills.map((skill) => (
                 <span
                   key={skill}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-gradient-to-r from-primary/10 to-primary/5 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:border-primary/60 hover:bg-primary/20 transition-all cursor-default"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-gradient-to-r from-primary/10 to-primary/5 px-3 py-1.5 text-xs font-semibold text-foreground shadow-xs hover:border-primary/60 hover:bg-primary/20 transition-all cursor-default"
                 >
                   <span className="size-1.5 rounded-full bg-primary" />
                   <span>{skill}</span>
@@ -874,7 +874,7 @@ export function ProfileView({
       <div className="flex items-center justify-between border-b border-border/70 pb-3">
         <div className="flex items-center gap-2">
           <Sparkles className="size-4 text-amber-400" />
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
             {profileCopy.sections.interests}
           </h2>
         </div>
@@ -910,7 +910,7 @@ export function ProfileView({
                           "inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium transition-all cursor-pointer select-none",
                           isChecked
                             ? "border-primary bg-primary/15 text-primary shadow-xs"
-                            : "border-border bg-card/40 text-muted-foreground hover:text-white hover:border-primary/40"
+                            : "border-border bg-card/40 text-muted-foreground hover:text-foreground hover:border-primary/40"
                         )}
                       >
                         {isChecked && (
@@ -937,7 +937,7 @@ export function ProfileView({
               {profile.interests.map((interest) => (
                 <span
                   key={interest}
-                  className="inline-flex items-center rounded-full border border-border/80 bg-card/70 px-3.5 py-1 text-xs font-semibold text-slate-200"
+                  className="inline-flex items-center rounded-full border border-border/80 bg-card/70 px-3.5 py-1 text-xs font-semibold text-foreground"
                 >
                   {interest}
                 </span>
@@ -959,7 +959,7 @@ export function ProfileView({
       <div className="flex items-center justify-between border-b border-border/70 pb-3">
         <div className="flex items-center gap-2">
           <Globe className="size-4 text-primary" />
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
             {profileCopy.labels.links}
           </h2>
         </div>
@@ -1025,7 +1025,7 @@ export function ProfileView({
                   href={profile.awsBuilderUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-white hover:border-[#FF9900]/50 transition-all group"
+                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-primary hover:border-[#FF9900]/50 transition-all group"
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <FaAws className="size-4 shrink-0 text-[#FF9900]" />
@@ -1039,10 +1039,10 @@ export function ProfileView({
                   href={profile.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-white hover:border-primary/50 transition-all group"
+                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-primary hover:border-primary/50 transition-all group"
                 >
                   <div className="flex items-center gap-2.5 truncate">
-                    <FaGithub className="size-4 shrink-0 text-white" />
+                    <FaGithub className="size-4 shrink-0 text-foreground" />
                     <span className="truncate text-xs font-semibold">{profile.githubUrl}</span>
                   </div>
                   <ExternalLink className="size-3 text-muted-foreground group-hover:text-primary shrink-0" />
@@ -1053,7 +1053,7 @@ export function ProfileView({
                   href={profile.linkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-white hover:border-primary/50 transition-all group"
+                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-primary hover:border-primary/50 transition-all group"
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <FaLinkedin className="size-4 shrink-0 text-[#0077b5]" />
@@ -1067,7 +1067,7 @@ export function ProfileView({
                   href={profile.websiteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-white hover:border-primary/50 transition-all group"
+                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-primary hover:border-primary/50 transition-all group"
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Globe className="size-4 shrink-0 text-primary" />
@@ -1081,7 +1081,7 @@ export function ProfileView({
                   href={profile.instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-white hover:border-primary/50 transition-all group"
+                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-primary hover:border-primary/50 transition-all group"
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <FaInstagram className="size-4 shrink-0 text-[#E4405F]" />
@@ -1095,7 +1095,7 @@ export function ProfileView({
                   href={profile.youtubeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-white hover:border-primary/50 transition-all group"
+                  className="flex items-center justify-between rounded-lg border border-border/80 bg-card/40 p-2.5 text-foreground hover:text-primary hover:border-primary/50 transition-all group"
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <FaYoutube className="size-4 shrink-0 text-[#CD201F]" />
@@ -1128,7 +1128,7 @@ export function ProfileView({
       <div className="flex items-center justify-between border-b border-border/70 pb-3">
         <div className="flex items-center gap-2">
           <Eye className="size-4 text-primary" />
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
             {profileCopy.sections.public}
           </h2>
         </div>
@@ -1137,7 +1137,7 @@ export function ProfileView({
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <span className="block text-sm font-semibold text-white">
+            <span className="block text-sm font-semibold text-foreground">
               {profileCopy.hints.publicToggle}
             </span>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
@@ -1158,7 +1158,7 @@ export function ProfileView({
                 ? "cursor-not-allowed opacity-50 bg-card border-border"
                 : isPublic
                 ? "bg-primary cursor-pointer shadow-md shadow-primary/30"
-                : "bg-slate-800 border-border cursor-pointer"
+                : "bg-muted border-border cursor-pointer"
             )}
           >
             <span
@@ -1197,7 +1197,7 @@ export function ProfileView({
                 )}
               </div>
               <div className="min-w-0">
-                <span className="text-sm font-bold text-white block truncate">
+                <span className="text-sm font-bold text-foreground block truncate">
                   {account.displayName || account.email}
                 </span>
                 <span className="text-xs text-primary font-semibold block truncate">
@@ -1213,7 +1213,7 @@ export function ProfileView({
             {profile.skills.length > 0 && (
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {profile.skills.slice(0, 4).map((s) => (
-                  <span key={s} className="text-[10px] rounded-md bg-primary/10 border border-primary/25 px-2 py-0.5 text-slate-200 font-medium">
+                  <span key={s} className="text-[10px] rounded-md bg-primary/10 border border-primary/25 px-2 py-0.5 text-foreground font-medium">
                     {s}
                   </span>
                 ))}
@@ -1235,7 +1235,7 @@ export function ProfileView({
     <div className="rounded-xl border border-border/80 bg-card/60 p-6 backdrop-blur-sm space-y-4 shadow-sm">
       <div className="flex items-center gap-2 border-b border-border/70 pb-3">
         <ShieldAlert className="size-4 text-emerald-400" />
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+        <h2 className="text-sm font-bold text-foreground uppercase tracking-wider">
           Privacy Guarantee
         </h2>
       </div>
@@ -1346,7 +1346,7 @@ export function ProfileView({
               {/* Name, Badges, and Headline */}
               <div className="sm:mb-1 space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2.5">
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground sm:text-white tracking-tight leading-tight">
                     {account.displayName || account.email}
                   </h1>
                   {account.role && (
@@ -1408,7 +1408,7 @@ export function ProfileView({
                   "h-9 px-3 text-xs border-border/80 transition-all cursor-pointer",
                   showIdCard
                     ? "bg-primary/20 border-primary text-primary shadow-xs"
-                    : "bg-card/60 hover:bg-card hover:border-primary/50 text-muted-foreground hover:text-white"
+                    : "bg-card/60 hover:bg-card hover:border-primary/50 text-muted-foreground hover:text-foreground"
                 )}
               >
                 <CreditCard className="size-3.5 mr-1.5 text-primary" />
@@ -1420,7 +1420,7 @@ export function ProfileView({
                 variant="outline"
                 size="sm"
                 onClick={handleShare}
-                className="h-9 px-3 text-xs border-border/80 bg-card/60 hover:bg-card hover:border-primary/50 text-muted-foreground hover:text-white cursor-pointer"
+                className="h-9 px-3 text-xs border-border/80 bg-card/60 hover:bg-card hover:border-primary/50 text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 <Share2 className="size-3.5 mr-1.5" />
                 <span>Share</span>
@@ -1428,7 +1428,7 @@ export function ProfileView({
 
               <Link
                 href={`/profile/${uniqueSlug}`}
-                className="inline-flex h-9 items-center justify-center rounded-md border border-border/80 bg-card/60 px-3 text-xs font-semibold text-muted-foreground hover:text-white hover:border-primary/50 transition-colors"
+                className="inline-flex h-9 items-center justify-center rounded-md border border-border/80 bg-card/60 px-3 text-xs font-semibold text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
                 title="View your public builder profile"
               >
                 <ArrowUpRight className="size-3.5 mr-1 text-primary" />
@@ -1438,7 +1438,7 @@ export function ProfileView({
               {isPublic && isApproved && (
                 <Link
                   href="/members"
-                  className="inline-flex h-9 items-center justify-center rounded-md border border-border/80 bg-card/60 px-3 text-xs font-semibold text-muted-foreground hover:text-white hover:border-primary/50 transition-colors"
+                  className="inline-flex h-9 items-center justify-center rounded-md border border-border/80 bg-card/60 px-3 text-xs font-semibold text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
                 >
                   <Compass className="size-3.5 mr-1 text-primary" />
                   <span>Directory</span>
@@ -1495,7 +1495,7 @@ export function ProfileView({
           {/* Interactive Profile Completeness Strip */}
           <div className="mt-5 pt-4 border-t border-border/60 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-3 w-full md:max-w-lg">
-              <span className="font-semibold text-white shrink-0 flex items-center gap-1.5">
+              <span className="font-semibold text-foreground shrink-0 flex items-center gap-1.5">
                 <Flame className="size-3.5 text-primary" />
                 Profile Power:
               </span>
@@ -1589,7 +1589,7 @@ export function ProfileView({
               <div className="space-y-3 flex-1">
                 <div className="flex items-center gap-2">
                   <Award className="size-5 text-primary" />
-                  <h3 className="font-bold text-lg text-white">Official Student Builder Credential</h3>
+                  <h3 className="font-bold text-lg text-foreground">Official Student Builder Credential</h3>
                 </div>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                   This digital membership pass confirms your affiliation with the AWS Student Builder Group at Lovely Professional University. It verifies your active participation in workshops, hackathons, cloud labs, and community networking.
@@ -1650,7 +1650,7 @@ export function ProfileView({
           </div>
           <div className="min-w-0">
             <span className="block text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Access Role</span>
-            <span className="font-bold text-sm text-white capitalize truncate block">
+            <span className="font-bold text-sm text-foreground capitalize truncate block">
               {account.role || "Member"}
             </span>
           </div>
@@ -1662,7 +1662,7 @@ export function ProfileView({
           </div>
           <div className="min-w-0">
             <span className="block text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Membership</span>
-            <span className="font-bold text-sm text-white capitalize truncate block">
+            <span className="font-bold text-sm text-foreground capitalize truncate block">
               {account.registrationStatus || "Active"}
             </span>
           </div>
@@ -1674,7 +1674,7 @@ export function ProfileView({
           </div>
           <div className="min-w-0">
             <span className="block text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Tech Stack</span>
-            <span className="font-bold text-sm text-white truncate block">
+            <span className="font-bold text-sm text-foreground truncate block">
               {profile.skills.length > 0 ? `${profile.skills.length} Skills Listed` : "None added"}
             </span>
           </div>
@@ -1689,7 +1689,7 @@ export function ProfileView({
           </div>
           <div className="min-w-0">
             <span className="block text-[11px] font-medium text-muted-foreground uppercase tracking-wider">Public Directory</span>
-            <span className="font-bold text-sm text-white truncate block">
+            <span className="font-bold text-sm text-foreground truncate block">
               {isPublic ? "Visible" : "Private"}
             </span>
           </div>
@@ -1705,7 +1705,7 @@ export function ProfileView({
             "inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap",
             activeTab === "overview"
               ? "bg-primary/15 border-primary text-primary shadow-xs"
-              : "border-transparent text-muted-foreground hover:text-white hover:bg-card/60"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           <Compass className="size-3.5" />
@@ -1719,7 +1719,7 @@ export function ProfileView({
             "inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap",
             activeTab === "academics"
               ? "bg-primary/15 border-primary text-primary shadow-xs"
-              : "border-transparent text-muted-foreground hover:text-white hover:bg-card/60"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           <GraduationCap className="size-3.5" />
@@ -1733,7 +1733,7 @@ export function ProfileView({
             "inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap",
             activeTab === "skills"
               ? "bg-primary/15 border-primary text-primary shadow-xs"
-              : "border-transparent text-muted-foreground hover:text-white hover:bg-card/60"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           <Layers className="size-3.5" />
@@ -1752,7 +1752,7 @@ export function ProfileView({
             "inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap",
             activeTab === "social"
               ? "bg-primary/15 border-primary text-primary shadow-xs"
-              : "border-transparent text-muted-foreground hover:text-white hover:bg-card/60"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           <Globe className="size-3.5" />
@@ -1766,7 +1766,7 @@ export function ProfileView({
             "inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap",
             activeTab === "security"
               ? "bg-primary/15 border-primary text-primary shadow-xs"
-              : "border-transparent text-muted-foreground hover:text-white hover:bg-card/60"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           <Lock className="size-3.5" />
@@ -1779,8 +1779,8 @@ export function ProfileView({
           className={cn(
             "inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-lg border transition-all cursor-pointer whitespace-nowrap ml-auto",
             activeTab === "all"
-              ? "bg-white/10 border-white/30 text-white"
-              : "border-transparent text-muted-foreground hover:text-white hover:bg-card/40"
+              ? "bg-primary/15 border-primary/40 text-primary font-bold shadow-xs"
+              : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           )}
         >
           <span>View All</span>
@@ -1873,14 +1873,14 @@ export function ProfileView({
         {/* Sticky Floating Action Bar during Edit Mode */}
         {isEditing && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-full border border-primary/50 bg-card/95 px-5 py-2.5 shadow-2xl backdrop-blur-md">
-            <span className="text-xs text-white font-semibold hidden sm:inline">Editing mode active</span>
+            <span className="text-xs text-foreground font-semibold hidden sm:inline">Editing mode active</span>
             <Button
               type="button"
               variant="outline"
               size="sm"
               onClick={handleCancel}
               disabled={savingForm}
-              className="h-8 px-3 text-xs border-border/80 text-muted-foreground hover:text-white cursor-pointer"
+              className="h-8 px-3 text-xs border-border/80 text-muted-foreground hover:text-foreground cursor-pointer"
             >
               <X className="size-3 mr-1" />
               <span>Cancel</span>
@@ -1911,7 +1911,7 @@ export function ProfileView({
       <Dialog open={presetDialogOpen} onOpenChange={setPresetDialogOpen}>
         <DialogContent className="max-w-md bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-white text-base font-bold flex items-center gap-2">
+            <DialogTitle className="text-foreground text-base font-bold flex items-center gap-2">
               <Palette className="size-4 text-primary" />
               <span>Select Cloud Cover Preset</span>
             </DialogTitle>
@@ -1934,7 +1934,7 @@ export function ProfileView({
                 )}
               >
                 <div className={cn("h-16 w-full rounded-lg bg-gradient-to-r mb-2.5 shadow-xs", preset.gradient)} />
-                <span className="text-xs font-bold text-white block truncate">{preset.name}</span>
+                <span className="text-xs font-bold text-foreground block truncate">{preset.name}</span>
                 <span className="text-[10.5px] text-muted-foreground">Cyber gradient</span>
               </button>
             ))}
@@ -1946,7 +1946,7 @@ export function ProfileView({
       <Dialog open={qrModalOpen} onOpenChange={setQrModalOpen}>
         <DialogContent className="max-w-sm bg-card border-border text-center">
           <DialogHeader>
-            <DialogTitle className="text-white text-base font-bold flex items-center justify-center gap-2">
+            <DialogTitle className="text-foreground text-base font-bold flex items-center justify-center gap-2">
               <QrCode className="size-4 text-primary" />
               <span>Builder Pass Verification</span>
             </DialogTitle>
@@ -1961,7 +1961,7 @@ export function ProfileView({
               )}
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white">{account.displayName || account.email}</h4>
+              <h4 className="text-sm font-bold text-foreground">{account.displayName || account.email}</h4>
               <p className="text-xs text-primary font-mono">{memberId}</p>
               <p className="text-[11px] text-muted-foreground mt-1">Lovely Professional University Chapter</p>
             </div>
@@ -1980,7 +1980,7 @@ export function ProfileView({
                 variant="outline"
                 size="sm"
                 onClick={() => setQrModalOpen(false)}
-                className="h-8 px-3 text-xs border-border text-muted-foreground hover:text-white cursor-pointer"
+                className="h-8 px-3 text-xs border-border text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 <span>Close</span>
               </Button>
@@ -1993,7 +1993,7 @@ export function ProfileView({
       <Dialog open={avatarDialogOpen} onOpenChange={setAvatarDialogOpen}>
         <DialogContent className="max-w-md bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-white text-base font-semibold">
+            <DialogTitle className="text-foreground text-base font-semibold">
               {profileCopy.dialogs.changePhoto}
             </DialogTitle>
           </DialogHeader>
@@ -2014,7 +2014,7 @@ export function ProfileView({
       <Dialog open={coverDialogOpen} onOpenChange={setCoverDialogOpen}>
         <DialogContent className="max-w-lg bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-white text-base font-semibold">
+            <DialogTitle className="text-foreground text-base font-semibold">
               {profileCopy.dialogs.changeCover}
             </DialogTitle>
           </DialogHeader>

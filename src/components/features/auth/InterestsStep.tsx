@@ -59,7 +59,7 @@ export function InterestsStep() {
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Fieldset 1: Interests */}
         <fieldset className="border-none p-0">
-          <legend className="text-[14px] font-medium text-white">
+          <legend className="text-[14px] font-medium text-foreground">
             {registrationCopy.interests.interestsLabel}{" "}
             <span className="font-normal text-muted-foreground">
               {registrationCopy.interests.interestsHint}
@@ -80,7 +80,7 @@ export function InterestsStep() {
                   <span
                     className={cn(
                       "flex h-10 items-center gap-1.5 rounded-md border border-border bg-card/40 px-4 text-[14px] text-muted-foreground transition-all",
-                      "hover:border-primary/50 hover:text-white",
+                      "hover:border-primary/50 hover:text-foreground",
                       "peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-background",
                       isChecked &&
                         "border-primary bg-primary/10 text-primary font-medium"
@@ -108,7 +108,7 @@ export function InterestsStep() {
         {/* Fieldset 2: Role (hidden when registration isn't pending) */}
         {isPendingRegistration && (
           <fieldset className="border-none p-0">
-            <legend className="text-[14px] font-medium text-white">
+            <legend className="text-[14px] font-medium text-foreground">
               {registrationCopy.interests.roleLabel}{" "}
               <span className="ml-1 text-primary" aria-hidden="true">
                 *
@@ -159,7 +159,7 @@ export function InterestsStep() {
                       strokeWidth={1.5}
                       aria-hidden="true"
                     />
-                    <span className="text-[15px] font-semibold text-white leading-tight">
+                    <span className="text-[15px] font-semibold text-foreground leading-tight">
                       {meta.label}
                     </span>
                     <span className="mt-1 text-[12.5px] text-muted-foreground leading-tight">

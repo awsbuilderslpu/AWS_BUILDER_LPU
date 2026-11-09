@@ -104,7 +104,7 @@ export function EventDetail({
           </span>
         </div>
 
-        <h1 className="text-4xl font-bold tracking-tight leading-tight text-white sm:text-5xl">
+        <h1 className="text-4xl font-bold tracking-tight leading-tight text-foreground sm:text-5xl">
           {event.title}
         </h1>
       </header>
@@ -130,7 +130,7 @@ export function EventDetail({
           <section aria-labelledby="about-event-title">
             <h2
               id="about-event-title"
-              className="text-xl font-semibold text-white tracking-tight"
+              className="text-xl font-semibold text-foreground tracking-tight"
             >
               {publicCopy.events.about}
             </h2>
