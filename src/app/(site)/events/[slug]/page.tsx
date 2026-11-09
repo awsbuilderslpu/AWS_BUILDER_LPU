@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 import { getPublicEvent, getMeetingLinkForSignedInUser } from "@/lib/public/events.server";
 import { getCurrentAccount } from "@/lib/auth/server";
@@ -40,6 +41,7 @@ export async function generateMetadata({
 }
 
 export default async function EventPage({ params }: PageProps) {
+  await connection();
   const { slug } = await params;
   const event = await getPublicEvent(slug);
 

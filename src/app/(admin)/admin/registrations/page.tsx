@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/purity */
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { requireRole } from "@/lib/auth/server";
 import { createClient } from "@/lib/supabase/server";
 import { isMailConfigured } from "@/lib/email/mailer.server";
@@ -26,6 +27,7 @@ interface PageProps {
 }
 
 export default async function RegistrationsPage({ searchParams }: PageProps) {
+  await connection();
   await requireRole(["administrator", "admin"], "/admin/registrations");
 
   const rawParams = await searchParams;

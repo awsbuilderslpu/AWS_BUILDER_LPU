@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { requireRole } from "@/lib/auth/server";
 import { createClient } from "@/lib/supabase/server";
 import { parseListParams, toSearchParams } from "@/lib/admin/list-params";
@@ -24,6 +25,7 @@ interface PageProps {
 }
 
 export default async function AdminMembersPage({ searchParams }: PageProps) {
+  await connection();
   const account = await requireRole(["administrator", "admin"], "/admin/members");
 
   const rawParams = await searchParams;

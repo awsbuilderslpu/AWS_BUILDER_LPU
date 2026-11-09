@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { requireStaff } from "@/lib/auth/server";
 import { createClient } from "@/lib/supabase/server";
 import { parseListParams, toSearchParams } from "@/lib/admin/list-params";
@@ -25,6 +26,7 @@ interface PageProps {
 }
 
 export default async function AdminEventsPage({ searchParams }: PageProps) {
+  await connection();
   const account = await requireStaff("/admin/events");
 
   const rawParams = await searchParams;
