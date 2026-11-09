@@ -282,7 +282,7 @@ export function NotificationsBell() {
         </div>
 
         {/* Footer: Link to admin management */}
-        <div className="border-t border-border/80 bg-[#040812] px-4 py-2.5 text-center">
+        <div className="border-t border-border/80 bg-muted/50 dark:bg-[#040812] px-4 py-2.5 text-center">
           <Link
             href="/admin/announcements"
             onClick={() => setOpen(false)}

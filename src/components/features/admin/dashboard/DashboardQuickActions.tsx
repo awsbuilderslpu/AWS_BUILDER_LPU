@@ -105,7 +105,7 @@ export function DashboardQuickActions({
               )}
             >
               <div className="flex items-start justify-between gap-2">
-                <div className="flex size-9 items-center justify-center rounded-lg border border-border/80 bg-[#050B18] text-muted-foreground transition-colors group-hover:border-primary/40 group-hover:bg-primary/10 group-hover:text-primary">
+                <div className="flex size-9 items-center justify-center rounded-lg border border-border/80 bg-muted/80 text-foreground/80 transition-colors group-hover:border-primary/40 group-hover:bg-primary/10 group-hover:text-primary dark:bg-[#050B18] dark:text-muted-foreground">
                   <Icon className="size-4" />
                 </div>
                 {action.badge && (

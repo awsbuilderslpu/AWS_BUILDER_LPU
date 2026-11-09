@@ -56,7 +56,7 @@ export function ChapterPulseCard() {
           return (
             <div
               key={t.label}
-              className="rounded-xl border border-border/60 bg-[#050B18]/60 p-2.5 sm:p-3"
+              className="rounded-xl border border-border/60 bg-muted/40 dark:bg-[#050B18]/60 p-2.5 sm:p-3"
             >
               <div className="flex items-center gap-1.5 text-muted-foreground/70">
                 <Icon className="size-3 text-primary/80" />
@@ -77,7 +77,7 @@ export function ChapterPulseCard() {
         href="/"
         className="group relative flex items-center gap-3 rounded-xl border border-primary/25 bg-primary/[0.04] p-3 transition-all hover:border-primary/50 hover:bg-primary/[0.08] hover:shadow-[0_0_15px_rgba(255,153,0,0.15)]"
       >
-        <div className="relative flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-[#050B18] overflow-hidden p-1">
+        <div className="relative flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-muted dark:bg-[#050B18] overflow-hidden p-1">
           <Image
             src="/images/artwork/Neon Cloud Computing Emblem.png"
             alt="AWS Cloud"

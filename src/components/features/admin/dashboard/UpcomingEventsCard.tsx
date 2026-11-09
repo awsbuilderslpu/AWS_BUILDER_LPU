@@ -83,7 +83,7 @@ export function UpcomingEventsCard({ events }: UpcomingEventsCardProps) {
               >
                 <div className="flex items-center gap-3 min-w-0">
                   {/* Date badge */}
-                  <div className="flex size-11 shrink-0 flex-col items-center justify-center rounded-xl border border-border bg-[#050B18] shadow-inner text-center">
+                  <div className="flex size-11 shrink-0 flex-col items-center justify-center rounded-xl border border-border bg-muted/60 dark:bg-[#050B18] shadow-inner text-center">
                     <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-accent leading-none">
                       {month}
                     </span>
