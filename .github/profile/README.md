@@ -9,7 +9,7 @@
 
 <div align="center">
 
-  <img src="https://raw.githubusercontent.com/awsbuilderslpu/AWS_BUILDER_LPU/main/public/images/logo.png" alt="AWS Student Builders Group LPU Logo" width="120" onerror="this.style.display='none'"/>
+  <img src="../../public/images/logo.png" alt="AWS Student Builders Group LPU Logo" width="120" />
 
   # ☁️ AWS Student Builders Group — LPU
   ### *A Stronger Cloud Community Together.*
